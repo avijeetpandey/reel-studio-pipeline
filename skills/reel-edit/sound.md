@@ -9,7 +9,7 @@ List every sound with its exact time and why, plus the deliberate silences:
 | 6.10 | — (silence) | twist line, face close | — |
 ```
 Rules:
-- **Every sound is motivated by motion on screen:** whoosh = something moves across; pop/click = something appears; line/scribble = something is drawn; key-press = typing; tick = counting; riser → hit = build-up and release (max one per reel).
+- **Every sound is motivated by motion on screen:** whoosh = something moves across (on footage); **digital-sweep** = a screen/card moves (UI beats — round 4: modern UI edits use soft digital sounds, not airy whooshes); **soft-pluck** / pop / click = something appears; **digital-tick** = a counter or list step; **check-blip** = a checklist tick; **low-pulse** under a big number or reveal; **soft-hit** = a gentle punchline; line/scribble = something is drawn; key-press = typing; tick = counting; riser → hit = build-up and release (max one per reel).
 - **Leave ≥ 2 silent spots** (the twist, and before the CTA). When everything makes a sound, nothing stands out.
 - Never two SFX at the same moment; never SFX on b-roll cuts (hard cuts are silent) or on caption pops.
 - **Levels:** SFX volume 0.15–0.35 (clearly under the voice); a 30–60 ms fade-out on every tail; a light shared room tone/reverb glue on the SFX bus (`hyperframes-audio`: small reverb, wet ~10%) so they sit in the same space.

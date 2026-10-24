@@ -1,0 +1,57 @@
+<!--
+COMPONENT: check-card — a small card with a title ("Claude added:", "All I do:") and empty circles that fill with a tick
+as each item is SAID, the item text writing in beside it. From the reference reels (round 4, carolyn.rose.official
+"Claude added: ✓ the zooms ✓ sound effects ✓ the text ✓ captions"; WINNING_PATTERNS.md §24). The empty circles show
+how many are coming, so viewers wait for the rest. Good for "what it does" lists of 3–5 short items.
+Seek-safe with NO callbacks: every row is a timeline `set`/tween at its own time.
+
+USE: paste CSS + markup into a `.g.clip` layer, then
+  buildCheckCard(tl, { el: "#cc", title: "Claude added:", items: ["the zooms", "sound effects", "the text", "captions"],
+                       at: [3.1, 3.7, 4.2, 4.8], start: 2.9, end: 6.4, x: 540, y: 330 })
+  at = the time each item is spoken (from WORDS). x/y = card centre-top in the 1080×1920 frame.
+RULES: max 5 items, ≤ 3 words each; one per reel (or two with different titles, never on screen together); top band
+  (y 250–700), never over the face; ≥ 34 px text; ticks in the accent, card in the treatment's surface colour.
+FEEL: "a to-do list getting done": the card drops in 12 px with a 0.25 s power2.out, all circles visible at once, each
+  tick pops (scale 0.6 → 1, 0.18 s) with the item text wiping in (0.2 s); pair with the `check-blip` SFX at 0.15 volume.
+-->
+
+<!-- CSS -->
+<style>
+  .cc { position: absolute; width: 560px; padding: 26px 32px 24px; border-radius: 22px; opacity: 0;
+        background: var(--card, rgba(62, 40, 38, 0.92)); color: var(--card-ink, #fff); box-shadow: 0 14px 40px rgba(0,0,0,0.3); }
+  .cc .t { font: 800 40px Montserrat, sans-serif; margin-bottom: 14px; }
+  .cc .r { display: flex; align-items: center; gap: 18px; height: 54px; }
+  .cc .o { width: 34px; height: 34px; border-radius: 50%; border: 3px solid currentColor; opacity: 0.55; flex: none;
+           display: grid; place-items: center; font: 800 22px Montserrat, sans-serif; }
+  .cc .o b { opacity: 0; transform: scale(0.6); }
+  .cc .w { font: 600 36px Montserrat, sans-serif; clip-path: inset(0 100% 0 0); white-space: nowrap; }
+</style>
+
+<!-- MARKUP -->
+<div id="cc" class="cc"><div class="t"></div></div>
+
+<!-- JS -->
+<script>
+  function buildCheckCard(tl, o) {
+    const root = document.querySelector(o.el);
+    root.querySelector(".t").textContent = o.title || "";
+    root.querySelectorAll(".r").forEach((r) => r.remove());
+    root.style.left = (o.x == null ? 540 : o.x) - 280 + "px";
+    root.style.top = (o.y == null ? 330 : o.y) + "px";
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#3ee0ff";
+    const rows = o.items.map((txt) => {
+      const r = document.createElement("div"); r.className = "r";
+      r.innerHTML = `<span class="o"><b>✓</b></span><span class="w"></span>`;
+      r.querySelector(".w").textContent = txt; root.appendChild(r); return r;
+    });
+    tl.fromTo(root, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, o.start);
+    o.at.forEach((t, i) => {
+      const circ = rows[i].querySelector(".o"), tick = circ.querySelector("b"), w = rows[i].querySelector(".w");
+      tl.to(circ, { opacity: 1, backgroundColor: accent, borderColor: accent, color: "#111", duration: 0.12 }, t);
+      tl.to(tick, { opacity: 1, scale: 1, duration: 0.18, ease: "back.out(2)" }, t);
+      tl.to(w, { clipPath: "inset(0 0% 0 0)", duration: 0.2, ease: "power1.out" }, t);
+    });
+    if (o.end != null) tl.to(root, { opacity: 0, y: -8, duration: 0.2, ease: "power2.in" }, o.end);
+    return root;
+  }
+</script>

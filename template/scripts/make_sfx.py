@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Synthesize original sound effects for reels (no downloads, no licences).
 Usage: python3 -I make_sfx.py <out_dir>   → whoosh-long, whoosh-air, riser-metal, hit-heavy, paper-slide,
-pen-scribble, ui-success, tick, line-draw (.wav, 44.1 kHz mono, peak −3 dBFS). Convert to mp3 with ffmpeg."""
+pen-scribble, ui-success, tick, line-draw, plus a soft 'digital' family (round 4, the 16K free-SFX reel: soft pluck,
+low pulse, digital sweep, digital tick, soft electronic hit, check-blip) for UI beats, checklists and counters
+(.wav, 44.1 kHz mono, peak −3 dBFS). Convert to mp3 with ffmpeg."""
 import math, os, random, struct, sys, wave
 
 SR = 44100
@@ -140,6 +142,50 @@ def line_draw(dur=0.6):
     return [a * b * c for a, b, c in zip(y, am, e)]
 
 
+def soft_pluck(f=660, dur=0.35):
+    """Karplus-Strong pluck, darkened — a gentle 'something appeared'."""
+    n, period = int(dur * SR), int(SR / f)
+    buf = [random.uniform(-1, 1) for _ in range(period)]
+    out = []
+    for i in range(n):
+        v = buf[i % period]
+        buf[i % period] = 0.5 * (v + buf[(i + 1) % period]) * 0.985
+        out.append(v)
+    return [v * math.exp(-i / SR * 9) for i, v in enumerate(out)]
+
+
+def low_pulse(dur=0.5, f=58):
+    """Sub thump with a soft attack — under a reveal or a big number."""
+    n = int(dur * SR)
+    return [math.sin(2 * math.pi * (f + 30 * math.exp(-i / SR * 25)) * i / SR) * min(1, i / (0.012 * SR)) * math.exp(-i / SR * 7) for i in range(n)]
+
+
+def digital_sweep(dur=0.45, f0=300, f1=2400):
+    """Rising filtered tone — screen/card transitions instead of an airy whoosh."""
+    n, ph, out = int(dur * SR), 0.0, []
+    for i in range(n):
+        f = f0 * (f1 / f0) ** (i / n)
+        ph += 2 * math.pi * f / SR
+        out.append(math.sin(ph) + 0.3 * math.sin(2 * ph))
+    y = svf(out, lambda i: 600 + 3000 * i / n, 1.4)
+    e = bell(n, 0.7, 1.5)
+    return [a * b for a, b in zip(y, e)]
+
+
+def digital_tick(f=3200):
+    """Short square blip — counters, list items, cursor clicks."""
+    n = int(0.03 * SR)
+    return [(1 if math.sin(2 * math.pi * f * i / SR) > 0 else -1) * 0.5 * math.exp(-i / SR * 220) for i in range(n)]
+
+
+def soft_hit(dur=0.7):
+    """Rounded electronic hit: low sine + a short low-passed noise burst (gentler than hit-heavy)."""
+    n = int(dur * SR)
+    tone = [math.sin(2 * math.pi * 98 * i / SR) * math.exp(-i / SR * 6) for i in range(n)]
+    nz = svf(noise(n), lambda i: 900, 0.8)
+    return [a + 0.6 * b * math.exp(-i / SR * 30) for i, (a, b) in enumerate(zip(tone, nz))]
+
+
 out = sys.argv[1] if len(sys.argv) > 1 else "."
 os.makedirs(out, exist_ok=True)
 sounds = {
@@ -152,6 +198,12 @@ sounds = {
     "ui-success": chime([880, 1318.5]),
     "tick": tick(),
     "line-draw": line_draw(),
+    "soft-pluck": soft_pluck(),
+    "low-pulse": low_pulse(),
+    "digital-sweep": digital_sweep(),
+    "digital-tick": digital_tick(),
+    "soft-hit": soft_hit(),
+    "check-blip": chime([1046.5, 1568], dur=0.3, gap=0.06),
 }
 for name, x in sounds.items():
     write(os.path.join(out, name + ".wav"), x)

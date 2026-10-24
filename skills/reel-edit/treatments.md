@@ -5,7 +5,7 @@ A reel = **brand constants** (never change) + **one treatment** (changes per ree
 
 ## Brand constants (every reel, every treatment)
 - Frame 0 = the creator's face already speaking the hook (see SKILL.md). Hook words in the top band.
-- Caption system: word-synced, ≤ 3 words, one highlighted word per chunk max, no punctuation shown, never ending on a weak word. Font: Montserrat 900 + 10 px stroke (default) — a treatment may swap the *highlight* style, never the readability.
+- Caption system: word-synced, ≤ 3 words, one highlighted word per chunk max, no punctuation shown, never ending on a weak word. Alternative for calm Notebook / Editorial Split reels: **karaoke reveal** (round 4): the whole short line sits at 35 % opacity and each word lights up as it's spoken, serif or the treatment's font. Font: Montserrat 900 + 10 px stroke (default) — a treatment may swap the *highlight* style, never the readability.
 - One accent colour per reel. Default brand accent cyan `#3ee0ff`; a treatment may use its own accent but only one.
 - Sign-off: CTA card with the yes/no question + "{brand}", shown WHILE the question is spoken; the video ends ≤ 0.5 s after the last word (no hold) so it loops into the hook.
 - Audio: voice first, −14 LUFS final, music bed under voice (see `sound.md`).

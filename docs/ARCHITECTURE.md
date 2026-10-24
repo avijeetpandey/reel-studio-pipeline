@@ -14,7 +14,7 @@ reel-studio-pipeline/            (this repo = the Claude Code plugin)
     WINNING_PATTERNS.md          lessons from reference reels (grows with study:)
     PIPELINE.md · WORKFLOW.md    spec + map
     scripts/                     see below
-    composition/                 reference-index.html (code patterns) · components/ (9 motion components + INDEX.md)
+    composition/                 reference-index.html (code patterns) · components/ (10 motion components + INDEX.md)
     carousel/                    deck.html (all layouts) · render.sh · examples/sampler/slides.js
     thumbnail/                   cover-template.html (A, curiosity) · cover-template-b.html (B, bold claim)
     review/review.html           timestamped-notes player
@@ -33,10 +33,11 @@ Your data (never in the repo): `~/.config/reel-studio/config.json` and `<studio>
 | `make_cut.py` | bakes the cut: HLG→SDR tone-map (`--exposure`, `--saturation`, `--no-grade`), 9:16, upscale, voice chain, 0.3 s end pad (the reel ends on the last word) |
 | `choose_style.py` | picks the treatment from the script (signals + format label + rotation in `style_log.md`), signature move, music mood, per-line component plan, CTA variant, list device (step-progress / list-header), count-roll + hand-annotate lines, literal hook image |
 | `pick_music.py` | picks the most energetic approved track not used in the last 3 reels, trims it to its best start with fades |
+| `beat_grid.py` | tempo + beat phase of the trimmed bed (whole-track comb, no drift), beats/bars in reel time; `--check` lists graphic entrances / b-roll cuts off the beat with the snapped time |
 | `music_energy.py` | scores tracks: BPM, hit density, intro length, best start, energy 0–100 |
 | `qa_reel.py` | timeline QA (flash, read time, face flash, face box, scene variety, static stretches, component budget), `--audio` (repeats, fillers, pauses > 0.25 s, first word, pace WPM, tail after the last word), `--cover` (near-blank) |
 | `analyze_reference.py` | reference reels → metrics.json, transcripts, hook strip + sheets |
-| `make_sfx.py` | synthesises an original SFX pack |
+| `make_sfx.py` | synthesises an original SFX pack (whooshes, riser, hits, paper, pen, chime, tick, line-draw + a digital family: soft pluck, low pulse, digital sweep, digital tick, soft hit, check blip) |
 | `render_cover.sh` · `finalize.sh` · `make_srt.js` · `sample_frames.sh` · `safe_zone.sh` · `make_lut.py` | covers, −14 LUFS master, SRT, contact sheets, UI-zone overlay, HDR LUT |
 
 ## The edit (reel-edit) in stages
@@ -45,7 +46,7 @@ Your data (never in the repo): `~/.config/reel-studio/config.json` and `<studio>
 3. **Face map** (`geometry.json`), **style** (`choose_style.py`), **beat map** (`EDIT_PLAN.md`, 11 rules), **motion briefs**, **enhance pass** (components + budget), **sound map**.
 4. **Composition** (HyperFrames, 1080×1920, seek-safe GSAP) — hook words at 0 s over the face, captions, components, camera moves, b-roll, CTA card, loop frame; helpers build graphic beats in parallel.
 5. **Sound** — energetic bed from second 1, carved under the voice, 2–3 signature SFX.
-6. **QA auto-fix ×3** — lint, check (+ UI zones), qa_reel (incl. the video ends ≤ 0.5 s after the last word), frame-0 gate, taste checks (music energy, best-looking ending, ≤ 1 emoji, nothing templated), draft + Studio preview.
+6. **QA auto-fix ×3** — lint, check (+ UI zones), qa_reel (incl. the video ends ≤ 0.5 s after the last word), beat check, frame grading (every 1 s frame ≥ 8/10), AI-slop tells, frame-0 gate, taste checks (music energy, best-looking ending, ≤ 1 emoji, nothing templated), draft + Studio preview.
 7. **Final** — delivery render, −14 LUFS, SRT, style log. 8. **Covers A/B**. 9. **Posting kit**. 10. **Upload**. 11. **Revisions → rules**.
 
 ## Treatments (10) and looks (A–E)

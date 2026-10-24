@@ -12,7 +12,8 @@ differs from the last reel, <= 2 heavy components, quiet twist + pre-CTA beats, 
 and a breather after every 2 upgraded lines.
 Also picks the in-video CTA card variant (follow / save), the list device for list reels (step-progress for 2–3 items,
 list-header for 4+), a count-roll for big numbers, hand-annotate when a line points at a real object, and a 1 s literal
-hook image when the hook has a strong verb (WINNING_PATTERNS.md §16–18, round 3).
+hook image when the hook has a strong verb (WINNING_PATTERNS.md §16–18, round 3), and a check-card for a line that
+lists 3–5 short items (§23, round 4).
 """
 import argparse, json, os, re, sys
 CFG_PATH = os.path.expanduser(os.environ.get("REEL_STUDIO_CONFIG", "~/.config/reel-studio/config.json"))
@@ -48,6 +49,15 @@ QUESTION = re.compile(r"\?\s*$")
 BIGNUM = re.compile(r"\b\d{1,3}(,\d{3})+\b|\b\d{4,}\b|\b\d+(\.\d+)?\s*(k|m|million|billion|lakh|crore|stars|installs|downloads|users)\b", re.I)
 POINT = re.compile(r"\b(this (light|lamp|lens|mic|camera|setup|button|line|part|corner|tab|icon)|look at (this|that)|right here|see this|over here|behind me)\b", re.I)
 HOOK_VERB = re.compile(r"\b(murder(ed|s)?|kill(ed|s)?|dead|died|stole|steal(s|ing)?|replac(ed|es|ing)|broke|break(s|ing)?|destroy(ed|s)?|ended|exposed|leaked|banned|wrong|lied|lying|fired|hacked|cheat(ed|ing)?)\b", re.I)
+
+
+def listy(t):
+    """3–5 short comma/and-separated items ("it added the zooms, the sound effects, the text and the captions") -> items."""
+    body = re.split(r"\b(added|adds|does|do|gives|handles|cuts|includes|is|are|:)\b", t, maxsplit=1)[-1]
+    parts = [p.strip(" .!?") for p in re.split(r",\s*(?:and\s+)?|\s+and\s+", body) if p.strip(" .!?")]
+    if 3 <= len(parts) <= 5 and all(1 <= len(p.split()) <= 3 for p in parts):
+        return parts
+    return []
 
 
 def parse_lines(path):
@@ -160,6 +170,8 @@ def plan_components(lines, treatment):
         words = len(t.split())
         if CODE.search(t) and re.search(r"[\"'“”`]|/|\bprompt|command|code\b", t, re.I):
             comp, why = "code-window", "line quotes a prompt/command/code -> typed card"
+        elif listy(t):
+            comp, why = "check-card", f"lists {len(listy(t))} short things -> live checklist that ticks as each is said"
         elif BIGNUM.search(t):
             comp, why = "count-roll", "says a big/growing number -> rolling counter (real figure only)"
         elif NUM.search(t) and words <= 14:
@@ -180,7 +192,7 @@ def plan_components(lines, treatment):
     for p in plan:
         if p["comp"] in ("code-window", "swing-window") and (p["start"] < 2.0 or p["end"] > total - 4.0):
             p["comp"], p["why"] = "pop-blur", p["why"] + " (heavy move not allowed in first 2 s / last 4 s)"
-    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3)):
+    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3), ("check-card", 1)):
         for p in [p for p in plan if p["comp"] == name][cap:]:
             p["comp"], p["why"] = "pop-blur", p["why"] + f" (max {cap} {name})"
     run = 0  # breather after every 2 upgraded lines

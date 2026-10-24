@@ -21,6 +21,7 @@ Components live in `T/composition/components/` (see `INDEX.md`, header comment o
 | quotes a prompt, command, code or config | typed card | `code-window` | real text from the script, ≤ 6 lines, ≤ 28 chars/line; max 2 heavy per reel together with swing-window |
 | is personal, an opinion, the twist delivery, the CTA question | nothing | — | stays `T` (face only) — these are the quiet moments |
 | says "number one / two / the best one" (a list) | visible progress | `step-progress` (2–3 items) or `list-header` (4+ items: title pinned from frame 0 + "#N" chip, or the full list with the current item lit) | one per reel, never both; `style_plan.json` → `list_progress` gives the device and times |
+| lists 3–5 short things it does / you do ("it adds the zooms, the sound, the captions") | live checklist | `check-card` | empty circles visible from the start, each ticks on its spoken word; ≤ 5 items, ≤ 3 words each |
 | says a big or growing number (stars, installs, users, $) | rolling counter | `count-roll` | real figure only (source in the plan); max 2 per reel; on the spoken number |
 | points at a real object ("this light", "right here", "behind me") | hand-drawn annotation | `hand-annotate` | circle + arrow + 2–3-word label drawn on the real frame; position from a frame grab; max 3; never over the face |
 | is the hook and has a strong verb (`hook_image` in `style_plan.json`) | literal hook image | registry block or hand-built | ~1 s, right after frame 0, then back to the face |
@@ -28,7 +29,7 @@ Components live in `T/composition/components/` (see `INDEX.md`, header comment o
 | has a chart, map, counter or diagram | registry block | `npx hyperframes catalog` | adapt to the treatment; tag `data-component="<block name>"` |
 
 ## 2. Budget (hard limits)
-- ≤ 1 signature move per reel (treatment's own) + ≤ 2 heavy components (swing-window / code-window). `step-progress`, `list-header`, `count-roll`, `hand-annotate` and `cta-card` don't count toward the heavy budget. Everything else is pop-blur or plain.
+- ≤ 1 signature move per reel (treatment's own) + ≤ 2 heavy components (swing-window / code-window). `step-progress`, `list-header`, `check-card`, `count-roll`, `hand-annotate` and `cta-card` don't count toward the heavy budget. Everything else is pop-blur or plain.
 - At least 2 quiet beats stay motion-free (twist, pre-CTA). Never a heavy component in the first 2 s or on the last 4 s.
 - Component colours/fonts come from the treatment variables, never inline hexes. Min text 34 px, nothing over the face box, safe box x 60–930, y 250–1420.
 - If the reel is mostly personal opinion with no named thing, ship it plain and say so at the checkpoint — fewer effects is the brand.

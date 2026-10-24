@@ -41,6 +41,7 @@ When the creator hands over a video (with or without notes), run the whole pipel
 - **Show the change, don't describe it** (round 3): every "do X" line gets a frame where X visibly happens: the light switches on, the bad version then the good one, Raw | Edited side by side. A list reel with no screen content jumps location/outfit per item when the footage has it.
 - **Editorial type for key phrases** (round 3): a serif with ONE italic/script accent word, mixed sizes in one block, for 3–5 moments. It reads as made by a person; the bold sans caption stays the readable default for everything else.
 - **Literal hook image** (round 3): when `style_plan.json` has `hook_image`, show the hook's strongest verb as a picture for ~1 s right after frame 0 (tape across a logo for "murdered", a struck-through "CHATBOT"). Face first, then the image, then back to the face.
+- **No AI-slop tells** (round 4, full list in `qa.md`): never all-caps centred text on a gradient, glow on everything, neon overload, cartoon versions of real people. Keep one honest human moment if the creator has one (a laugh, a self-aware "um").
 - **Never film/TV clips or other creators' footage** even as a 1 s reference: use a quote card (serif line + "— Dune") or the creator acting the line.
 - **Must not look AI-edited, cartoony or monotonous** (the creator, 24 Oct 2026): no emoji-stuffed labels (≤ 1 emoji per reel on screen), no sticker on every beat, no generic "whimsical" doodles as a substitute for an idea. Edits come from real editing craft: rhythm cuts, speed ramps, punch-ins on the beat, match cuts, sound design, real b-roll, and 2–3 strong designed moments — not a constant layer of overlays. Vary the rhythm: fast stretches, then a held face moment.
 
@@ -89,6 +90,7 @@ When the creator hands over a video (with or without notes), run the whole pipel
 
 ## 5. Sound
 - Follow the sound map with the reel's **2–3 signature SFX used the same way every time** (sound.md "SFX as structure"): SFX motivated by on-screen motion, ≥ 2 silent spots, never two at once, no SFX on b-roll hard cuts or caption pops, volume 0.15–0.35, 30–60 ms fade on tails, light shared reverb glue.
+- **Beat grid:** `python3 -I T/scripts/beat_grid.py assets/audio/bgm.mp3 --offset <bed start> --out work/beats.json` → snap graphic entrances, b-roll cuts and camera punch-ins that are NOT tied to a word onto beats (big moments on bars); after the build run it with `--check` (qa.md step 5). Speech timing always wins.
 - Music: `pick_music.py` (see Autopilot) → trimmed `bgm.mp3` that is energetic from second 1; never a soft intro. Bed ≈ −20 dB under the voice (gain 0.10–0.12), carved with `hyperframes-audio`'s `carve.mjs` (`--bed bgm --voice a-roll`), lift to ~0.2 under the CTA question, then a 0.15 s fade with the last word (no music tail). the creator's voice is never suppressed.
 
 ## 6. Self-check + review gate (before showing the creator) — full list in `qa.md`

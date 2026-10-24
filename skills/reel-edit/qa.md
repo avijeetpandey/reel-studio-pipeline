@@ -13,7 +13,8 @@ Run all of this after the build and again on the final render. Fix, re-run, and 
    - **enhance budget:** more than 2 heavy components (swing-window/code-window), two overlapping, roll-text over 4 words (reads `data-component`)
    - **scene variety:** same scene type > 2 in a row, < 3 scene types, missing breathers (reads `data-scene` attributes)
 4. **Transcript re-check** on the cut (before building) and on the final: `python3 -I T/scripts/qa_reel.py --audio <file.mp4>` re-transcribes word-level and flags a **word/phrase said twice** within 3 s, filler words (um, uh, like-as-filler, basically, so-as-opener), pauses > 0.25 s between words, a tail > 0.8 s after the last word (end ≤ 0.5 s after it), a clipped first/last word, and lists brand names to verify spelling.
-5. Frame 0 gate and A/V: first frame shows the face (snapshot at 0 and 0.25 s), voice starts ≤ 0.1 s, audio and video streams both start at 0 (`ffprobe -show_entries stream=start_time`).
+5. **Beat check:** `python3 -I T/scripts/beat_grid.py <composition>/assets/audio/bgm.mp3 --offset <bed start> --check <composition_dir>` → apply every `SNAP` suggestion that keeps the entrance ≤ 0.1 s before its word (round 4: "lock every cut to the beat"); big moments on bar lines.
+6. Frame 0 gate and A/V: first frame shows the face (snapshot at 0 and 0.25 s), voice starts ≤ 0.1 s, audio and video streams both start at 0 (`ffprobe -show_entries stream=start_time`).
 
 ## Enhance pass (see `enhance.md` §4)
 Every component passes the earn-it test, lands on its spoken word, survives a backwards seek, and matches the treatment. Failures are fixed or removed.
@@ -21,6 +22,12 @@ Every component passes the earn-it test, lands on its spoken word, survives a ba
 ## Reference-reel checks (WINNING_PATTERNS.md)
 - `qa_reel.py` warns when a graphic beat holds still for long stretches (no clip starts/ends for > 4 s while no camera move is planned) and fails a near-blank cover (`--cover`).
 - By eye: proof is on screen at frame 0 beside the face; lists show progress (stepper/pinned title); the CTA card is in the safe box and ends before the loop overlay.
+
+## Frame grading (round 4 — "make it watch its own frames")
+Sample one frame per second (`T/scripts/sample_frames.sh final.mp4 work/grade 1`) and look at **every** frame full size. Score each 1–10: is the face clear and well lit, is the text readable and placed on purpose, would a human editor have made this frame? Any frame **< 8** gets fixed (re-place, simplify, re-time) and re-graded. A **dead frame** (nothing changed for > 4 s and no camera move) counts as a 6. Write the scores into the checkpoint's QA report (min, median, every frame < 8 and what changed).
+
+## AI-slop tells (round 4 — fail the reel if any is present)
+All-caps centred text on a gradient · glow/neon on everything · 3D or cartoon versions of real people · "FREE FOREVER"-style stickers · more than one decoration on a beat · emoji labels · a template look nobody would choose by hand. The four most decorated reference reels got the fewest likes.
 
 ## the creator's taste checks (24 Oct 2026)
 - Play the first 3 s of the music alone: is it energetic? If not, re-trim or re-pick.
