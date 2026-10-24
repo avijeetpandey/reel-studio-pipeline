@@ -161,6 +161,38 @@
   .tape.l { left: 40px; } .tape.r { right: 40px; transform: rotate(5deg); }
 
   /* template / copy box */
+  /* round 5 layouts (WINNING_PATTERNS §26–28) */
+  .finding-art { margin-top: 34px; background: var(--card); border: 2px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.06); }
+  .finding-art pre { font-family: var(--mono); font-size: 28px; line-height: 1.5; padding: 26px 30px; white-space: pre-wrap; }
+  .finding-art .out { background: var(--ink); color: var(--paper); font-family: var(--mono); font-size: 26px; padding: 18px 30px; }
+  .finding-art .out i { font-family: var(--hand); font-style: normal; font-size: 32px; color: var(--hl-ink, #FFD84A); margin-right: 10px; }
+  .rows { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px 22px; padding: 26px 30px; font-size: 32px; align-items: center; }
+  .rows .from { font-family: var(--mono); color: var(--muted); } .rows .to { font-weight: 800; } .rows .ar { color: var(--muted); }
+  .found { margin-top: 30px; font-size: 40px; line-height: 1.3; font-weight: 600; }
+  .found b { color: var(--blue); }
+  .dd { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px; }
+  .dd .ph { background: var(--card); border: 6px solid #8E9099; border-radius: 46px; height: 560px; padding: 40px 28px 28px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+  .dd .ph img { max-width: 100%; max-height: 380px; border-radius: 12px; }
+  .dd .ph p { font-size: 34px; line-height: 1.3; font-weight: 600; text-align: center; }
+  .dd .mark { width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; font: 800 34px var(--head); color: #fff; }
+  .dd .bad .mark { background: #A9ADB6; } .dd .good .mark { background: #22B573; }
+  .road { margin-top: 36px; display: flex; flex-direction: column; gap: 18px; }
+  .road > div { display: grid; grid-template-columns: 74px 1fr; gap: 22px; align-items: start; background: var(--card); border: 2px solid var(--line); border-radius: 18px; padding: 20px 26px; }
+  .road b.n { font: 800 52px/1 var(--head); color: var(--pen); }
+  .road > div > div { min-width: 0; }
+  .road h4 { font-size: 40px; line-height: 1.15; font-weight: 800; }
+  .road span { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 24px; color: var(--muted); }
+  .road .hot { border-color: var(--ink); }
+  .is-photo { background: #222; }
+  .is-photo::before { display: none; }
+  .is-photo .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+  .is-photo .hdr .who b, .is-photo .hdr .who span, .is-photo .hdr .pg { color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+  .is-photo .c { justify-content: flex-end; padding-bottom: 40px; }
+  .bubble { align-self: flex-start; background: #FFF8E7; color: #17191E; font-size: 34px; font-weight: 600; padding: 14px 26px; border-radius: 26px 26px 26px 6px; box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+  .pcard { margin-top: 18px; background: #fff; color: #17191E; border-radius: 30px; padding: 34px 38px; box-shadow: 0 14px 40px rgba(0,0,0,.3); }
+  .pcard p { font-size: 38px; line-height: 1.38; font-weight: 600; }
+  .pcard li { font-size: 36px; line-height: 1.35; font-weight: 600; margin-left: 34px; }
+  .pcard li + li { margin-top: 8px; }
   .copy { margin-top: 40px; background: var(--card); border: 2.5px dashed var(--ink); border-radius: 18px; padding: 34px 36px; font-family: var(--mono); font-size: 34px; line-height: 1.5; white-space: pre-wrap; }
 
   /* recap */
@@ -231,6 +263,10 @@
     timeline: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="tl">${s.events.map(e => `<div class="${e.hot ? "hot" : ""}"><b>${esc(e.when)}</b><span class="fit">${fmt(e.text)}</span></div>`).join("")}</div>${note(s.note, "left")}</div>`,
     screenshot: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="shot"><span class="tape l"></span><span class="tape r"></span><img src="${esc(s.image)}"></div>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${note(s.note, "left")}</div>`,
     template: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="copy fit">${esc(s.copy)}</div>${note(s.note || "screenshot this", "left")}</div>`,
+    finding: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}<div class="finding-art">${s.code ? `<pre>${esc(s.code)}</pre>` : ""}${s.rows ? `<div class="rows">${s.rows.map(r => `<span class="from">${esc(r[0])}</span><span class="ar">→</span><span class="to">${esc(r[1])}</span>`).join("")}</div>` : ""}${s.output ? `<div class="out"><i>output</i>${esc(s.output)}</div>` : ""}</div>${s.found ? `<p class="found fit">${fmt(s.found)}</p>` : ""}${note(s.note, "left")}</div>`,
+    dodont: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}<div class="dd">${[["bad", s.bad, "✕"], ["good", s.good, "✓"]].map(([k, v, m]) => `<div class="ph ${k}">${v.image ? `<img src="${esc(v.image)}">` : `<p class="fit">${fmt(v.text || "")}</p>`}<span class="mark">${m}</span></div>`).join("")}</div>${note(s.note, "left")}</div>`,
+    roadmap: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="road">${s.steps.map((x, k) => `<div class="${x.hot ? "hot" : ""}"><b class="n">${k + 1 + (s.from || 0)}</b><div><h4 class="fit">${fmt(x.what)}</h4>${x.resource ? `<span class="fit">${esc(x.resource)}</span>` : ""}</div></div>`).join("")}</div>${note(s.note, "left")}</div>`,
+    photo: (s) => `<img class="bg" src="${esc(s.image)}"><div class="c">${s.bubble ? `<span class="bubble">${esc(s.bubble)}</span>` : ""}<div class="pcard">${P(s.body).map(b => `<p class="fit">${fmt(b)}</p>`).join("")}${s.items ? `<ul>${s.items.map(i => `<li class="fit">${fmt(i)}</li>`).join("")}</ul>` : ""}</div></div>`,
     recap: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-m fit">${fmt(s.title || "Quick recap")}</h2><ol class="recap">${s.items.map(i => `<li class="fit"><span>${fmt(i)}</span></li>`).join("")}</ol>${note(s.note || "screenshot this", "left")}</div>`,
     cta: (s) => `<div class="c cta">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-l fit">${fmt(s.question)}</h2><span class="yn">${esc(s.yn || "Yes or no? Tell me below.")}</span>${s.share ? `<p class="share fit">${fmt(s.share)}</p>` : ""}
         <div class="follow"><img src="${esc(A.avatar)}"><div><b>${esc(s.follow || "I decode one AI thing every day.")}</b><span>Follow ${esc(A.handle)} for tomorrow's</span></div></div></div>`
@@ -259,7 +295,7 @@
         if (maxB > cb.bottom + 2) issues.push(`content overflows the slide by ${Math.round(maxB - cb.bottom)}px — cut words, don't shrink type`);
         sl.querySelectorAll(".fit").forEach(e => { if (e.scrollWidth > e.clientWidth + 2) issues.push("a line is wider than its box: " + e.textContent.slice(0, 40)); });
         const h = sl.querySelector("h1,h2"); if (h && words(h) > (s.type === "cta" ? 16 : 12)) issues.push(`headline has ${words(h)} words (max ${s.type === "cta" ? 16 : 12})`);
-        const total = words(c); const cap = { cover: 26, cta: 45, recap: 55, glossary: 70, checklist: 60, steps: 50, compare: 60, story: 60, template: 80, timeline: 60 }[s.type] || 40;
+        const total = words(c); const cap = { cover: 26, cta: 45, recap: 55, glossary: 70, checklist: 60, steps: 50, compare: 60, story: 60, template: 80, timeline: 60, finding: 75, dodont: 40, roadmap: 60, photo: 55 }[s.type] || 40;
         if (total > cap) issues.push(`${total} words on a ${s.type} slide (max ${cap})`);
         out.push({ slide: i, type: s.type, words: total, issues });
       });

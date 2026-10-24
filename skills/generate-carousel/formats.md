@@ -19,6 +19,10 @@ Research basis (Oct 2026): hook slide decides most of the outcome; 7–10 slides
 | Templates | C27 | Save |
 | Comic | C18 | Share |
 | Workflow (personal) | C21 | Follow |
+| Roadmap (round 5) | any "how to start" | Save + follow |
+| Rule cards ✗/✓ (round 5) | C04, C25 | Save + share |
+| Finding checklist (round 5) | C10, C19 | Save |
+| Photo list (round 5) | career / beginner | Save + share |
 
 ## Glossary (8–9 slides)
 1 `cover` (number + promise, photo) → 2 `statement` (why these words matter; "explained like I would to my mom") → 3–7 `glossary` with 3 terms each, **grouped by theme with a kicker** ("Part 1 · How it reads you") so it reads as a story, not a dictionary — one of them carries the fix as an `eg` or a pen `note` (e.g. sycophancy → "tell it: say when I'm wrong") → 8 `recap` "If you remember only 3" → 9 `cta`.
@@ -63,6 +67,18 @@ Use `story` slides with one line of dialogue each and `stamp` as the panel label
 
 ## Workflow (personal, 8)
 1 `cover` ("My real AI workflow as a senior engineer", photo) → 2–7 `point` one step each, written as "I …" → 8 `cta`. Keep it employer-neutral.
+
+## Roadmap (7–9) — round 5 ("The order I'd learn X if I started from zero", 4.1K; "how to get into tech in 2026")
+`cover` (the order + "from zero" + year; the creator's photo) → `photo` or `statement` (the reassurance: "you don't need everything before your first job") → `roadmap` slides (2–3 steps each, one real free resource per step, the hardest step marked `hot`) → `photo` ("your first 3 months") → `recap` → `cta` (follow card). Caption: the full order as numbered text with the resources.
+
+## Rule cards ✗/✓ (7–8) — round 5 ("Rules of clean design")
+`cover` → one `dodont` per rule (rule title + 2 lines + bad vs good mockup, real screenshots when possible) → `recap` → `cta`.
+
+## Finding checklist (7–8) — round 5 ("The SQL data cleaning checklist I run on every dataset")
+`cover` ("The X checklist I run on every Y") → `checklist` (all N questions, "swipe →") → one `finding` per check (heading = the check as a plain claim, one sentence, the real query/table, the finding: "found 9. There were really 18.") → `cta`.
+
+## Photo list (8–10) — round 5 ("10/10 hobbies that make you smarter", 49K)
+`cover` (photo collage + the number) → one `photo` per item (the creator's own photo of that thing + one-line benefit) → `cta`. Only when the items are visible things the creator can photograph himself.
 
 ## Learnings log
 (Add after each post's 48 h numbers: format, ID, saves, shares, profile visits, what to repeat.)

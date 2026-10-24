@@ -13,7 +13,7 @@ and a breather after every 2 upgraded lines.
 Also picks the in-video CTA card variant (follow / save), the list device for list reels (step-progress for 2–3 items,
 list-header for 4+), a count-roll for big numbers, hand-annotate when a line points at a real object, and a 1 s literal
 hook image when the hook has a strong verb (WINNING_PATTERNS.md §16–18, round 3), and a check-card for a line that
-lists 3–5 short items (§23, round 4).
+lists 3–5 short items (§23, round 4), and a pill-list card for each "master these to become a…" line (§27, round 5).
 """
 import argparse, json, os, re, sys
 CFG_PATH = os.path.expanduser(os.environ.get("REEL_STUDIO_CONFIG", "~/.config/reel-studio/config.json"))
@@ -48,6 +48,7 @@ TWIST = re.compile(r"\b(but|actually|the truth|here'?s the thing|turns out|the c
 QUESTION = re.compile(r"\?\s*$")
 BIGNUM = re.compile(r"\b\d{1,3}(,\d{3})+\b|\b\d{4,}\b|\b\d+(\.\d+)?\s*(k|m|million|billion|lakh|crore|stars|installs|downloads|users)\b", re.I)
 POINT = re.compile(r"\b(this (light|lamp|lens|mic|camera|setup|button|line|part|corner|tab|icon)|look at (this|that)|right here|see this|over here|behind me)\b", re.I)
+ROLE = re.compile(r"\b(master these|skills you need|to become an? [\w-]+ (engineer|developer|scientist|analyst|designer|manager))\b", re.I)
 HOOK_VERB = re.compile(r"\b(murder(ed|s)?|kill(ed|s)?|dead|died|stole|steal(s|ing)?|replac(ed|es|ing)|broke|break(s|ing)?|destroy(ed|s)?|ended|exposed|leaked|banned|wrong|lied|lying|fired|hacked|cheat(ed|ing)?)\b", re.I)
 
 
@@ -158,6 +159,9 @@ def plan_components(lines, treatment):
     for i, l in enumerate(lines):
         t, comp, why = l["text"], "-", "no upgrade (default)"
         quiet = None
+        if i == 0 and ROLE.search(t):  # round 5: screenshot-card reels show the first card on the hook itself
+            plan.append({**l, "i": i, "comp": "pill-list", "why": "hook names a role's skill list -> first screenshot card on the hook", "quiet": False})
+            continue
         if i == 0:
             quiet = "hook: hook words own this line"
         elif i == n - 1:
@@ -170,6 +174,8 @@ def plan_components(lines, treatment):
         words = len(t.split())
         if CODE.search(t) and re.search(r"[\"'“”`]|/|\bprompt|command|code\b", t, re.I):
             comp, why = "code-window", "line quotes a prompt/command/code -> typed card"
+        elif ROLE.search(t):
+            comp, why = "pill-list", "names a role's skill list -> screenshot card (8–12 skills + sourced salary line)"
         elif listy(t):
             comp, why = "check-card", f"lists {len(listy(t))} short things -> live checklist that ticks as each is said"
         elif BIGNUM.search(t):
@@ -192,7 +198,7 @@ def plan_components(lines, treatment):
     for p in plan:
         if p["comp"] in ("code-window", "swing-window") and (p["start"] < 2.0 or p["end"] > total - 4.0):
             p["comp"], p["why"] = "pop-blur", p["why"] + " (heavy move not allowed in first 2 s / last 4 s)"
-    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3), ("check-card", 1)):
+    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3), ("check-card", 1), ("pill-list", 6)):
         for p in [p for p in plan if p["comp"] == name][cap:]:
             p["comp"], p["why"] = "pop-blur", p["why"] + f" (max {cap} {name})"
     run = 0  # breather after every 2 upgraded lines

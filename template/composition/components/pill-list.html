@@ -1,0 +1,59 @@
+<!--
+COMPONENT: pill-list — a dense, numbered list of 8–12 short items in soft colour pills, with a role/title chip and one
+fact line under it (salary range, time to learn). Made to be SCREENSHOT and SAVED: it holds still long enough to read
+the title, too short to read every pill, so viewers pause, screenshot or save. From the reference reels (round 5,
+xouryn 25K: "Master these to become an ML Engineer" + 12 skills + base pay, one card per role; WINNING_PATTERNS.md §29).
+Seek-safe with NO callbacks: the pills stagger in with timeline tweens; each card swaps with a `set`.
+
+USE: paste CSS + markup into a `.g.clip` layer (left side, beside the face), then
+  buildPillList(tl, { el: "#pl", cards: [
+      { title: "ML Engineer", items: ["Python","NumPy","Pandas","Scikit-learn","PyTorch","Feature engineering","Model evaluation","MLflow","Docker","Cloud"], fact: "India: ₹12–35 LPA" },
+      { title: "Backend Engineer", items: ["Java or Go","SQL","Redis","Kafka","REST + gRPC","System design","Docker","AWS"], fact: "India: ₹8–30 LPA" } ],
+    at: [0.4, 3.6], end: 7.0 })
+  at = when each card appears (the spoken "become an X"). fact = a real, sourced figure (put the source in the edit plan).
+RULES: one per reel; ≤ 12 pills per card, ≤ 3 words each; left 60–560 px so the face (right/centre) stays clear; each card
+  2.5–4 s; pill text ≥ 28 px (it is meant to be screenshotted, not read in full); real figures only.
+FEEL: "a cheat sheet sliding onto the table": the title chip pops (0.18 s), pills fall in top to bottom 40 ms apart
+  (y −10 → 0, opacity), the fact line fades in last; the next card replaces it instantly (hard cut, no exit animation).
+-->
+
+<!-- CSS -->
+<style>
+  .pl { position: absolute; left: 60px; top: 300px; width: 500px; opacity: 0; }
+  .pl .ti { display: inline-block; background: #fff; color: #111; font: 800 34px Montserrat, sans-serif; padding: 8px 18px; border-radius: 10px; margin-bottom: 16px; }
+  .pl .row { display: flex; align-items: center; gap: 10px; margin: 7px 0; opacity: 0; }
+  .pl .row b { width: 44px; height: 34px; border-radius: 8px; display: grid; place-items: center; background: rgba(255,255,255,0.18); color: #fff; font: 700 22px "JetBrains Mono", Menlo, monospace; }
+  .pl .row span { padding: 4px 16px; border-radius: 9px; font: 700 28px Montserrat, sans-serif; color: #15171c; }
+  .pl .fact { margin-top: 18px; font: 700 30px Montserrat, sans-serif; color: #fff; opacity: 0; text-shadow: 0 2px 10px rgba(0,0,0,.5); }
+</style>
+
+<!-- MARKUP -->
+<div id="pl" class="pl"></div>
+
+<!-- JS -->
+<script>
+  function buildPillList(tl, o) {
+    const root = document.querySelector(o.el);
+    const tints = ["#C9B8FF", "#B8E3FF", "#FFD1E8", "#FFE8A8", "#BFF2D4", "#FFD6B8"];
+    root.innerHTML = "";
+    const cards = o.cards.map((c) => {
+      const d = document.createElement("div"); d.style.position = "absolute"; d.style.left = "0"; d.style.top = "0"; d.style.width = "100%";
+      d.innerHTML = `<div class="ti"></div>` + c.items.map((it, i) => `<div class="row"><b>${String(i + 1).padStart(2, "0")}</b><span style="background:${tints[i % tints.length]}"></span></div>`).join("") + `<div class="fact"></div>`;
+      d.querySelector(".ti").textContent = c.title;
+      d.querySelectorAll(".row span").forEach((s, i) => (s.textContent = c.items[i]));
+      d.querySelector(".fact").textContent = c.fact || "";
+      root.appendChild(d); return d;
+    });
+    tl.set(root, { opacity: 1 }, o.at[0]);
+    cards.forEach((d, k) => {
+      const t = o.at[k];
+      tl.set(cards, { opacity: 0 }, t);
+      tl.set(d, { opacity: 1 }, t);
+      tl.fromTo(d.querySelector(".ti"), { scale: 0.9 }, { scale: 1, duration: 0.18, ease: "power2.out" }, t);
+      d.querySelectorAll(".row").forEach((r, i) => tl.fromTo(r, { opacity: 0, y: -10 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out" }, t + 0.1 + i * 0.04));
+      tl.to(d.querySelector(".fact"), { opacity: 1, duration: 0.25 }, t + 0.2 + d.querySelectorAll(".row").length * 0.04);
+    });
+    if (o.end != null) tl.set(root, { opacity: 0 }, o.end);
+    return root;
+  }
+</script>

@@ -2,7 +2,7 @@
 
 Goal: one command per topic (or per week) → script, carousel, LinkedIn post, edited reel, covers, all in one Drive folder, with filming + 2 approvals as the only interruptions. Built on the existing skills: `reel-script`, `generate-carousel`, `reel-edit`. This file is the spec to build from. Since 24 Oct 2026 every stage also follows `WINNING_PATTERNS.md` (learned from the creator's reference reels), `reel-edit` picks the style itself with `scripts/choose_style.py` + the enhance pass, and QA includes `qa_reel.py --cover` and the static-frame check.
 
-## Pipeline as of 25 Oct 2026 (after four reference-reel studies + the first test edit)
+## Pipeline as of 25 Oct 2026 (after five reference studies + the first test edit)
 ```
 LEARN (any time)   study: <links> → browser → MP4 + caption + stats → analyze_reference.py (transcript, WPM, cuts, loudness,
                    sheets) → NOTES.md → WINNING_PATTERNS.md round → rules pushed into each skill / QA script
@@ -11,7 +11,7 @@ HALF 1  make:      research (facts + trending claim for Fact-or-Hype) → script
                    ∥ carousel (recipe-list / formats.md, SEO caption) ∥ LinkedIn → CHECKPOINT 1 → upload half 1
 FILM               the creator films + AirDrops → `footage ready`      (or `edit: <video>` = edit-only mode, no Half 1)
 HALF 2             footage → review (raw-vs-graded HDR check) → cut (pauses out, qa --audio: repeats, fillers, pace ≥ 190 WPM)
-                   → face map → choose_style.py (10 treatments, rotation) → beat map + motion briefs → enhance pass (10 components + beat grid,
+                   → face map → choose_style.py (10 treatments, rotation) → beat map + motion briefs → enhance pass (11 components + beat grid,
                    budget) → on-screen facts checked → pick_music.py (energetic track, trimmed to its drop) + 2–3 signature SFX
                    → build (helpers per beat) ∥ covers A/B ∥ posting kit (hook, list, trust line, yes/no, SEO keyword line, tags)
                    → QA auto-fix ×3 (lint, check, UI zones, qa_reel: enhance/static/read-time/face, --cover, beat_grid --check, frame grading ≥ 8/10, frame-0, taste:

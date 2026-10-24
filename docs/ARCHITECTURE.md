@@ -14,8 +14,8 @@ reel-studio-pipeline/            (this repo = the Claude Code plugin)
     WINNING_PATTERNS.md          lessons from reference reels (grows with study:)
     PIPELINE.md · WORKFLOW.md    spec + map
     scripts/                     see below
-    composition/                 reference-index.html (code patterns) · components/ (10 motion components + INDEX.md)
-    carousel/                    deck.html (all layouts) · render.sh · examples/sampler/slides.js
+    composition/                 reference-index.html (code patterns) · components/ (11 motion components + INDEX.md)
+    carousel/                    deck.html (all layouts, incl. finding · dodont · roadmap · photo) · render.sh · examples/sampler/slides.js
     thumbnail/                   cover-template.html (A, curiosity) · cover-template-b.html (B, bold claim)
     review/review.html           timestamped-notes player
     posting-kit-template.md

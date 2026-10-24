@@ -37,9 +37,9 @@ It also **learns**: send it links to reels you like (`study: <links>`) and it wa
 | `make-content` | `make: <topic>` · `make: a; b; c` · `footage ready` · `edit: <video>` · `study: <links>` · `continue <reel>` · `pipeline status` | The orchestrator: runs everything below in parallel with helper agents, tracks every stage in a resumable manifest, stops only for filming and the two approvals |
 | `reel-script` | "script a reel about …" | Format pick (10 formats incl. **Fact or Hype?**, identity reframe, mantra, skit, experiment, myth-or-fact…), 3 hooks, timed 25–35 s script (≈ 200 WPM), edit brief, b-roll list, covers, LinkedIn post + image, a **shoot sheet** artifact for your phone (framing, lighting for the chosen look, checklist) |
 | `reel-edit` | "edit this reel" | Senior-editor workflow on HyperFrames: review → tight cut → face map → **automatic style** (10 treatments, rotated) → beat map → motion components → captions → **automatic energetic music** + signature SFX → QA auto-fix loop → Studio preview → final render → A/B covers → posting kit → Drive |
-| `generate-carousel` | "make a carousel about …" | 1080×1350 "engineer's notebook" slides, recipe-list format, QA, caption with SEO keyword line, alt text, LinkedIn PDF |
+| `generate-carousel` | "make a carousel about …" | 1080×1350 "engineer's notebook" slides (plus photo, roadmap, ✗/✓ and finding layouts), recipe-list and roadmap formats, QA, caption with SEO keyword line, alt text, LinkedIn PDF |
 
-Plus: 10 seek-safe motion components (roll-text, pop-blur, swing-window, code-window, step-progress, list-header, check-card, count-roll, hand-annotate, cta-card), a beat grid that snaps graphic entrances to the music, a music energy analyser + automatic picker/trimmer, a reference-reel analyser, a QA script (read time, static stretches, face box, component budget, pace, blank covers), cover/carousel/LinkedIn templates, a timestamped review player, and `WINNING_PATTERNS.md` — the distilled lessons from ~71 reference reels (four study rounds).
+Plus: 11 seek-safe motion components (roll-text, pop-blur, swing-window, code-window, step-progress, list-header, check-card, pill-list, count-roll, hand-annotate, cta-card), a beat grid that snaps graphic entrances to the music, a music energy analyser + automatic picker/trimmer, a reference-reel analyser, a QA script (read time, static stretches, face box, component budget, pace, blank covers), cover/carousel/LinkedIn templates, a timestamped review player, and `WINNING_PATTERNS.md` — the distilled lessons from ~94 reference reels and 10 carousels (five study rounds).
 
 ## Requirements
 - **Claude Code** (CLI or desktop app) with a plan that allows long sessions. The desktop app adds the built-in browser (used for Studio previews, YouTube Audio Library and `study:`).
@@ -97,7 +97,7 @@ HALF 1   research → script.md (format · look A–E · 95–120 words · proof
          → shoot sheet ∥ carousel ∥ LinkedIn → CHECKPOINT 1 → upload
 FILM     you → footage ready   (or edit: <video>)
 HALF 2   review (HDR check) → cut (pace ≥ 190 WPM) → face map → choose_style.py (10 looks, rotation) → beat map → enhance pass
-         (10 components, budget, beat grid) → facts checked → pick_music.py (energetic, trimmed) + SFX → build ∥ covers ∥ posting kit
+         (11 components, budget, beat grid) → facts checked → pick_music.py (energetic, trimmed) + SFX → build ∥ covers ∥ posting kit
          → QA auto-fix ×3 (incl. ends on the last word, frame grading ≥ 8/10) → draft + Studio preview → CHECKPOINT 2 → final → −14 LUFS → SRT → upload → style_log
 LOOP     your notes → rules; 48 h numbers → follow-up ideas
 ```
