@@ -126,3 +126,37 @@ Notes + numbers: `$STUDIO/research/refs_2026-10b/NOTES.md`. These rules extend (
 - Post caption: line 1 = the hook or the claim; then the list/steps as text; a trust line ("not sponsored", "nothing runs without your yes", "not financial advice"); the yes/no question; **an SEO keyword line at the end** (plain phrases separated by " · " that people would search: "free alternatives to paid software · open source tools · …"); 3–5 specific hashtags.
 - Covers: most proven reels use the **hook frame itself** as the cover (face + readable title in frame 0) — so frame 0 must work as a thumbnail; designed covers ("STOP PAYING FOR CLAUDE CODE", "BUILD PROJECTS ON AUTOPILOT") put 3–5 huge words over the face/hero object.
 - Series labels on the cover ("pt.2", "Fact or Hype?") make the grid read as a show.
+
+---
+# Round 3 (19 reels, 25 Oct 2026) — your own study notes live in $STUDIO/research/
+
+## 16. Topic and script
+- **The viewer's own problem beats a tool tour, every time.** Top 6 = "how you look on camera", "your talking heads are boring", "an AI stole my job", "how your home is marketed" (17K–56K likes). Bottom 6 = "this skill installs skills", "MCPs you need", "Claude in one weekend" (17–740). Phrase every topic as the viewer's problem first, with the tool as the fix ("Your Claude forgets everything → here's the fix"), never "X tool does Y".
+- **Persona twist hook** (51K): say the stereotype, then flip it in the next line. "I'm a software engineer in Bangalore and an AI stole my job. That's what I'd say if I were mid." Your version: "I'm a [your job] and AI already does half my work. Here's the half it can't."
+- More hook shapes that won: "If you've been struggling with X, try this." · "This is how we're going to make your X less boring." · "Here's why X gets you ignored." · "Instead of Netflix tonight, watch these 3." Retire "If you're using X and not using this one Y, you're using X wrong" and "master X in one weekend" (both flopped this round; viewers have heard them).
+- **Specifics make it believable:** a day, a number, a named object ("on Tuesday it booked the studio", "minute 9 to 12 of that video", "mine runs at 6 a.m.").
+- **Series framing** gives a reason to follow: "Day 3 of…", "part 1 of 3", a named franchise ("Fact or Hype?", "AI Maxxing"). A next-episode tease ("next video: how to talk to camera") may sit right before the yes/no CTA.
+- **Explain one real concept plainly** (the 51K reel taught "symbol grounding" in two lines). One proper term, explained in everyday words, makes the viewer feel smarter, and they share it.
+
+## 17. Show the change, don't describe it
+- **Physical before → after on camera**: switch the light on while saying it; open the bad version, then the good one; Raw | My Edit side by side (17K on an 11 s reel). Every "do X" line should have a frame where X visibly happens.
+- **Location / outfit jumps** per sentence (19.7K, 33 cuts/min): when a list reel has no screen content, film each item in a different spot.
+- **Over-the-shoulder b-roll of yourself working** (hands, screen, desk from behind): 2–3 shots per shoot. Real, and better than any stock clip.
+- **Pop-culture moments**: never film/TV clips (copyright). Use a quote card (serif, the line plus "— Dune") or the creator acting the line.
+
+## 18. Graphics that read as "made by a person"
+- **Editorial type**: serif body plus an *italic/script accent word*, mixed sizes in one block ("the *third thing* we're going to do"). It replaces the bold-sans "AI look". Use it for 3–5 key phrases.
+- **Hand-drawn annotations on the real frame**: a stroke circle, an arrow and a handwritten label pointing at a real object, drawn on as it's said (`hand-annotate.html`).
+- **Pinned list header**: the title stays on top, with a "#N" chip that swaps per item, or the full list with the current item lit (`list-header.html`). Use this or `step-progress`, not both.
+- **Rolling counters** for any number that grows: stars, installs, users, $ (`count-roll.html`).
+- **Literal hook image** for 1 s: the hook's strongest verb drawn as a picture (tape across a logo for "murdered", a struck-through "CHATBOT").
+- **Proof is the real artefact**: the real YouTube thumbnail, the GitHub URL chip, the actual post screenshot. Rebuild product UIs (phone, notification toast, email draft) as clean HTML mockups on a soft colour canvas, with the face in the lower half.
+- **Halftone Collage look** (new treatment): b&w halftone cutouts, one flat yellow block, paper drop-shadows, heavy condensed type, elements sliding in on the beat. Use it for opinion/strategy reels.
+
+## 19. Edit and sound (measured)
+- Pace 185–236 WPM (median ≈ 212). In 15/19 reels no gap between words reaches 0.12 s. Cut every breath (`qa_reel.py --audio` flags pauses > 0.25 s).
+- **The last spoken word is the last frame** in 13/19 reels: no outro hold, no music tail, no silent logo. The loop restarts straight into the hook. Rule: the video ends ≤ 0.5 s after the final word (`qa_reel.py --audio` checks it). The CTA card appears *while* the question is spoken, not after.
+- Music where measurable sits close under the voice (−17 to −21 dB) and is cinematic on story reels. Keep the creator's rule (energetic bed, every reel); for story/philosophy reels the bed may be cinematic and rise in the gaps.
+
+## 20. Post captions
+- Long, personal captions did best: the story behind the reel, the gear/setup list, "one thing I forgot to say: …". Add a **"forgot to say"** line or a **setup/gear line** to the caption when it's true. Keep the yes/no question and the SEO line.

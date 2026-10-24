@@ -1,0 +1,62 @@
+<!--
+COMPONENT: count-roll — an odometer number whose digits ROLL from one value to another (794,555 → 875,923 installs) with a small
+label under it. From the reference reels (hananazeez.ai rolling skill counts, think_macro_ savings counter; WINNING_PATTERNS.md §13, §18):
+a number that moves feels live and true. Use for anything that grows: stars, installs, users, $ saved, tokens.
+Seek-safe with NO callbacks: every digit is a 0–9 strip moved with a y tween (no onUpdate text writes).
+
+USE: paste CSS + markup into a `.g.clip` layer, then
+  buildCountRoll(tl, { el: "#cr", from: 794555, to: 875923, label: "skills on the directory", start: 6.2, dur: 1.4, end: 9.0 })
+OPTIONS: prefix ("$", "₹"), suffix ("+", "★", "M"), sep ("," default; "" for none), color (default var(--accent)), size (px, default 150).
+RULES: one counter on screen at a time; real numbers only (source in the edit plan); start the roll on the spoken number;
+  ≤ 9 digits; label ≤ 5 words, muted, ≥ 34 px; graphics band (y 250–700) or a full-screen beat, never over the face.
+FEEL: "a mechanical odometer": low digits spin more turns than high ones (lower digit = +1 extra turn), all land together
+  with power3.out; a 2 % scale settle on landing; label fades in 0.2 s after the roll starts.
+-->
+
+<!-- CSS -->
+<style>
+  .cr { position: absolute; left: 0; right: 0; top: 520px; text-align: center; opacity: 0; }
+  .cr .n { display: inline-flex; align-items: flex-start; font: 800 var(--cr-size, 150px)/1.2 Montserrat, sans-serif;
+           color: var(--cr-color, var(--accent)); font-variant-numeric: tabular-nums; }
+  .cr .d { display: inline-block; height: 1.2em; overflow: hidden; }
+  .cr .d i { display: block; height: 1.2em; line-height: 1.2em; font-style: normal; }
+  .cr .lbl { margin-top: 18px; font: 600 38px Montserrat, sans-serif; color: var(--muted, #b9bcc4); opacity: 0; }
+</style>
+
+<!-- MARKUP -->
+<div id="cr" class="cr"><div class="n"></div><div class="lbl"></div></div>
+
+<!-- JS -->
+<script>
+  function buildCountRoll(tl, o) {
+    const root = document.querySelector(o.el), n = root.querySelector(".n"), lbl = root.querySelector(".lbl");
+    if (o.size) root.style.setProperty("--cr-size", o.size + "px");
+    if (o.color) root.style.setProperty("--cr-color", o.color);
+    const sep = o.sep == null ? "," : o.sep, fmt = (v) => String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g, sep);
+    const to = fmt(o.to), from = fmt(o.from || 0).padStart(to.length, " ");
+    n.innerHTML = ""; lbl.textContent = o.label || "";
+    const add = (txt) => { const s = document.createElement("span"); s.textContent = txt; n.appendChild(s); };
+    if (o.prefix) add(o.prefix);
+    const strips = [];
+    let k = 0;                                       // digit index from the left
+    [...to].forEach((ch, i) => {
+      if (!/\d/.test(ch)) { add(ch); return; }
+      const d = document.createElement("span"); d.className = "d";
+      const turns = Math.min(k++, 3);                  // lower digits spin more turns (capped at 3)
+      const f = /\d/.test(from[i]) ? +from[i] : 0, t = +ch, total = turns * 10 + t;
+      let html = ""; for (let j = 0; j <= total; j++) html += `<i>${j % 10}</i>`;
+      d.innerHTML = html; n.appendChild(d);
+      strips.push({ el: d, f, total });
+    });
+    if (o.suffix) add(o.suffix);
+    tl.set(root, { opacity: 1 }, o.start - 0.05);
+    strips.forEach(({ el, f, total }) => {
+      const col = [...el.children];
+      tl.fromTo(col, { yPercent: -100 * Math.min(f, total) }, { yPercent: -100 * total, duration: o.dur || 1.4, ease: "power3.out" }, o.start);
+    });
+    tl.fromTo(n, { scale: 1 }, { scale: 1.02, duration: 0.12, yoyo: true, repeat: 1 }, o.start + (o.dur || 1.4));
+    tl.to(lbl, { opacity: 1, duration: 0.25 }, o.start + 0.2);
+    if (o.end != null) tl.to(root, { opacity: 0, duration: 0.22, ease: "power2.in" }, o.end);
+    return root;
+  }
+</script>

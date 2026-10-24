@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Step 2: bake the tightened, upscaled, graded A-roll from a list of kept source ranges.
-Usage: python3 -I make_cut.py <source.mp4> <segments.txt> <out.mp4> [--hold 3.9] [--exposure 0.92] [--saturation 1.1] [--no-grade]
+Usage: python3 -I make_cut.py <source.mp4> <segments.txt> <out.mp4> [--hold 0.3] [--exposure 0.92] [--saturation 1.1] [--no-grade]
 segments.txt: one "start-end" (seconds, source time) per line, in order.
 Pad each kept range ~0.06 s before the first word and ~0.08 s after the last word.
 Prints the cut-time position of every join (use these for punch-in zooms).
@@ -10,7 +10,7 @@ face-cam PiP renders square). --exposure tunes that LUT (default 0.92). SDR sour
 import os, subprocess, sys
 
 src, segfile, out = sys.argv[1:4]
-hold = float(sys.argv[sys.argv.index("--hold") + 1]) if "--hold" in sys.argv else 3.9
+hold = float(sys.argv[sys.argv.index("--hold") + 1]) if "--hold" in sys.argv else 0.3  # round 3: end on the last word (13/19 proven reels end ≤ 0.4 s after it)
 expo = sys.argv[sys.argv.index("--exposure") + 1] if "--exposure" in sys.argv else "0.92"
 grade = "" if "--no-grade" in sys.argv else None  # --no-grade: skip the brighten/contrast pass (bright phone footage)
 sat = sys.argv[sys.argv.index("--saturation") + 1] if "--saturation" in sys.argv else "1.1"  # lower (0.85–0.95) for already-vivid footage

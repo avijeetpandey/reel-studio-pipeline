@@ -1,17 +1,17 @@
 # Treatments — so no two reels look the same
 
 A reel = **brand constants** (never change) + **one treatment** (changes per reel, chosen from the content) + **scene mix** from the beat map (`planning.md`).
-**Autonomous:** `T/scripts/choose_style.py` applies this section for you (scores the seven treatments from the content, enforces the rotation, picks the signature move). Pick the treatment in step 3 from the topic, the script's format and its analogy. Then check `$STUDIO/reels/style_log.md`: **never the same treatment as either of the last 2 reels**, and never the same signature move as the last reel. Log the choice after the render.
+**Autonomous:** `T/scripts/choose_style.py` applies this section for you (scores the ten treatments from the content, enforces the rotation, picks the signature move). Pick the treatment in step 3 from the topic, the script's format and its analogy. Then check `$STUDIO/reels/style_log.md`: **never the same treatment as either of the last 2 reels**, and never the same signature move as the last reel. Log the choice after the render.
 
 ## Brand constants (every reel, every treatment)
 - Frame 0 = the creator's face already speaking the hook (see SKILL.md). Hook words in the top band.
 - Caption system: word-synced, ≤ 3 words, one highlighted word per chunk max, no punctuation shown, never ending on a weak word. Font: Montserrat 900 + 10 px stroke (default) — a treatment may swap the *highlight* style, never the readability.
 - One accent colour per reel. Default brand accent cyan `#3ee0ff`; a treatment may use its own accent but only one.
-- Sign-off: CTA card with the yes/no question + "{brand}", then the loop frame.
+- Sign-off: CTA card with the yes/no question + "{brand}", shown WHILE the question is spoken; the video ends ≤ 0.5 s after the last word (no hold) so it loops into the hook.
 - Audio: voice first, −14 LUFS final, music bed under voice (see `sound.md`).
 - Safe box x 60–930, y 250–1420. Face never covered.
 
-## The nine treatments
+## The ten treatments
 
 ### 1. Clean Tech (default for "how AI works" with a system/flow)
 - **Use for:** mechanisms, pipelines, "what happens when…", architecture.
@@ -82,6 +82,15 @@ A reel = **brand constants** (never change) + **one treatment** (changes per ree
 - **Feel:** "Honest test-drive: skeptical, curious, then a clear verdict."
 - **Signature moves:** checkbox verdict tick; a live counter (time / credits used / result) during the test.
 - **SFX:** click on checkbox, success/error on verdict, whoosh into the screen test.
+
+### 10. Halftone Collage (opinion, strategy, "why most people…" — round 3, Oct 2026)
+- **Use for:** strategy and mindset takes, "why X gets you ignored", before/after arguments, short punchy reels (11–25 s).
+- **Look:** a light grey `#E6E5E3` desk with a white card or paper sheet holding the frame, drop shadows like real paper; **black-and-white halftone cutouts** (vintage people, hands, objects; public-domain or self-shot, run through a halftone filter); ONE flat yellow block `#F2C230`; heavy condensed sans for the key word with a tiny lowercase kicker on it ("no / plan", "but with / strategy"). the creator's face sits in a torn-paper or rounded cutout window for most of it; the collage owns 2–4 beats.
+- **Feel:** "A zine being assembled on the beat: pieces slide in from off-card and stop dead with a hard shadow; a yellow block wipes across; nothing floats or glows."
+- **Signature moves:** a halftone figure acts out the line (falls, climbs, runs from a clock); a yellow block wipes in behind the key word on the beat; Raw | My Edit side by side for the twist.
+- **Captions:** small black condensed on white paper strips (no stroke), key word bigger.
+- **SFX palette:** paper slap, scissors snip, stamp. **Music:** punchy hip-hop / funk, cuts land on the beat.
+- **Never:** colour stock photos, gradients, glow, emoji. Halftone assets must be public-domain, CC0 or the creator's own photos (note the source in the edit plan).
 
 ## Style DNA (optional, makes it unmistakably the creator's)
 If `$STUDIO/template/style-dna.md` exists, read it before choosing: it lists 3–5 reels the creator loves (links + what they likes in each — captions, motion, colour, pacing). Borrow one element from each, never copy one creator whole. If it doesn't exist, mention once at the checkpoint that 3–5 reference reels would sharpen the style.

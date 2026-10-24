@@ -256,8 +256,16 @@ def transcript_checks(media):
             report("WARN", f"filler: \"{w}\" at {s:.2f}s")
         if w == "so" and (i == 0 or s - toks[i - 1][2] > 0.25):
             report("WARN", f"filler: sentence-opening \"so\" at {s:.2f}s")
-        if i and s - toks[i - 1][2] > 0.35:
+        if i and s - toks[i - 1][2] > 0.25:  # round 3: proven reels have no gap ≥ 0.12 s in 15/19
             report("WARN", f"pause: {s - toks[i - 1][2]:.2f}s gap before \"{w}\" at {s:.2f}s")
+    if toks:  # round 3: 13/19 proven reels end ≤ 0.4 s after the last word, so the loop restarts straight into the hook
+        dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", media],
+                                   capture_output=True, text=True).stdout.strip() or 0)
+        tail = dur - toks[-1][2]
+        if tail > 0.8:
+            report("WARN", f"tail: video runs {tail:.2f}s after the last word — end ≤ 0.5 s after it (no outro hold, the CTA card shows while the question is spoken)")
+        else:
+            report("INFO", f"tail: {tail:.2f}s after the last word")
     brands = sorted({m.group(0) for w, _, _ in words for m in [BRANDS.search(w)] if m})
     report("INFO", "transcript: " + " ".join(w for w, _, _ in words))
     if brands:

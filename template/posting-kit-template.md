@@ -43,6 +43,7 @@
 <list reels: the whole list as numbered text — 1️⃣ <item> – <one-line benefit> (one line each; searchable, saveable, answers "where do I find these?")>
 <other reels: 2–3 short lines explaining the idea in plain words, with the topic's trending terms as plain text>
 <one trust line in the creator's words, e.g. "Tested it myself — no hype.">
+<optional, only when true (round 3: long personal captions did best): "One thing I forgot to say: …" or the setup/gear line ("Shot on: a phone + a cheap lav mic, one lamp behind me")>
 
 💾 Save this for <use case>
 📤 Send it to a friend who <relatable situation>

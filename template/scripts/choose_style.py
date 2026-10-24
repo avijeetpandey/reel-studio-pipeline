@@ -10,7 +10,9 @@ Rules it enforces (see reel-edit treatments.md / enhance.md): never the treatmen
 Cinematic Cutout at most once per 4 reels, a frequency penalty so one look can't dominate, a signature move that
 differs from the last reel, <= 2 heavy components, quiet twist + pre-CTA beats, no heavy move in the first 2 s / last 4 s,
 and a breather after every 2 upgraded lines.
-Also picks the in-video CTA card variant (follow / save) and a step-progress plan for list reels (WINNING_PATTERNS.md).
+Also picks the in-video CTA card variant (follow / save), the list device for list reels (step-progress for 2–3 items,
+list-header for 4+), a count-roll for big numbers, hand-annotate when a line points at a real object, and a 1 s literal
+hook image when the hook has a strong verb (WINNING_PATTERNS.md §16–18, round 3).
 """
 import argparse, json, os, re, sys
 CFG_PATH = os.path.expanduser(os.environ.get("REEL_STUDIO_CONFIG", "~/.config/reel-studio/config.json"))
@@ -19,12 +21,13 @@ STUDIO = os.path.expanduser(CFG.get("studio_dir", "~/Documents/reel-studio"))
 PLUGIN = os.path.expanduser(CFG.get("plugin_root", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")))
 
 HOME = os.path.expanduser("~")
-NAMES = ["Clean Tech", "Notebook", "Newsroom", "Terminal", "Data", "Cinematic Cutout", "Editorial Split", "Studio Kinetic", "Fact-or-Hype Reaction"]
+NAMES = ["Clean Tech", "Notebook", "Newsroom", "Terminal", "Data", "Cinematic Cutout", "Editorial Split", "Studio Kinetic", "Fact-or-Hype Reaction", "Halftone Collage"]
 MUSIC = {"Clean Tech": "light electronic, low", "Notebook": "warm lo-fi / acoustic, very low",
          "Newsroom": "minimal pulse, tense but quiet", "Terminal": "minimal electronic",
          "Data": "modern, steady", "Cinematic Cutout": "cinematic pad, swell into the twist",
          "Editorial Split": "funky (pick_music.py --mood funky)",
-         "Studio Kinetic": "dramatic or funky bed, low (pick_music.py)", "Fact-or-Hype Reaction": "funky/bright (pick_music.py)"}
+         "Studio Kinetic": "dramatic or funky bed, low (pick_music.py)", "Fact-or-Hype Reaction": "funky/bright (pick_music.py)",
+         "Halftone Collage": "punchy hip-hop / funk, cuts on the beat (pick_music.py --mood funky)"}
 SIGNALS = {
     "mechanism": r"\b(how|works?|token|tokens|embedding|vector|model|pipeline|layers?|attention|context|step|inside|under the hood|architecture|train(ed|ing)?|neural)\b",
     "analogy": r"\b(like|imagine|think of|it'?s as|similar to|autocomplete|recipe|kitchen|library|child|five|explain|everyday|just a|basically a|picture)\b",
@@ -34,6 +37,7 @@ SIGNALS = {
     "demo": r"\b(watch|here'?s how|set (it )?up|install|connect(ed)?|type|click|open|step)\b",
     "factcheck": r"\b(fact|hype|claim|claims|tested|test it|tried|really works|actually works|verdict|is it real|viral)\b",
     "identity": r"\b(you are|you're too|you talk|you overthink|you ask|career|superpower|go all in|stop|start|nobody tells you)\b",
+    "strategy": r"\b(strategy|plan|random(ly)?|consisten(t|cy)|growth|ignored|results|direction|mindset|habits?|discipline|why most|most people|algorithm)\b",
     "emotion": r"\b(job|jobs|replace[ds]?|fear|laid off|career|scared|nobody|lie|truth|wrong|quit|salary|fired|worth|dead|dying|stop)\b",
 }
 NUM = re.compile(r"\d|\b(percent|million|billion|trillion|lakh|crore|thousand)\b|[%₹$]", re.I)
@@ -41,6 +45,9 @@ APP = re.compile(r"\b(chatgpt|claude|gemini|google|linkedin|youtube|instagram|ap
 CODE = re.compile(r"\b(prompt|command|type[sd]?|code|script|terminal|query|config|sql|regex)\b", re.I)
 TWIST = re.compile(r"\b(but|actually|the truth|here'?s the thing|turns out|the catch|except|in reality|surprise)\b", re.I)
 QUESTION = re.compile(r"\?\s*$")
+BIGNUM = re.compile(r"\b\d{1,3}(,\d{3})+\b|\b\d{4,}\b|\b\d+(\.\d+)?\s*(k|m|million|billion|lakh|crore|stars|installs|downloads|users)\b", re.I)
+POINT = re.compile(r"\b(this (light|lamp|lens|mic|camera|setup|button|line|part|corner|tab|icon)|look at (this|that)|right here|see this|over here|behind me)\b", re.I)
+HOOK_VERB = re.compile(r"\b(murder(ed|s)?|kill(ed|s)?|dead|died|stole|steal(s|ing)?|replac(ed|es|ing)|broke|break(s|ing)?|destroy(ed|s)?|ended|exposed|leaked|banned|wrong|lied|lying|fired|hacked|cheat(ed|ing)?)\b", re.I)
 
 
 def parse_lines(path):
@@ -105,6 +112,7 @@ def choose(text, script_text, log, force):
         "Editorial Split": counts["list"] * 1.6 + counts["demo"] * 0.6,  # lists + tool demos (WINNING_PATTERNS.md)
         "Studio Kinetic": counts["identity"] * 1.5 + counts["emotion"] * 0.6,  # opinion / career / mantra (round 2)
         "Fact-or-Hype Reaction": counts["factcheck"] * 2.0,  # test a viral claim (round 2)
+        "Halftone Collage": counts["strategy"] * 1.4 + counts["identity"] * 0.4,  # opinion / strategy (round 3)
     }
     fmt = re.search(r"format[^\n]*", script_text or "", re.I)
     if fmt:  # the script's own format label is a strong hint
@@ -112,7 +120,8 @@ def choose(text, script_text, log, force):
         for key, name, bonus in [("news", "Newsroom", 3), ("myth", "Notebook", 2), ("analog", "Notebook", 2), ("explain", "Notebook", 1),
                                  ("hot take", "Cinematic Cutout", 2), ("story", "Cinematic Cutout", 2), ("experiment", "Terminal", 2),
                                  ("list", "Editorial Split", 3), ("story-demo", "Editorial Split", 2),
-                                 ("fact or hype", "Fact-or-Hype Reaction", 6), ("reframe", "Studio Kinetic", 3), ("mantra", "Studio Kinetic", 3)]:
+                                 ("fact or hype", "Fact-or-Hype Reaction", 6), ("reframe", "Studio Kinetic", 3), ("mantra", "Studio Kinetic", 3),
+                                 ("opinion", "Halftone Collage", 2), ("strategy", "Halftone Collage", 3), ("collage", "Halftone Collage", 6)]:
             if key in f:
                 score[name] += bonus
     hist = [treatments_of(r["treatment"]) for r in log]
@@ -151,8 +160,12 @@ def plan_components(lines, treatment):
         words = len(t.split())
         if CODE.search(t) and re.search(r"[\"'“”`]|/|\bprompt|command|code\b", t, re.I):
             comp, why = "code-window", "line quotes a prompt/command/code -> typed card"
+        elif BIGNUM.search(t):
+            comp, why = "count-roll", "says a big/growing number -> rolling counter (real figure only)"
         elif NUM.search(t) and words <= 14:
             comp, why = "roll-text", "carries the key number -> headline roll"
+        elif POINT.search(t) and treatment != "Halftone Collage":
+            comp, why = "hand-annotate", "points at a real object -> hand-drawn circle + arrow on the frame (place it from a frame grab)"
         elif APP.search(t) and treatment != "Cinematic Cutout":
             comp, why = "swing-window", f"names {APP.search(t)[0]} -> screen card (needs a REAL capture/screenshot of it)"
         elif re.search(r"\b(called|term|known as|is a|means)\b", t, re.I) or re.findall(r"(?<!^)\b[A-Z][a-zA-Z]{3,}\b", t):
@@ -167,9 +180,9 @@ def plan_components(lines, treatment):
     for p in plan:
         if p["comp"] in ("code-window", "swing-window") and (p["start"] < 2.0 or p["end"] > total - 4.0):
             p["comp"], p["why"] = "pop-blur", p["why"] + " (heavy move not allowed in first 2 s / last 4 s)"
-    rolls = [p for p in plan if p["comp"] == "roll-text"]
-    for p in rolls[2:]:
-        p["comp"], p["why"] = "pop-blur", p["why"] + " (max 2 roll-texts)"
+    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3)):
+        for p in [p for p in plan if p["comp"] == name][cap:]:
+            p["comp"], p["why"] = "pop-blur", p["why"] + f" (max {cap} {name})"
     run = 0  # breather after every 2 upgraded lines
     for p in plan:
         if p["comp"] != "-":
@@ -202,18 +215,27 @@ def main():
     last_move = log[-1]["move"].lower() if log else ""
     move = next((m for m in moves if m.split(";")[0].lower()[:24] not in last_move), moves[0] if moves else "")
     plan = plan_components(lines, pick)
-    item_re = re.compile(r"\b(number (one|two|three|four|five)|first|second|third|the best (one|part)|last one)\b", re.I)
+    item_re = re.compile(r"\b((rule|tip|step|tool|skill) )?number (one|two|three|four|five|six|seven|eight|nine|ten)|\b(first|second|third|fourth|fifth)\b|the best (one|part)|last one|#\d+|\b(day|step|rule|tip) \d+\b", re.I)
     items = [l["start"] for l in lines if item_re.search(l["text"])]
-    progress = {"component": "step-progress", "steps": items, "total": len(items)} if len(items) >= 2 else None
+    listed = re.search(r"\b(\d+|three|four|five|six|seven|eight|nine|ten) (things|tools|ways|skills|mistakes|steps|rules|systems|apps|settings|tips|effects|prompts|habits|signs)\b", lines[0]["text"], re.I)
+    progress = None
+    if len(items) >= 4 or (listed and len(items) >= 2 and not re.match(r"(two|three|2|3)\b", listed[1], re.I)):
+        progress = {"component": "list-header", "mode": "chip", "items": items, "total": len(items),
+                    "title": (listed[0] if listed else lines[0]["text"][:40]), "note": "title pinned from frame 0 (doubles as cover text)"}
+    elif len(items) >= 2:
+        progress = {"component": "step-progress", "steps": items, "total": len(items)}
+    hv = HOOK_VERB.search(lines[0]["text"])
+    hook_image = {"verb": hv[0], "at": lines[0]["start"], "brief": f"1 s literal image of \"{hv[0]}\" (e.g. tape across a logo, a struck-through word), then back to the face"} if hv else None
     cta = "save" if re.search(r"\b(framework|structure|checklist|template|cheat ?sheet|steps|save this)\b", text, re.I) else "follow"
-    out = {"treatment": pick, "list_progress": progress, "cta_variant": cta, "why": why, "signals": counts, "numbers": nums, "signature_move": move,
+    out = {"treatment": pick, "list_progress": progress, "hook_image": hook_image, "cta_variant": cta, "why": why, "signals": counts, "numbers": nums, "signature_move": move,
            "music_mood": MUSIC[pick], "last_treatments": [r["treatment"] for r in log[-2:]],
            "heavy_count": sum(p["comp"] in ("code-window", "swing-window") for p in plan),
            "lines": [{k: p[k] for k in ("i", "start", "end", "text", "comp", "why", "quiet")} for p in plan]}
     json.dump(out, open(a.out, "w"), indent=2, ensure_ascii=False)
 
     print(f"Treatment: {pick}   Signature move: {move}\nMusic mood: {MUSIC[pick]}\nWhy: {why}")
-    print(f"CTA card: {cta}   List progress: {'step-progress at ' + ', '.join(f'{t:.1f}s' for t in items) if progress else 'none'}\n")
+    print(f"CTA card: {cta}   List device: {progress['component'] + ' at ' + ', '.join(f'{t:.1f}s' for t in items) if progress else 'none'}")
+    print(f"Hook image: {hook_image['brief'] if hook_image else 'none'}\n")
     print("| # | Time | Line | Component | Why |\n|---|---|---|---|---|")
     for p in plan:
         print(f"| {p['i'] + 1} | {p['start']:.1f}–{p['end']:.1f} | {p['text'][:60]} | {p['comp']} | {p['why']} |")

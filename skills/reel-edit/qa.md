@@ -12,7 +12,7 @@ Run all of this after the build and again on the final render. Fix, re-run, and 
    - **face box:** runs `check --caption-zone` with each shot's face box from `geometry.json` → no text over the face
    - **enhance budget:** more than 2 heavy components (swing-window/code-window), two overlapping, roll-text over 4 words (reads `data-component`)
    - **scene variety:** same scene type > 2 in a row, < 3 scene types, missing breathers (reads `data-scene` attributes)
-4. **Transcript re-check** on the cut (before building) and on the final: `python3 -I T/scripts/qa_reel.py --audio <file.mp4>` re-transcribes word-level and flags a **word/phrase said twice** within 3 s, filler words (um, uh, like-as-filler, basically, so-as-opener), pauses > 0.35 s between words, a clipped first/last word, and lists brand names to verify spelling.
+4. **Transcript re-check** on the cut (before building) and on the final: `python3 -I T/scripts/qa_reel.py --audio <file.mp4>` re-transcribes word-level and flags a **word/phrase said twice** within 3 s, filler words (um, uh, like-as-filler, basically, so-as-opener), pauses > 0.25 s between words, a tail > 0.8 s after the last word (end ≤ 0.5 s after it), a clipped first/last word, and lists brand names to verify spelling.
 5. Frame 0 gate and A/V: first frame shows the face (snapshot at 0 and 0.25 s), voice starts ≤ 0.1 s, audio and video streams both start at 0 (`ffprobe -show_entries stream=start_time`).
 
 ## Enhance pass (see `enhance.md` §4)

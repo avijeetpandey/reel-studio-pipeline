@@ -5,7 +5,7 @@ COMPONENT: cta-card — the in-video CTA the winners use instead of a spoken ask
   comment — a comment composer that types the viewer's answer (e.g. "YES") and posts it; use with the yes/no question
 Seek-safe with NO callbacks: typing is per-character spans revealed by `set`s; button states are `set`s at fixed times.
 
-USE: paste CSS + markup into the CTA clip (last 3.9 s), then
+USE: paste CSS + markup into the CTA clip (from the start of the spoken yes/no question to the end; the reel ends ≤ 0.5 s after its last word — no hold), then
   buildCtaCard(tl, { el: "#cta", variant: "follow", start: 27.4, promise: "__PROMISE__" })
   buildCtaCard(tl, { el: "#cta", variant: "comment", start: 27.4, answer: "YES" })
   Pass avatar: "assets/avatar-cartoon.png" (the approved cartoon avatar — copy it from T/carousel/assets/) for follow/comment.

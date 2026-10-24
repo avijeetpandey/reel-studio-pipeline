@@ -1,0 +1,55 @@
+<!--
+COMPONENT: list-header — the list's title pinned at the top for the whole list, with either a "#N" chip that swaps on each item
+(theaustinschneider "10 Systems Your Agency Needs… #1–#10") or the full item list with the current item lit and done items dimmed
+(tenfoldmarc "16 video effects" list). Viewers see how far along they are, so they stay (WINNING_PATTERNS.md §2, §18).
+Seek-safe with NO callbacks: each change is a timeline `set`/tween at its own time.
+
+USE: paste CSS + markup into a `.g.clip` layer, then
+  buildListHeader(tl, { el: "#lh", title: "5 Claude settings|nobody uses", mode: "chip", items: [3.1, 8.4, 13.0, 18.2, 23.5], start: 0, end: 27 })
+  buildListHeader(tl, { el: "#lh", title: "Skills I use", mode: "list", names: ["watch", "video-use", "HyperFrames"], items: [2.0, 7.5, 13.1] })
+  title: "|" = line break; items = the time each item is first said.
+RULES: one per reel, and never together with step-progress; title ≤ 6 words, 2 lines max, 64–72 px, white with a soft shadow
+  (or ink on paper treatments); sits at y 150–420 (top safe zone), never over the face; list mode ≤ 8 names, ≥ 34 px.
+FEEL: "a scoreboard, not a slide": the title is there from frame 0 (it doubles as the cover text); the chip swaps with a 0.18 s
+  pop (scale 1.12 → 1); the lit item gets the accent colour and a 6 px nudge right, done items drop to 45 % opacity.
+-->
+
+<!-- CSS -->
+<style>
+  .lh { position: absolute; left: 60px; right: 60px; top: 150px; text-align: center; opacity: 0; }
+  .lh .t { font: 800 68px/1.06 Montserrat, sans-serif; color: var(--ink-on-video, #fff); text-shadow: 0 3px 16px rgba(0,0,0,0.45); }
+  .lh .chip { display: inline-block; margin-top: 18px; padding: 8px 22px; border-radius: 14px; background: var(--surface, #fff);
+              color: #111; font: 800 46px Montserrat, sans-serif; }
+  .lh .list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 40px; margin: 22px auto 0; width: 820px; text-align: left; }
+  .lh .list b { font: 600 34px "JetBrains Mono", Menlo, monospace; color: var(--ink-on-video, #fff); opacity: 0.8; }
+</style>
+
+<!-- MARKUP -->
+<div id="lh" class="lh"><div class="t"></div><div class="chip"></div><div class="list"></div></div>
+
+<!-- JS -->
+<script>
+  function buildListHeader(tl, o) {
+    const root = document.querySelector(o.el), t = root.querySelector(".t"), chip = root.querySelector(".chip"), list = root.querySelector(".list");
+    t.innerHTML = (o.title || "").split("|").join("<br>");
+    const accent = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#3ee0ff";
+    tl.set(root, { opacity: 1 }, o.start || 0);
+    if (o.mode === "list") {
+      chip.style.display = "none";
+      const els = (o.names || []).map((n, i) => { const b = document.createElement("b"); b.textContent = String(i + 1).padStart(2, "0") + "  " + n; list.appendChild(b); return b; });
+      o.items.forEach((at, i) => {
+        tl.to(els[i], { color: accent, opacity: 1, x: 6, duration: 0.2, ease: "power2.out" }, at);
+        if (i) tl.to(els[i - 1], { color: "#fff", opacity: 0.45, x: 0, duration: 0.2 }, at);
+      });
+    } else {
+      list.style.display = "none";
+      tl.set(chip, { opacity: 0 }, 0);
+      o.items.forEach((at, i) => {
+        tl.set(chip, { textContent: "#" + (i + 1), opacity: 1 }, at);
+        tl.fromTo(chip, { scale: 1.12 }, { scale: 1, duration: 0.18, ease: "power2.out" }, at);
+      });
+    }
+    if (o.end != null) tl.to(root, { opacity: 0, duration: 0.22, ease: "power2.in" }, o.end);
+    return root;
+  }
+</script>
