@@ -51,7 +51,7 @@ Plus: 6 seek-safe motion components (roll-text, pop-blur, swing-window, code-win
 ## Install
 In Claude Code:
 ```
-/plugin marketplace add akplancer/reel-studio-pipeline
+/plugin marketplace add avijeetpandey/reel-studio-pipeline
 ```
 ```
 /plugin install reel-studio
