@@ -1,0 +1,7 @@
+{
+  "name": "reel-studio",
+  "owner": { "name": "Reel Studio contributors" },
+  "plugins": [
+    { "name": "reel-studio", "source": "./", "description": "Script, edit and package Instagram Reels / YouTube Shorts end to end with Claude Code." }
+  ]
+}

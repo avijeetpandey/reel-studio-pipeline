@@ -1,0 +1,117 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=JetBrains+Mono:wght@700&display=block" rel="stylesheet" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; background: #03060d; }
+  #c { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Montserrat, sans-serif; color: #fff; }
+  .bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 700px 620px at 540px 1050px, rgba(62,224,255,0.30), rgba(62,224,255,0) 70%),
+      radial-gradient(ellipse 900px 700px at 540px 300px, rgba(124,140,255,0.22), rgba(124,140,255,0) 70%),
+      linear-gradient(180deg, #060b1c 0%, #04101f 45%, #02050b 100%);
+  }
+  .grid {
+    position: absolute; left: -200px; right: -200px; top: 1150px; height: 900px;
+    background-image:
+      linear-gradient(rgba(62,224,255,0.16) 2px, transparent 2px),
+      linear-gradient(90deg, rgba(62,224,255,0.16) 2px, transparent 2px);
+    background-size: 90px 90px;
+    transform: perspective(700px) rotateX(62deg);
+    transform-origin: 50% 0%;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.9), rgba(0,0,0,0));
+  }
+  svg.map { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+  #me {
+    position: absolute; left: -230px; top: -150px; width: 1540px;
+    filter: drop-shadow(0 0 6px rgba(62,224,255,0.95)) drop-shadow(0 0 40px rgba(62,224,255,0.45));
+  }
+  .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 520px; background: linear-gradient(to top, rgba(2,5,11,0.92), rgba(2,5,11,0)); }
+  .head { position: absolute; left: 0; right: 0; top: 262px; text-align: center; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 14px;
+    padding: 12px 28px; border-radius: 999px;
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.25);
+    font-size: 44px; font-weight: 800; letter-spacing: 0.01em;
+  }
+  .dot { width: 18px; height: 18px; border-radius: 50%; background: #10a37f; box-shadow: 0 0 14px #10a37f; }
+  .big {
+    margin-top: 22px;
+    font-size: 150px; font-weight: 900; line-height: 0.95; letter-spacing: -0.02em;
+    text-transform: uppercase;
+    background: linear-gradient(180deg, #ffffff 0%, #ffffff 55%, #bfefff 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 8px 0 rgba(0,0,0,0.55)) drop-shadow(0 0 30px rgba(62,224,255,0.35));
+  }
+  .big .no { color: #ff4d5e; -webkit-text-fill-color: #ff4d5e; }
+  .sub {
+    margin-top: 16px; font-size: 64px; font-weight: 900; color: #3ee0ff;
+    text-shadow: 0 0 26px rgba(62,224,255,0.65), 0 6px 0 rgba(0,0,0,0.6);
+  }
+  .pill {
+    position: absolute; left: 50%; top: 1455px; transform: translateX(-50%) rotate(-2deg);
+    padding: 22px 46px; border-radius: 26px;
+    background: #3ee0ff; color: #031018;
+    font-size: 72px; font-weight: 900; white-space: nowrap;
+    box-shadow: 0 0 0 6px rgba(3,16,24,0.9), 0 0 60px rgba(62,224,255,0.75), 0 18px 40px rgba(0,0,0,0.6);
+  }
+  .brand {
+    position: absolute; left: 0; right: 0; top: 1610px; text-align: center;
+    font-family: "JetBrains Mono", monospace; font-size: 34px; font-weight: 700; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.85); text-transform: uppercase;
+  }
+  .brand b { color: #3ee0ff; }
+</style>
+</head>
+<body>
+<div id="c">
+  <div class="bg"></div>
+  <div class="grid"></div>
+
+  <!-- word-map constellation -->
+  <svg class="map" viewBox="0 0 1080 1920">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <g stroke="rgba(62,224,255,0.35)" stroke-width="2" fill="none">
+      <polyline points="70,760 150,690 120,860 60,980" />
+      <polyline points="1010,720 940,800 1020,900 960,1010" />
+    </g>
+    <!-- far distance line -->
+    <line x1="150" y1="690" x2="940" y2="800" stroke="#ff7a59" stroke-width="4" stroke-dasharray="14 14" opacity="0.85" />
+    <g filter="url(#glow)">
+      <circle cx="150" cy="690" r="14" fill="#3ee0ff" />
+      <circle cx="120" cy="860" r="12" fill="#3ee0ff" />
+      <circle cx="70" cy="760" r="8" fill="#7c8cff" />
+      <circle cx="60" cy="980" r="8" fill="#7c8cff" />
+      <circle cx="940" cy="800" r="14" fill="#ff7a59" />
+      <circle cx="1010" cy="720" r="8" fill="#ffd166" />
+      <circle cx="1020" cy="900" r="9" fill="#ff7a59" />
+      <circle cx="960" cy="1010" r="8" fill="#9dff7a" />
+    </g>
+    <g font-family="Montserrat, sans-serif" font-weight="900" font-size="40">
+      <text x="56" y="660" fill="#ffffff">dog</text>
+      <text x="40" y="910" fill="#ffffff">puppy</text>
+      <text x="1040" y="860" fill="#ffffff" text-anchor="end">toaster</text>
+    </g>
+    <text x="545" y="700" font-family="JetBrains Mono, monospace" font-weight="700" font-size="34" fill="#ff7a59" text-anchor="middle" opacity="0">d = 0.91</text>
+  </svg>
+
+  <img id="me" src="cutout.png" />
+  <div class="shade"></div>
+
+  <div class="head">
+    <div class="chip"><span class="dot"></span>ChatGPT</div>
+    <div class="big"><span class="no">CAN'T</span> READ</div>
+    <div class="sub">your words 🤯</div>
+  </div>
+
+  <div class="pill">It reads a MAP 🗺️</div>
+  <div class="brand">__BRAND__</div>
+</div>
+</body>
+</html>

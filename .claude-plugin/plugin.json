@@ -1,0 +1,8 @@
+{
+  "name": "reel-studio",
+  "version": "1.0.0",
+  "description": "End-to-end short-form content studio for Claude Code: topic → script + shoot sheet → carousel + LinkedIn → (you film) → fully edited Reel/Short with captions, motion graphics, music, covers and posting kit → Drive. Learns from reference reels you like.",
+  "author": { "name": "Reel Studio contributors" },
+  "keywords": ["reels", "shorts", "video-editing", "hyperframes", "content-creation", "carousel"],
+  "skills": "./skills"
+}

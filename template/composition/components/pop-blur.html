@@ -1,0 +1,41 @@
+<!--
+COMPONENT: pop-blur — generic enter/exit for any card, chip or label: rises, scales up and sharpens in; drifts up and blurs out.
+Ported from the Remotion `Pop` (Desktop/animated-reels). The default entrance for graphics (stat chips, labels, lower cards).
+Seek-safe: GSAP tweens only. Time the entrance to the spoken word: pass the word's start from WORDS.
+
+USE: add class "pop" to any element (it starts hidden), then
+  buildPop(tl, { el: "#chip-1", start: 5.9, end: 8.1 })       // end optional
+  buildPop(tl, { el: ".stat", start: [5.9, 6.3, 6.7] })        // several, one start each
+OPTIONS: y (rise px, default 36), scale (from, default 0.92), blur (px, default 10), dur (0.38), exit ("up" | "none").
+RULES: no bounce (overshoot ≤ 2%); exits are faster than entrances (0.22 s) with an 8–12 px drift; never two cards at once;
+  min text 34 px; nothing over the face box.
+FEEL: "settles like a page landing on a desk": power3.out, tiny back overshoot, blur clears before the end.
+-->
+
+<!-- CSS -->
+<style>
+  .pop { opacity: 0; will-change: transform, opacity, filter; }
+  .chip { display: inline-flex; align-items: center; padding: 16px 30px; border-radius: 999px; background: var(--surface, #fff);
+          color: #1b1b1a; font: 800 38px Montserrat, sans-serif; box-shadow: 0 10px 28px rgba(0,0,0,0.28); white-space: nowrap; }
+</style>
+
+<!-- MARKUP -->
+<div id="chip-1" class="pop chip" style="position:absolute; left: 60px; top: 520px">no credits</div>
+
+<!-- JS -->
+<script>
+  function buildPop(tl, o) {
+    const els = gsap.utils.toArray(o.el);
+    const starts = Array.isArray(o.start) ? o.start : els.map(() => o.start);
+    const y = o.y ?? 36, s0 = o.scale ?? 0.92, blur = o.blur ?? 10, dur = o.dur ?? 0.38;
+    els.forEach((el, i) => {
+      tl.set(el, { opacity: 0 }, 0);
+      tl.fromTo(el, { opacity: 0, y, scale: s0, filter: `blur(${blur}px)` },
+        { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: dur, ease: "back.out(1.1)" }, starts[i]);
+      if (o.end != null && o.exit !== "none") {
+        tl.to(el, { opacity: 0, y: -10, scale: 0.97, filter: "blur(8px)", duration: 0.22, ease: "power2.in" }, o.end);
+      }
+    });
+    return els;
+  }
+</script>

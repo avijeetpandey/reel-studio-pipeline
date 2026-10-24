@@ -1,0 +1,41 @@
+# Sound design — the part viewers feel but never notice
+
+## Sound map (write it after the beat map, before mixing)
+List every sound with its exact time and why, plus the deliberate silences:
+```
+| t (s) | Sound file | Event on screen | Volume |
+| 0.00 | impact-bass-1 | hook words land | 0.30 |
+| 2.35 | paper-slide | lower card slides up | 0.22 |
+| 6.10 | — (silence) | twist line, face close | — |
+```
+Rules:
+- **Every sound is motivated by motion on screen:** whoosh = something moves across; pop/click = something appears; line/scribble = something is drawn; key-press = typing; tick = counting; riser → hit = build-up and release (max one per reel).
+- **Leave ≥ 2 silent spots** (the twist, and before the CTA). When everything makes a sound, nothing stands out.
+- Never two SFX at the same moment; never SFX on b-roll cuts (hard cuts are silent) or on caption pops.
+- **Levels:** SFX volume 0.15–0.35 (clearly under the voice); a 30–60 ms fade-out on every tail; a light shared room tone/reverb glue on the SFX bus (`hyperframes-audio`: small reverb, wet ~10%) so they sit in the same space.
+- **Music:** bed under the voice at about **−20 dB** relative (gain ≈ 0.10–0.12), carved under the voice with `hyperframes-audio`'s `carve.mjs`; can rise to ~0.4 on the end card; fade out. Choose by mood from `music/INDEX.md` (tags: calm / curious / tense / warm / upbeat / cinematic) to match the treatment and the script's emotion — not the same track as the last reel (check `style_log.md`).
+- Only YouTube Audio Library music ("Attribution not required"). **Every reel has music.** If `music/INDEX.md` has no unused track for the mood, Claude opens YouTube Studio → Audio Library itself, filters Attribution not required + mood, previews, downloads the best fit **without asking the creator** (their standing OK, 22 Oct 2026), saves it to `T/composition/assets/audio/music/` and adds a line to `INDEX.md`. Only stop if a sign-in is needed.
+
+## Music energy (the creator's note, 24 Oct 2026: "the music is very ugly and not at all energetic")
+- The bed must be **at full energy from the first second**: never start a track on a soft or ambient intro. Find the drop / main groove (look at the waveform: `ffmpeg -i track.mp3 -af astats=metadata=1:reset=1 …` or listen-by-loudness every 2 s) and trim the file to start there (`ffmpeg -ss <drop> -i track.mp3 -t <reel length + 1> assets/audio/bgm.mp3`), with a 0.3 s fade-in.
+- Pick for **tempo and drive**, not mood words: ~100–128 BPM, a clear beat, bright and modern (pop / electronic / funk / hip-hop instrumental). Calm or "inspirational" library tracks only when the reel is genuinely calm.
+- Before mixing, render a 10 s preview of the music alone at 0–10 s; if it doesn't make you want to keep watching, pick another track.
+- Cut graphic changes and punch-ins **on the beat** where possible (beat map from the track's onsets), so the edit feels musical, not timed by a script.
+
+## Library (`T/composition/assets/audio/sfx/`) — families
+| Family | Files | Use |
+|---|---|---|
+| Whooshes | whoosh-short, whoosh, whoosh-air, whoosh-long, whoosh-cinematic | movement of cards/camera (short/air = small moves, long = big moves, cinematic = TB/hook) |
+| Clicks & UI | click-soft, click, key-press, pop, ping, notification, ui-success, error, tick | appear/disappear, UI cards, typing, success/"wrong", count-ups (tick) |
+| Drawing & paper | pen-scribble, line-draw, paper-slide | Notebook + Newsroom treatments: circles/underlines, drawn lines, cards placed |
+| Risers & hits | riser, riser-metal, impact-bass-1, impact-bass-2, hit-heavy | build-up and drop (max one per reel); hook impact |
+| Texture | typing, chime, sparkle | terminal, success, magic moments (sparingly) |
+Pick from the treatment's SFX palette (`treatments.md`). `whoosh-air, whoosh-long, riser-metal, hit-heavy, paper-slide, pen-scribble, ui-success, tick, line-draw` are original sounds synthesized by `T/scripts/make_sfx.py` (no licence issues; tweak and regenerate if one feels off). The YouTube Audio Library's sound effects are mostly 2014 field/foley recordings — use them only for real-world sounds. Never download without asking.
+
+## CTA card and list beats (from the reference reels)
+- CTA card: soft click on the cursor press, a pop on the state change (Following / Saved / Posted), key ticks while the answer types (≤ 0.25 volume).
+- Step-progress: one soft tick per item change; the big numeral gets a light pop. Still never two SFX at once.
+
+## SFX as structure (round 2, WINNING_PATTERNS §14)
+- Pick **2–3 signature sounds per reel and use them the same way every time**: whoosh = scene/graphic change, riser = the 0.6 s before a payoff/number, hit (impact-bass / boom) = the punchline or verdict, click/tick = counters and checkboxes, ui-success / error = FACT / HYPE verdicts.
+- Keep a constant low bed (≈ −25 dB under the voice) for talk reels; skits and demos may run voice + SFX only.

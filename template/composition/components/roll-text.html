@@ -1,0 +1,63 @@
+<!--
+COMPONENT: roll-text — headline words rise out of a mask, stagger per word, accent word in the accent colour.
+Ported from the Remotion `RollText` (Desktop/animated-reels). Use for hook words, a big claim, a twist line.
+Seek-safe: GSAP tweens only, no wall clock. Words are split once at build time.
+
+USE: paste the CSS into <style>, the markup into a `.g.clip` layer, the JS after `const tl = gsap.timeline({paused:true})`.
+  buildRollText(tl, { el: "#rt-hook", start: 0.1, exitAt: 2.4 })
+DATA: text lives in data-text. "|" = line break, *word* = accent. Keep ≤ 4 words, ≥ 64 px (headline 64–96).
+RULES: sits in the graphics band above the face (y 250–1420), never over the face box. Exit is faster than entrance.
+FEEL: "words rise out of a slot": expo-out, 0.55 s per word, 0.06 s stagger, 70 px travel, small blur that clears.
+-->
+
+<!-- CSS -->
+<style>
+  .rt { position: absolute; left: 60px; right: 150px; text-align: center; font-weight: 800; line-height: 1.05;
+        font-size: 84px; color: var(--ink); letter-spacing: -0.01em; }
+  .rt .ln { display: block; white-space: nowrap; }
+  .rt .mask { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.04em 0.03em 0.16em; margin: -0.04em -0.03em -0.16em; }
+  .rt .wd { display: inline-block; will-change: transform; }
+  .rt .hi { color: var(--accent); }
+  .rt .sp { display: inline-block; width: 0.26em; }
+</style>
+
+<!-- MARKUP (inside a .g.clip layer; position with top:) -->
+<div id="rt-hook" class="rt" style="top: 420px" data-text="This reel was|written as *code*"></div>
+
+<!-- JS -->
+<script>
+  function buildRollText(tl, o) {
+    const root = document.querySelector(o.el);
+    const stagger = o.stagger ?? 0.06, inDur = o.inDur ?? 0.55, travel = o.travel ?? 70;
+    root.innerHTML = "";
+    const words = [];
+    root.dataset.text.split("|").forEach((line) => {
+      const ln = document.createElement("span");
+      ln.className = "ln";
+      let hi = false;
+      line.split(" ").forEach((raw, i, arr) => {
+        if (raw.startsWith("*")) hi = true;
+        const mask = document.createElement("span");
+        mask.className = "mask";
+        const wd = document.createElement("span");
+        wd.className = "wd" + (hi ? " hi" : "");
+        wd.textContent = raw.replace(/\*/g, "");
+        mask.appendChild(wd);
+        ln.appendChild(mask);
+        if (i < arr.length - 1) { const s = document.createElement("span"); s.className = "sp"; ln.appendChild(s); }
+        if (raw.replace(/[.,?!]+$/, "").endsWith("*")) hi = false;
+        words.push(wd);
+      });
+      root.appendChild(ln);
+    });
+    tl.set(root, { opacity: 0 }, 0); // hidden before start (seek-safe)
+    tl.set(root, { opacity: 1 }, o.start);
+    tl.fromTo(words, { yPercent: 115, filter: "blur(6px)" },
+      { yPercent: 0, filter: "blur(0px)", duration: inDur, ease: "expo.out", stagger }, o.start);
+    if (o.exitAt != null) {
+      tl.to(words, { yPercent: -115, filter: "blur(6px)", duration: 0.25, ease: "power3.in", stagger: 0.02 }, o.exitAt);
+      tl.set(root, { opacity: 0 }, o.exitAt + 0.25 + 0.02 * words.length);
+    }
+    return words;
+  }
+</script>

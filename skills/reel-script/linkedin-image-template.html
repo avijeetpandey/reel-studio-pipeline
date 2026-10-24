@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<title>LinkedIn image</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+<!-- 1080×1350 (4:5) LinkedIn feed image, {brand} clean tech. Fill: kicker, headline (≤ 8 words, key words in .k), 3–4 point card, footer stays. -->
+<style>
+:root { --cyan:#3ee0ff; --bg:#0a0e13; --text:#f4f7fa; --muted:#8b98a8; }
+* { box-sizing:border-box; margin:0; padding:0; }
+html,body { width:1080px; height:1350px; background:var(--bg); }
+body { position:relative; overflow:hidden; color:var(--text); font-family:'Montserrat',sans-serif; }
+body::before { content:""; position:absolute; inset:0;
+  background: radial-gradient(60% 40% at 85% 10%, rgba(62,224,255,.22), transparent 70%),
+              radial-gradient(50% 35% at 10% 95%, rgba(62,224,255,.12), transparent 70%); }
+body::after { content:""; position:absolute; inset:0; opacity:.5;
+  background-image:linear-gradient(rgba(62,224,255,.05) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(62,224,255,.05) 1px, transparent 1px);
+  background-size:72px 72px; }
+.wrap { position:relative; z-index:1; height:100%; display:flex; flex-direction:column; padding:96px; }
+.kicker { font-family:'JetBrains Mono',monospace; font-size:30px; color:var(--cyan); letter-spacing:.04em; }
+h1 { font-weight:900; font-size:104px; line-height:1.04; letter-spacing:-.02em; margin-top:36px; }
+h1 .k { color:var(--cyan); }
+.card { margin-top:auto; background:rgba(255,255,255,.04); border:1.5px solid rgba(62,224,255,.28);
+  border-radius:30px; box-shadow:0 0 60px rgba(62,224,255,.12); padding:44px 48px;
+  display:flex; flex-direction:column; gap:22px; }
+.pt { display:grid; grid-template-columns:56px 1fr; font-size:38px; font-weight:700; line-height:1.3; }
+.pt b { font-family:'JetBrains Mono',monospace; color:var(--cyan); font-size:32px; padding-top:4px; }
+.foot { margin-top:56px; display:flex; justify-content:space-between; align-items:center;
+  font-family:'JetBrains Mono',monospace; font-size:28px; color:var(--muted); }
+.tag { color:var(--text); font-weight:800; font-family:'Montserrat',sans-serif; font-size:30px; }
+.tag b { color:var(--cyan); }
+</style></head><body><div class="wrap">
+  <div class="kicker">// ai hallucinations</div>
+  <h1>ChatGPT doesn't know <span class="k">when it's wrong.</span></h1>
+  <div class="card">
+    <div class="pt"><b>01</b><span>It predicts the next likely word</span></div>
+    <div class="pt"><b>02</b><span>Likely-sounding isn't the same as true</span></div>
+    <div class="pt"><b>03</b><span>So verify anything that matters</span></div>
+  </div>
+  <div class="foot"><span class="tag">__BRAND__</span><span>__NAME__ · __ROLE__</span></div>
+</div></body></html>

@@ -1,0 +1,100 @@
+---
+name: reel-script
+description: Turn a topic into a ready-to-shoot {brand} reel — a suggested format (explainer, experiment, 3-AI comparison, myth-or-fact, hot take, POV skit, family/vox-pop, news, story) with its shooting plan, 3 hook options, a 25–35 s script in timed beats (line to say, on-screen text, graphic/b-roll, delivery note), loop line, yes/no CTA, b-roll list, cover/title ideas, a professional LinkedIn post (+ 4:5 image) on the same topic, plus a visual shoot sheet (framing guide, lighting plan, do/avoid, pre-shoot checklist) published as an artifact the creator can open on their phone while filming. Use whenever the creator gives a topic or idea for a reel/short and wants a script, hook, shoot plan or "what should I say".
+---
+
+# Reel script + shoot sheet
+
+> **Setup first.** These values come from `~/.config/reel-studio/config.json` (written by the `studio-setup` skill — run it if the file is missing):
+> `$STUDIO` = `studio_dir` (your working folder: `template/`, `reels/`, `carousels/`, `research/`) · `$PLUGIN` = `plugin_root` (this plugin) ·
+> `{brand}`, `{handle}`, `{creator_name}`, `{drive_remote}`, `{drive_folder}` = the matching config keys. Channel rules, approval gates,
+> posting slots and timezone live in `$STUDIO/CHANNEL_RULES.md` — they override any default numbers written below.
+
+**Read first:** `$STUDIO/template/WINNING_PATTERNS.md` (hooks, structure, proof, captions, CTAs, covers from the reference reels the creator picked).
+
+Input: a topic (and optionally an angle, a target length, or notes). Output: `script.md`, `linkedin_post.md` + `linkedin_image.png`, and a published shoot sheet. Do not edit video here — that is the `reel-edit` skill.
+
+**Pipeline mode:** if `reels/<reel_name>/pipeline.json` exists, `make-content` is orchestrating — use its `research.md` instead of re-researching, run only the sections it asks for (it runs section 6 LinkedIn in a separate helper), and don't publish a second shoot sheet if one is already linked in the manifest.
+
+## 1. Set up
+- `reel_name` = snake_case of the topic (e.g. `why_chatgpt_makes_things_up`). Folder: `$STUDIO/reels/<reel_name>/` (create it; move the session there with change_directory if the session is elsewhere).
+- Ask nothing unless the topic is missing. Make sensible choices and note them.
+
+## 2. Research (quick, 1–3 web searches)
+- Check every factual claim you'll put in the script is correct *today* (models change fast: e.g. ChatGPT can browse, so say "by default it doesn't look facts up", not "it never looks anything up").
+- Look for the angle people are talking about this week and one relatable everyday example.
+- **Fact or Hype? episodes:** find a viral AI claim from the last 7 days (web search: trending AI tool/claim + Instagram/X/YouTube), save the source post's URL + date, and plan the live test (what the creator will run on screen, what result would make it FACT vs HYPE). Never present the original creator's clip as the creator's; show it as a screenshot/quote with the handle.
+
+## 3. Topic check
+Label it **Broad AI curiosity / career** (good) or **Dev-only** (post rarely). If dev-only, propose a broader angle of the same idea ("prompt caching" → "Why ChatGPT replies faster the second time") and write the script for the broader one unless the creator said otherwise.
+
+## 3b. Pick the format
+Suggest the format that fits the topic best (unless the creator named one) and one alternative, with a one-line reason. Write the script and the shoot plan for that format. Avoid repeating the format of the last 2 reels in `$STUDIO/reels/` (check their `script.md`) so the weekly mix stays varied (Mon explainer · Tue experiment/comparison · Wed myth-or-fact/hot take · Thu explainer · Fri skit/family/vox-pop · Sat news/reaction · Sun story/reply).
+
+| Format | Script shape | Shooting plan (goes in the shoot sheet "Format & shots" card) |
+|---|---|---|
+| **Explainer** (default) | claim → analogy → how it works → **the fix** (one thing the viewer can do today) → twist → CTA | Talking head, standard framing/lighting; 1–2 screen recordings. |
+| **Experiment** ("I tested it so you don't have to") | the challenge + stakes (0–3 s) → 3–4 attempt beats → result reveal → verdict + CTA | Talking-head intro + verdict; screen-record every AI step; film real-world proof (food arriving, the itinerary on paper). Keep screens readable. Allow a day to run it. |
+| **Comparison** (same prompt, 3 AIs) | the prompt → AI 1 / 2 / 3 results (one beat each) → winner + why → "would you pick the same?" | Screen-record each AI with the identical prompt, same window size, outputs unedited; talking head only for intro and verdict. No personal data in the recordings. |
+| **Myth or fact** | claim on screen → "myth or fact?" + 1 s pause → reveal → why in one line → next claim (2–3 claims) | Talking head; film a deliberate pause + reaction face per claim; on-screen MYTH/FACT stamps. |
+| **Hot take** | the opinion as line 1 → 2 reasons → the fair counterpoint → "agree? yes or no" | Closer, punchier framing, slightly lower camera; one take, high energy. |
+| **POV skit** | "POV: …" on screen → 3–5 short exchanges → punchline → CTA as text | Film each character as a separate take (change one prop / position / angle per character); tripod locked; "POV" text overlay; 15–25 s. |
+| **Family / vox-pop** | the question → 2–4 real answers → your explanation → callback to the funniest answer | Get consent on camera; a lav or second phone per person (audio matters most); vertical, eye level, natural light; same question every time. |
+| **News / reaction** | what happened (1 fact-checked line) → why it matters to normal people → what to do → CTA | Green-screen style: real source page/headline above you (never a fake); post within 24 h; say the date. |
+| **Story** (senior-engineer life) | the moment (line 1) → what happened → the lesson → question to viewers | Softer, closer framing, calmer delivery; optional b-roll of desk / commute. Nothing internal from your employer. |
+| **Numbered list** ("3 Claude tools nobody uses") | pinned title with the number → item 1 → item 2 → open loop "but the best one is…" → item 3 (the strongest) → CTA. 3 items in 25–35 s (5 only at ≤ 5 s each); each item = name + what it does for you + real proof on screen | Split framing (screen recording top, face bottom): leave the top half of the frame clean; screen-record each item working (real app, real output). Finger-count gesture on "number two". |
+| **Story-demo** ("I gave Claude a phone and it…") | the result in line 1 → the mini-story of one real task (3 beats, real screen) → "here's how" in 2 steps → the catch → CTA | Record the real task end-to-end first (screen + any real-world proof), then film the talking head; same seat and light as usual. |
+| **Fact or Hype?** (series — the creator's recurring franchise) | the viral AI claim on screen ("they say Claude can now…") → "fact or hype?" → test it live on screen with reactions → FACT/HYPE verdict + one-line why → yes/no CTA | Film the reaction pose (arms crossed, skeptical) for the claim, screen-record the real test end to end, film the verdict to camera. Same opening line + checkbox graphic every episode. |
+| **Identity reframe list** (career) | "'You X' → so Y" × 5–7 fast pairs ("'You ask too many questions' → become a debugger") → the turn ("that thing they criticise is your edge") → yes/no CTA | Lo-fi selfie or cinematic studio; one take, high energy; a small pinned quote caption at the top changes per pair. |
+| **Mantra** | one line repeated as the spine (3–4×), each time with a sharper reason, ≤ 25 s | Cinematic studio look (dark room, warm practical light, mic in frame); one continuous energetic take. |
+| **Skit** | a 20–40 s mini story where the tool/idea solves a funny problem; dialogue lines | Two characters (the creator + the creator in a cap, or the creator + an on-screen AI character); lock the tripod, film each side separately. |
+| **Money saved list** | "N free tools that replace $X of paid software" → each item with what it replaces + monthly saving → total → CTA | Screen-record each tool's real page; talking head bottom. |
+| **Prompt makeover / reply-to-comment** | the bad prompt or comment on screen → the fix → results side by side | Screen-record both prompts and results; talking head for the fix. |
+
+For **series episodes** (e.g. "Day X/30"), open with "Day X of 30. Today…", end with a teaser for the next day, then the CTA.
+
+## 4. Write the script (channel rules from `$STUDIO/CHANNEL_RULES.md` — follow exactly)
+- **95–120 spoken words in 25–35 s (≈ 200 WPM — the proven reels run 167–246 WPM, WINNING_PATTERNS §11).** Short sentences, no warm-up, every breath gets cut in the edit. One idea, one everyday analogy, one twist line. Count the words.
+- **Credibility line by second 5** (proof: a number, a test you ran, stars, a result) and **live reactions** written into the script ("okay, this is actually good", "I didn't expect that") plus an honest verdict — talk like a person reacting, not a narrator.
+- **Structure:** Hook (0–2 s) → **Lead** (pays the hook off and carries the viewer past ~8 s) → body → **one open-loop line** at 50–70 % ("but that's not the best part", "the catch:") → payoff / fix → CTA → loop line. Lists put the strongest item last.
+- **3 hook options**, each a plain-English claim (no question, no jargon, no "Hi guys / So today"), ≤ 8 words, each with **hook words**: 2–4 words taken from the spoken claim that `reel-edit` shows above the face in the first 0.55 s (e.g. "trained to agree"). Mark one recommended and say why in one line. Write them from the hook shapes in `WINNING_PATTERNS.md` §1 and §11 (round 2 adds: "Don't open X again before you have…", "You can now… completely free", "Someone just released a free repo that…", "Before you risk a single…", "These are the ONLY N … you need", "I want to teach you how to…", fact-or-hype) and §1's 7 shapes (number + promise + scarcity · everyone-vs-you · kill-claim · reverse psychology · new capability · pain → fix · number + low effort + time) — use 3 different shapes. Each hook also names **what is on screen at frame 0 next to the face** (the real page, the result, the diagram already moving) — never a blank or title card.
+- **The fix:** every explainer (and most other formats) gives one concrete thing the viewer can do today — a setting, a sentence to type, a check. Fix-first Shorts get 100k–8M views vs ~1k for explanation-only on the same topic (Oct 2026 demand check).
+- **Beats:** 5–7 rows. Each has: time range, the exact line to say (short sentences, spoken style, contractions), on-screen text ≤ 5 words, **scene** (T / TC / TL / SP / FG / TB — see `$PLUGIN/skills/reel-edit/planning.md`), the visual (real asset or graphic idea), a 3–6 word **motion feel** ("settles like a page", "draws itself"), and a delivery note where it matters (lean in, slow down, pause, point).
+- **Pacing (same rules as reel-edit):** one graphic per idea, not per sentence; a change every 2–4 s but only when the words motivate it; after every 2 graphic beats one plain **T** beat; the twist is always **T**; at least 2 quiet moments (the twist and right before the CTA); at least 3 scene types; at most one **TB**.
+- **Show it working:** every claim about a tool is proven by a recording of the real product doing it (the output, not the settings page). List the exact recording in the assets checklist.
+- **Real over generic:** every product, site, app, document, number or person mentioned gets a real visual — a screen recording the creator makes, a page to capture (URL), a real screenshot — never a generic icon or stock chart. Choose it from the meaning of the whole line, not a keyword.
+- **CTA = one debatable yes/no question**, then a **loop line** that flows back into the hook ("Because remember…" → hook). Never "comment KEYWORD".
+- **Key words to highlight** (1–2, the words that make you keep watching). The treatment decides the highlight colour/style; at most one highlighted word per caption chunk.
+
+## 5. B-roll and packaging
+- B-roll: what the creator should screen-record himself (Cmd+Shift+5 / phone screen recording) with the exact action and length, plus 1–2 real pages to capture (docs, papers, GitHub, Wikipedia). Never fake product UIs.
+- **Edit brief** (read by `reel-edit` autopilot — it wins over its defaults):
+  - **Treatment:** one of the seven in `$PLUGIN/skills/reel-edit/treatments.md` (incl. **Editorial Split** for lists and tool demos) that fits the topic, format and analogy — and is not the treatment of either of the last 2 reels in `$STUDIO/reels/style_log.md`. One-line reason. (Optional: if left out, `reel-edit` picks it automatically with `choose_style.py`.)
+  - **Signature move:** one, not used in the last reel (from the log).
+  - **Look** (WINNING_PATTERNS §12): A lo-fi selfie · B cinematic studio · C graphic top / face box · D reaction/stitch · E prop as screen — one, with a one-line reason; it sets the shoot sheet's lighting and framing.
+  - **Music mood:** funky · happy · bright · dramatic (energetic by default; `reel-edit` picks the track automatically with `pick_music.py`).
+  - **Assets to capture:** a checklist of every screen recording / page / screenshot / prop the beats need, with exact action and length.
+- Cover A (curiosity question, ≤ 4 words), Cover B (bold claim, ≤ 4 words). Covers are separate uploads, never part of the video. Follow `WINNING_PATTERNS.md` §7: for a list reel the cover carries the number + topic + scarcity ("3 Claude tools nobody uses"); a small lead-in line + a big key phrase; the face or the hero visual; a series tag when it's a series.
+- **In-video CTA card** for the edit brief: Follow card (default), Save card (framework/reference reels), or comment composer typing the yes/no answer — `reel-edit` builds it from `T/composition/components/`.
+- **YouTube title:** one quick YouTube search for the topic first; phrase the title the way people actually search it ("Will AI replace software engineers?", "What is RAG"), ≤ 60 chars, no hashtags. Note the top result's view count as a demand signal.
+
+## 6. LinkedIn post (same topic, professional platform — not a copy of the reel)
+Quick web search first for current LinkedIn practice (what's working this month, any format changes).
+- **Voice:** first person, the creator (their role from CHANNEL_RULES.md) sharing a practical insight with peers. Calm, credible, specific. No hype words ("game-changer", "mind-blowing", "revolutionary"), no slang, no clickbait, no fake stats. Verified facts only.
+- **your employer:** never share internal your employer details, tools, numbers or projects, and never imply your employer endorses the post. Personal experience framed generally ("on teams I've worked with…") is fine.
+- **Hook (first 2 lines, ≤ ~200 characters, shown before "…see more"):** a concrete observation or tension from real work ("Most AI mistakes I review aren't model bugs. They're trust bugs."). No emoji opener, no "I'm excited to share", no question as the very first line.
+- **Body:** 150–250 words. Short paragraphs of 1–2 lines with white space between them. One concrete example (a realistic engineering situation), the simple explanation (same analogy as the reel, said more professionally), then **one practical takeaway** — up to 3 short bullets of what to do differently at work.
+- **Close:** one genuine open question that invites experience, not yes/no ("How does your team check AI output before it ships?"). No engagement bait ("comment YES", "like if you agree", "follow for more").
+- **Format:** ≤ 2 emoji in the whole post (zero is fine), **3 hashtags** at the very end (1 broad e.g. #ArtificialIntelligence, 1 role e.g. #SoftwareEngineering, 1 topic). No links in the body — if a source is worth sharing, put it in a first comment and say so.
+- **Media (recommend one):** (a) the finished reel uploaded natively (vertical is fine), or (b) a 1080×1350 image: copy `linkedin-image-template.html` (next to this file), fill the kicker / headline (≤ 8 words, key words in `.k`) / 3 points, render with
+  `"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --disable-gpu --hide-scrollbars --window-size=1080,1350 --virtual-time-budget=4000 --screenshot=<reel folder>/linkedin_image.png "file://<reel folder>/linkedin_image.html"` and look at the PNG.
+- **Schedule:** Tue–Thu 8–10 AM (your timezone), the morning after the reel goes live. Reply to every comment in the first hour.
+- Write it all to `linkedin_post.md`: post text (ready to paste), alt text for the image, first-comment text (if any), media choice, schedule.
+
+## 7. Write the files
+1. `script.md` in the reel folder: topic check, format (+ alternative), hooks (+ hook words), beats table (with scene + motion feel), loop + CTA, key words, b-roll, **edit brief**, packaging, and a plain **teleprompter** block (just the lines to say, one paragraph per beat). `reel-edit` reads this as its plan.
+2. **Shoot sheet:** load the `artifact-design` skill first, then copy `shoot-sheet-template.html` (next to this file) to `<reel folder>/shoot_sheet.html` and replace every `<!-- FILL: … -->` section with this reel's content (also the `<title>`, `#reelName`, h1 and header chips). Fill the "Format & shots" card with the chosen format, the alternative, and the shot list from the 3b table adapted to this topic; add a header chip with the format name. Fill the "Edit brief" card (treatment, signature move, music mood, assets-to-capture checklist) and show each beat's scene code on its beat card. If the plan has a **TB** (text-behind-head) beat, add to the setup notes: plain background with a metre of space behind, no hair-coloured backdrop, so the cutout edges come out clean. Fill the LinkedIn card with the full post text. Set the lighting/framing card from the edit brief's **Look** (WINNING_PATTERNS §12): A lo-fi selfie = phone at arm's length or on a table, window light on the face, a lived-in background; B cinematic studio = room lights off, one warm practical lamp behind/beside you for bokeh, key light 45° in front, mic visible in shot, darker top; C graphic-top = head and shoulders framed in the lower half, plain background; D reaction = arms-crossed skeptical take + a separate verdict take; E prop = laptop/phone held in frame showing the slide. Keep the `<!-- STATIC -->` sections (framing guide, lighting plan, do/avoid, checklist) and the style/script as they are; only adjust a static caption if this topic needs a different setup (e.g. standing, outdoors, a prop or a laptop in shot — then say where it goes).
+3. Publish `shoot_sheet.html` with the Artifact tool (icon `"video"`, one-sentence description) so the creator can open it on their phone while filming.
+
+## 8. Reply
+Short: the suggested format (and the alternative), the recommended hook, the LinkedIn hook line, word count / length, topic label, the artifact link, and the path to `script.md`. Offer one change ("want a punchier version or a different analogy?"). Don't paste the whole script into chat — it's in the files.

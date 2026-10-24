@@ -1,0 +1,275 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<!-- {brand} carousel deck. Reads window.DECK from slides.js (same folder).
+     ?slide=N renders slide N alone at 1080×1350 · ?print=1 renders every slide as PDF pages · ?qa=1 writes checks into #qa.
+     Look: an engineer's notebook. Paper, dot grid, one ink, a highlighter and a red pen. No gradients, glow or glass. -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700;800&family=Caveat:wght@600;700&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #FAF9F6; --ink: #17191E; --muted: #5F6570; --line: #D9D6CE; --card: #FFFFFF;
+    --pen: #D2412B; --hl: 255, 226, 88; --blue: #2B59C3;
+    --head: "Hanken Grotesk", "Helvetica Neue", Arial, sans-serif;
+    --hand: "Caveat", "Bradley Hand", cursive;
+    --mono: "JetBrains Mono", Menlo, monospace;
+  }
+  .ink-theme { --paper: #15181D; --ink: #F2F0EA; --muted: #A2A8B3; --line: #343944; --card: #1D2128; --pen: #FF7A5C; --hl: 255, 214, 64; --blue: #8FB0FF; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { background: #888; }
+  body.single { width: 1080px; height: 1350px; overflow: hidden; }
+  .slide {
+    position: relative; width: 1080px; height: 1350px; overflow: hidden;
+    background-color: var(--paper); color: var(--ink); font-family: var(--head);
+    -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision;
+  }
+  /* paper: dot grid + faint grain */
+  .slide::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .55;
+    background-image: radial-gradient(circle, rgba(0,0,0,.13) 1.6px, transparent 2px); background-size: 40px 40px; background-position: 20px 20px; }
+  .ink-theme .slide::before { background-image: radial-gradient(circle, rgba(255,255,255,.09) 1.6px, transparent 2px); }
+  .plain .slide::before { display: none; }
+  .ruled .slide::before { opacity: 1; background-image: linear-gradient(transparent 58px, rgba(43,89,195,.10) 58px, rgba(43,89,195,.10) 60px); background-size: 100% 60px; background-position: 0 30px; }
+  .slide::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .06; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/></filter><rect width='300' height='300' filter='url(%23n)'/></svg>"); }
+  .ink-theme .slide::after { mix-blend-mode: screen; opacity: .05; }
+
+  /* header: who's talking + where you are */
+  .hdr { position: absolute; left: 96px; right: 96px; top: 70px; display: flex; align-items: center; gap: 18px; z-index: 3; }
+  .hdr img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+  .who { display: flex; flex-direction: column; line-height: 1.15; }
+  .who b { font-size: 28px; font-weight: 800; }
+  .who span { font-size: 22px; color: var(--muted); font-weight: 500; }
+  .pg { margin-left: auto; font-family: var(--mono); font-size: 22px; color: var(--muted); text-align: right; line-height: 1.3; }
+  .pg i { font-style: normal; display: block; color: var(--ink); opacity: .75; }
+
+  /* content box */
+  .c { position: absolute; left: 96px; right: 96px; top: 196px; bottom: 130px; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
+  .c.top { justify-content: flex-start; }
+  .kicker { font-family: var(--mono); font-size: 24px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 26px; }
+  .t-xl { font-size: 104px; line-height: 1.0; font-weight: 800; letter-spacing: -.025em; }
+  .t-l { font-size: 82px; line-height: 1.04; font-weight: 800; letter-spacing: -.02em; }
+  .t-m { font-size: 76px; line-height: 1.06; font-weight: 800; letter-spacing: -.015em; }
+  .t-s { font-size: 64px; line-height: 1.08; font-weight: 800; letter-spacing: -.01em; }
+  .body { font-size: 44px; line-height: 1.36; font-weight: 500; color: var(--ink); margin-top: 30px; max-width: 860px; }
+  .body + .body { margin-top: 18px; }
+  .muted { color: var(--muted); }
+  .eg { font-size: 38px; line-height: 1.35; color: var(--muted); margin-top: 18px; }
+  .eg::before { content: "e.g. "; font-family: var(--hand); font-size: 44px; color: var(--pen); }
+  .src { position: absolute; left: 96px; right: 96px; bottom: 64px; font-family: var(--mono); font-size: 20px; color: var(--muted); z-index: 3; }
+
+  /* hand marks */
+  mark { background: none; color: inherit; position: relative; z-index: 0; padding: 0 .08em; }
+  mark::before { content: ""; position: absolute; z-index: -1; left: -.06em; right: -.08em; top: .14em; bottom: .06em; transform: rotate(-1.2deg) skewX(-6deg); border-radius: .12em .3em .18em .35em;
+    background: linear-gradient(100deg, rgba(var(--hl),.0) 0%, rgba(var(--hl),.85) 3%, rgba(var(--hl),.72) 45%, rgba(var(--hl),.9) 92%, rgba(var(--hl),0) 100%); }
+  .ul, .circ { position: relative; white-space: nowrap; }
+  .ul svg { position: absolute; left: -2%; width: 104%; height: .32em; bottom: -.16em; overflow: visible; }
+  .circ svg { position: absolute; left: -9%; top: -16%; width: 118%; height: 132%; overflow: visible; }
+  .ul path, .circ path, .arrow path, .tick path, .box path { fill: none; stroke: var(--pen); stroke-linecap: round; stroke-linejoin: round; }
+  .note { font-family: var(--hand); font-size: 54px; line-height: 1.05; color: var(--pen); font-weight: 700; transform: rotate(-2.5deg); display: inline-block; }
+  .note-wrap { display: flex; align-items: center; gap: 10px; margin-top: 34px; }
+  .arrow { width: 120px; height: 70px; flex: none; overflow: visible; }
+  .arrow path { stroke-width: 4.5; }
+
+  /* cover */
+  .is-cover .t-xl { max-width: 900px; }
+  .is-cover .c { justify-content: flex-start; }
+  .is-cover.has-photo .t-xl { font-size: 96px; max-width: 880px; }
+  .photo { position: absolute; right: -40px; bottom: 0; width: 600px; z-index: 1; }
+  .is-cover .sub { font-size: 40px; line-height: 1.3; color: var(--muted); font-weight: 500; margin-top: 28px; max-width: 760px; }
+  .is-cover.has-photo .sub { max-width: 520px; }
+  .swipe { position: absolute; right: 96px; bottom: 74px; z-index: 3; display: flex; align-items: center; gap: 6px; }
+  .is-cover.has-photo .swipe { left: 96px; right: auto; }
+  .swipe .note { font-size: 50px; }
+
+  .cover-shot { margin-top: 56px; align-self: center; transform: rotate(-2deg); }
+  .cover-shot img { width: 780px; height: 520px; max-height: none; object-fit: cover; border: 14px solid #fff; border-bottom-width: 70px; border-radius: 4px; }
+
+  /* numbered point */
+  .num { font-family: var(--hand); font-size: 96px; line-height: .8; color: var(--pen); font-weight: 700; margin-bottom: 18px; }
+
+  /* steps / flow */
+  .flow { display: flex; flex-direction: column; gap: 0; margin-top: 36px; }
+  .step { background: var(--card); border: 2.5px solid var(--ink); border-radius: 20px; padding: 24px 30px; font-size: 44px; line-height: 1.25; font-weight: 700; box-shadow: 5px 6px 0 rgba(0,0,0,.08); }
+  .step small { display: block; font-family: var(--mono); font-size: 22px; font-weight: 500; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 6px; }
+  .step.hot { border-color: var(--pen); }
+  .down { height: 54px; width: 100%; display: flex; justify-content: flex-start; padding-left: 60px; }
+  .down svg { width: 40px; height: 54px; overflow: visible; }
+  .down path { fill: none; stroke: var(--ink); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* cover tags: the topic's words as paper tags (no-photo cover) */
+  .tags { display: flex; flex-wrap: wrap; gap: 18px 16px; margin-top: 56px; max-width: 900px; }
+  .tag { position: relative; display: inline-block; background: var(--card); border: 2.5px solid var(--ink); border-radius: 14px; padding: 10px 20px; font-size: 40px; font-weight: 800; letter-spacing: -.01em; box-shadow: 4px 5px 0 rgba(0,0,0,.08); white-space: nowrap; }
+  .tag.lit { background: rgba(var(--hl), .9); }
+  .tag.ghost { color: var(--muted); border-color: var(--line); font-weight: 700; }
+  .tag .circ-svg { position: absolute; left: -14%; top: -30%; width: 128%; height: 160%; overflow: visible; }
+  .tag .circ-svg path { fill: none; stroke: var(--pen); stroke-width: 4; stroke-linecap: round; }
+  .tag-note { position: relative; margin-top: 30px; }
+
+  /* compare */
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 40px; }
+  .col { background: var(--card); border: 2px solid var(--line); border-radius: 22px; padding: 32px 30px; }
+  .col h4 svg { flex: none; }
+  .col h4 { font-size: 44px; line-height: 1.1; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+  .col p { font-size: 40px; line-height: 1.3; font-weight: 500; }
+  .col p + p { margin-top: 14px; }
+  .col.bad h4 { color: var(--muted); }
+  .col.good { border-color: var(--ink); }
+  .myth-q { font-size: 58px; line-height: 1.2; font-weight: 700; color: var(--muted); text-decoration: line-through; text-decoration-color: var(--pen); text-decoration-thickness: 5px; }
+  .myth-wrap { position: relative; margin-top: 10px; align-self: flex-start; }
+  .myth-wrap svg { position: absolute; left: -10px; right: -10px; top: 0; width: calc(100% + 20px); height: 100%; overflow: visible; }
+  .myth-wrap path { fill: none; stroke: var(--pen); stroke-width: 5; stroke-linecap: round; }
+  .fact-l { font-family: var(--hand); font-size: 58px; color: var(--pen); margin-top: 46px; }
+
+  /* checklist */
+  .checks { list-style: none; margin-top: 44px; display: flex; flex-direction: column; gap: 40px; }
+  .checks li { display: grid; grid-template-columns: 64px 1fr; gap: 24px; align-items: start; font-size: 46px; line-height: 1.3; font-weight: 600; }
+  .checks li small { display: block; font-size: 36px; font-weight: 500; color: var(--muted); margin-top: 4px; }
+  .box { width: 58px; height: 58px; overflow: visible; margin-top: 2px; }
+  .box .sq { stroke: var(--ink); stroke-width: 3.5; }
+  .box .tk { stroke: var(--pen); stroke-width: 6; }
+
+  /* glossary */
+  .terms { display: flex; flex-direction: column; gap: 0; margin-top: 10px; }
+  .term { padding: 36px 0; }
+  .term + .term { border-top: 2px dashed var(--line); }
+  .term h3 { font-size: 78px; font-weight: 800; letter-spacing: -.015em; line-height: 1.05; }
+  .term p { font-size: 46px; line-height: 1.34; font-weight: 500; margin-top: 14px; }
+
+  /* tweet / story text */
+  .tw { font-size: 56px; line-height: 1.3; font-weight: 500; }
+  .tw p + p { margin-top: 30px; }
+  .stamp { font-family: var(--mono); font-size: 24px; color: var(--muted); margin-bottom: 26px; letter-spacing: .04em; }
+
+  /* stat */
+  .big-n { font-size: 250px; line-height: .9; font-weight: 800; letter-spacing: -.04em; }
+
+  /* timeline */
+  .year { font-family: var(--mono); font-size: 34px; color: var(--pen); margin-bottom: 14px; }
+  .tl { position: relative; padding-left: 56px; margin-top: 44px; display: flex; flex-direction: column; gap: 48px; }
+  .tl::before { content: ""; position: absolute; left: 12px; top: 10px; bottom: 10px; width: 3px; background: var(--ink); opacity: .8; border-radius: 3px; }
+  .tl div { position: relative; }
+  .tl div::before { content: ""; position: absolute; left: -54px; top: 14px; width: 26px; height: 26px; border-radius: 50%; background: var(--paper); border: 3.5px solid var(--ink); }
+  .tl div.hot::before { border-color: var(--pen); background: var(--pen); }
+  .tl b { font-family: var(--mono); font-size: 30px; font-weight: 500; color: var(--muted); display: block; }
+  .tl span { font-size: 48px; line-height: 1.3; font-weight: 700; }
+
+  /* screenshot */
+  .shot { position: relative; margin-top: 40px; align-self: flex-start; max-width: 100%; transform: rotate(-1deg); }
+  .shot img { display: block; max-width: 888px; max-height: 640px; border: 2px solid var(--line); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.10); background: #fff; }
+  .tape { position: absolute; width: 150px; height: 44px; background: rgba(var(--hl), .45); top: -20px; transform: rotate(-6deg); }
+  .tape.l { left: 40px; } .tape.r { right: 40px; transform: rotate(5deg); }
+
+  /* template / copy box */
+  .copy { margin-top: 40px; background: var(--card); border: 2.5px dashed var(--ink); border-radius: 18px; padding: 34px 36px; font-family: var(--mono); font-size: 34px; line-height: 1.5; white-space: pre-wrap; }
+
+  /* recap */
+  .recap { list-style: none; counter-reset: r; margin-top: 40px; display: flex; flex-direction: column; gap: 30px; }
+  .recap li { counter-increment: r; display: grid; grid-template-columns: 76px 1fr; font-size: 46px; line-height: 1.3; font-weight: 600; }
+  .recap li::before { content: counter(r) "."; font-family: var(--hand); font-size: 58px; color: var(--pen); line-height: .9; }
+
+  /* cta */
+  .cta .t-l { max-width: 880px; }
+  .cta .yn { font-family: var(--hand); font-size: 64px; color: var(--pen); margin-top: 22px; transform: rotate(-2deg); display: inline-block; }
+  .share { font-size: 44px; line-height: 1.35; font-weight: 500; margin-top: 44px; max-width: 840px; }
+  .follow { margin-top: 90px; display: flex; align-items: center; gap: 24px; padding: 26px 30px; border: 2.5px solid var(--ink); border-radius: 24px; background: var(--card); }
+  .follow img { width: 92px; height: 92px; border-radius: 50%; object-fit: cover; }
+  .follow b { font-size: 36px; font-weight: 800; display: block; }
+  .follow span { font-size: 30px; color: var(--muted); }
+
+  #qa { position: absolute; left: -99999px; }
+  @page { size: 1080px 1350px; margin: 0; }
+  @media print { html, body { background: none; } .slide { break-after: page; } }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<pre id="qa"></pre>
+<script src="slides.js"></script>
+<script>
+(function () {
+  const D = window.DECK, q = new URLSearchParams(location.search);
+  const A = Object.assign({ name: "__NAME__", handle: "@__HANDLE__", role: "__ROLE__", avatar: "assets/avatar-cartoon.png" }, D.author || {});
+  document.body.className = [D.theme === "ink" ? "ink-theme" : "", D.paper || "dots"].join(" ");
+  const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  // hand-drawn marks: small random wobble so no two look machine-identical (seeded, so renders are repeatable)
+  let seed = 7; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const w = (a) => (rnd() - .5) * a;
+  const ulSvg = () => `<svg viewBox="0 0 300 20" preserveAspectRatio="none"><path stroke-width="5" d="M3 ${12 + w(4)} C 70 ${4 + w(5)}, 150 ${16 + w(5)}, 220 ${8 + w(4)} S 290 ${10 + w(4)}, 297 ${12 + w(3)}"/></svg>`;
+  const circSvg = () => `<svg viewBox="0 0 200 100" preserveAspectRatio="none"><path stroke-width="4" d="M${18 + w(6)} ${30 + w(6)} C 40 2, 170 0, 192 ${40 + w(6)} C 210 80, 120 104, 60 96 C 0 88, -6 40, 40 ${14 + w(6)} L 70 ${6 + w(4)}"/></svg>`;
+  const arrowSvg = (dir) => dir === "down"
+    ? `<svg class="arrow" viewBox="0 0 80 120" style="width:70px;height:110px"><path d="M40 6 C ${30 + w(10)} 40, ${50 + w(10)} 70, 40 108 M22 88 L40 110 L58 86"/></svg>`
+    : `<svg class="arrow" viewBox="0 0 120 70"><path d="M6 ${50 + w(8)} C 40 ${10 + w(8)}, 70 ${60 + w(8)}, 110 ${26 + w(4)} M86 16 L111 26 L94 48"/></svg>`;
+  const downSvg = () => `<div class="down"><svg viewBox="0 0 40 54"><path d="M20 4 C ${16 + w(6)} 20, ${24 + w(6)} 34, 20 48 M9 36 L20 49 L31 35"/></svg></div>`;
+  const boxSvg = (on) => `<svg class="box" viewBox="0 0 60 60"><path class="sq" d="M6 ${8 + w(3)} L${54 + w(2)} 6 L${55 + w(2)} ${54 + w(2)} L${7 + w(2)} 55 Z"/>${on === false ? "" : `<path class="tk" d="M12 30 L26 46 L58 ${4 + w(4)}"/>`}</svg>`;
+  const strikeSvg = () => `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 ${55 + w(8)} C 30 ${45 + w(8)}, 70 ${62 + w(8)}, 100 ${48 + w(8)}"/></svg>`;
+  // inline markup: ==highlight== __underline__ ((circle)) **bold**
+  const fmt = s => esc(s)
+    .replace(/==(.+?)==/g, "<mark>$1</mark>")
+    .replace(/__(.+?)__/g, (_, t) => `<span class="ul">${t}${ulSvg()}</span>`)
+    .replace(/\(\((.+?)\)\)/g, (_, t) => `<span class="circ">${t}${circSvg()}</span>`)
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  const note = (n, dir) => n ? `<div class="note-wrap">${dir === "left" ? arrowSvg() : ""}<span class="note">${fmt(n)}</span>${dir === "left" ? "" : ""}</div>` : "";
+  const total = D.slides.length;
+  const hdr = (i) => `<div class="hdr"><img src="${esc(A.avatar)}"><div class="who"><b>${esc(A.name)}</b><span>${esc(A.handle)} · ${esc(A.role)}</span></div><div class="pg"><i>${esc(D.series || "")}</i>${String(i + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}</div></div>`;
+  const P = s => (Array.isArray(s) ? s : s ? [s] : []);
+
+  const L = {
+    cover: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h1 class="t-xl fit">${fmt(s.title)}</h1>${s.sub ? `<p class="sub fit">${fmt(s.sub)}</p>` : ""}${s.image ? `<div class="shot cover-shot"><span class="tape l"></span><span class="tape r"></span><img src="${esc(s.image)}"></div>` : ""}${s.tags ? `<div class="tags">${s.tags.map((t, k) => `<span class="tag${(s.lit || []).includes(k) ? " lit" : ""}${(s.ghost || []).includes(k) ? " ghost" : ""}" style="transform:rotate(${(w(7)).toFixed(1)}deg)">${esc(t)}${s.circle === k ? circSvg().replace("<svg ", '<svg class="circ-svg" ') : ""}</span>`).join("")}</div>` : ""}${note(s.note, "left")}</div>
+      ${s.photo ? `<img class="photo" src="${esc(s.photo)}">` : ""}<div class="swipe"><span class="note">${esc(s.swipe || "swipe")}</span>${arrowSvg()}</div>`,
+    statement: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="${s.size === "xl" ? "t-xl" : "t-l"} fit">${fmt(s.title)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${note(s.note, "left")}</div>`,
+    point: (s) => `<div class="c">${s.n ? `<div class="num">${esc(s.n)}</div>` : ""}${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-m fit">${fmt(s.title)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${s.eg ? `<p class="eg fit">${fmt(s.eg)}</p>` : ""}${s.image ? `<div class="shot"><span class="tape l"></span><img src="${esc(s.image)}"></div>` : ""}${note(s.note, "left")}</div>`,
+    steps: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="flow">${s.steps.map((x, k) => (k ? downSvg() : "") + `<div class="step${x.hot ? " hot" : ""} fit">${x.label ? `<small>${esc(x.label)}</small>` : ""}${fmt(x.text || x)}</div>`).join("")}</div>${note(s.note, "left")}</div>`,
+    compare: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="cmp">
+        <div class="col bad"><h4>${boxSvg(false)}${esc(s.left.head)}</h4>${P(s.left.points).map(p => `<p class="fit">${fmt(p)}</p>`).join("")}</div>
+        <div class="col good"><h4>${boxSvg(true)}${esc(s.right.head)}</h4>${P(s.right.points).map(p => `<p class="fit">${fmt(p)}</p>`).join("")}</div></div>${note(s.note, "left")}</div>`,
+    myth: (s) => `<div class="c">${s.n ? `<div class="num">${esc(s.n)}</div>` : ""}<div class="kicker">Myth</div><div class="myth-wrap"><span class="myth-q fit">“${esc(s.myth)}”</span></div><div class="fact-l">Actually…</div><h2 class="t-m fit" style="margin-top:10px">${fmt(s.fact)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${note(s.note, "left")}</div>`,
+    checklist: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><ul class="checks">${s.items.map(it => `<li>${boxSvg(it.done !== false)}<div class="fit">${fmt(it.text || it)}${it.small ? `<small>${fmt(it.small)}</small>` : ""}</div></li>`).join("")}</ul>${note(s.note, "left")}</div>`,
+    glossary: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<div class="terms">${s.terms.map(t => `<div class="term"><h3 class="fit">${fmt(t.term)}</h3><p class="fit">${fmt(t.def)}</p>${t.eg ? `<p class="eg fit">${fmt(t.eg)}</p>` : ""}</div>`).join("")}</div>${note(s.note, "left")}</div>`,
+    story: (s) => `<div class="c">${s.stamp ? `<div class="stamp">${esc(s.stamp)}</div>` : ""}<div class="tw fit">${P(s.text).map(t => `<p>${fmt(t)}</p>`).join("")}</div>${note(s.note, "left")}</div>`,
+    stat: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<div class="big-n">${fmt(s.number)}</div><h2 class="t-s fit" style="margin-top:26px">${fmt(s.title)}</h2>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${note(s.note, "left")}</div>`,
+    timeline: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="tl">${s.events.map(e => `<div class="${e.hot ? "hot" : ""}"><b>${esc(e.when)}</b><span class="fit">${fmt(e.text)}</span></div>`).join("")}</div>${note(s.note, "left")}</div>`,
+    screenshot: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="shot"><span class="tape l"></span><span class="tape r"></span><img src="${esc(s.image)}"></div>${P(s.body).map(b => `<p class="body fit">${fmt(b)}</p>`).join("")}${note(s.note, "left")}</div>`,
+    template: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-s fit">${fmt(s.title)}</h2><div class="copy fit">${esc(s.copy)}</div>${note(s.note || "screenshot this", "left")}</div>`,
+    recap: (s) => `<div class="c">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-m fit">${fmt(s.title || "Quick recap")}</h2><ol class="recap">${s.items.map(i => `<li class="fit"><span>${fmt(i)}</span></li>`).join("")}</ol>${note(s.note || "screenshot this", "left")}</div>`,
+    cta: (s) => `<div class="c cta">${s.kicker ? `<div class="kicker">${fmt(s.kicker)}</div>` : ""}<h2 class="t-l fit">${fmt(s.question)}</h2><span class="yn">${esc(s.yn || "Yes or no? Tell me below.")}</span>${s.share ? `<p class="share fit">${fmt(s.share)}</p>` : ""}
+        <div class="follow"><img src="${esc(A.avatar)}"><div><b>${esc(s.follow || "I decode one AI thing every day.")}</b><span>Follow ${esc(A.handle)} for tomorrow's</span></div></div></div>`
+  };
+
+  const render = (s, i) => {
+    const f = L[s.type]; if (!f) throw new Error("unknown slide type: " + s.type);
+    const src = s.source ? `<div class="src">Source: ${esc(s.source)}</div>` : "";
+    return `<section class="slide is-${s.type}${s.photo ? " has-photo" : ""}" data-i="${i + 1}">${hdr(i)}${f(s)}${src}</section>`;
+  };
+
+  const root = document.getElementById("root");
+  const one = parseInt(q.get("slide") || "0", 10);
+  if (one) { document.body.classList.add("single"); root.innerHTML = render(D.slides[one - 1], one - 1); }
+  else root.innerHTML = D.slides.map(render).join("");
+
+  if (q.get("qa")) {
+    // checks: content box overflow, text limits, layout rules
+    const words = el => (el.textContent || "").trim().split(/\s+/).filter(Boolean).length;
+    const out = [];
+    document.fonts.ready.then(() => {
+      document.querySelectorAll(".slide").forEach(sl => {
+        const i = +sl.dataset.i, s = D.slides[i - 1], c = sl.querySelector(".c"), cb = c.getBoundingClientRect();
+        const issues = [];
+        let maxB = 0; c.querySelectorAll("*").forEach(e => { const r = e.getBoundingClientRect(); if (r.height) maxB = Math.max(maxB, r.bottom); });
+        if (maxB > cb.bottom + 2) issues.push(`content overflows the slide by ${Math.round(maxB - cb.bottom)}px — cut words, don't shrink type`);
+        sl.querySelectorAll(".fit").forEach(e => { if (e.scrollWidth > e.clientWidth + 2) issues.push("a line is wider than its box: " + e.textContent.slice(0, 40)); });
+        const h = sl.querySelector("h1,h2"); if (h && words(h) > (s.type === "cta" ? 16 : 12)) issues.push(`headline has ${words(h)} words (max ${s.type === "cta" ? 16 : 12})`);
+        const total = words(c); const cap = { cover: 26, cta: 45, recap: 55, glossary: 70, checklist: 60, steps: 50, compare: 60, story: 60, template: 80, timeline: 60 }[s.type] || 40;
+        if (total > cap) issues.push(`${total} words on a ${s.type} slide (max ${cap})`);
+        out.push({ slide: i, type: s.type, words: total, issues });
+      });
+      if (D.slides[0].type !== "cover") out.push({ slide: 1, issues: ["slide 1 must be a cover"] });
+      if (D.slides[D.slides.length - 1].type !== "cta") out.push({ slide: D.slides.length, issues: ["last slide must be a cta"] });
+      if (D.slides.length < 6 || D.slides.length > 10) out.push({ deck: true, issues: [`${D.slides.length} slides (aim for 6–10)`] });
+      document.getElementById("qa").textContent = JSON.stringify(out);
+    });
+  }
+})();
+</script>
+</body>
+</html>

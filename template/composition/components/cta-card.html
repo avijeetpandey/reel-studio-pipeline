@@ -1,0 +1,76 @@
+<!--
+COMPONENT: cta-card — the in-video CTA the winners use instead of a spoken ask (WINNING_PATTERNS.md §6). Three variants:
+  follow  — a profile card "@{handle} · <promise>" with a Follow button; a cursor glides in and clicks → "Following ✓"
+  save    — a big "🔖 Save this" button; the cursor clicks → "Saved ✓"
+  comment — a comment composer that types the viewer's answer (e.g. "YES") and posts it; use with the yes/no question
+Seek-safe with NO callbacks: typing is per-character spans revealed by `set`s; button states are `set`s at fixed times.
+
+USE: paste CSS + markup into the CTA clip (last 3.9 s), then
+  buildCtaCard(tl, { el: "#cta", variant: "follow", start: 27.4, promise: "__PROMISE__" })
+  buildCtaCard(tl, { el: "#cta", variant: "comment", start: 27.4, answer: "YES" })
+  Pass avatar: "assets/avatar-cartoon.png" (the approved cartoon avatar — copy it from T/carousel/assets/) for follow/comment.
+RULES: sits in the safe box (y 250–1420), never over the face box; one CTA card per reel; it ends before the loop overlay starts.
+SOUND (sound.md): soft click on the cursor press, a pop on the state change, keyboard ticks while typing (volume ≤ 0.25).
+FEEL: "a real phone UI": card rises 30 px and settles (0.4 s power3.out); cursor eases in over 0.6 s; press = scale 0.94 → 1 in 0.15 s.
+-->
+
+<!-- CSS -->
+<style>
+  .cta { position: absolute; left: 110px; width: 760px; top: 1010px; opacity: 0; }
+  .cta .card { display: flex; align-items: center; gap: 22px; padding: 26px 30px; border-radius: 28px; background: rgba(255,255,255,0.96);
+               box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #15171c; font: 600 34px Montserrat, sans-serif; }
+  .cta .av { width: 84px; height: 84px; border-radius: 50%; background: center/cover no-repeat var(--avatar, #ccd); flex: none; }
+  .cta .who { flex: 1; line-height: 1.15; }
+  .cta .who small { display: block; font: 500 26px Montserrat, sans-serif; color: #6b7080; }
+  .cta .btn { position: relative; padding: 18px 30px; border-radius: 18px; background: var(--accent); color: #0b0d12; font: 800 32px Montserrat, sans-serif; white-space: nowrap; }
+  .cta .btn .on { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 18px; background: #e9ebf0; color: #15171c; opacity: 0; }
+  .cta .box { flex: 1; min-height: 64px; display: flex; align-items: center; padding: 0 22px; border-radius: 18px; background: #f0f1f4; font: 800 40px Montserrat, sans-serif; }
+  .cta .box .ch { display: none; }
+  .cta .cur { position: absolute; width: 46px; height: 46px; opacity: 0; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+</style>
+
+<!-- MARKUP (pick the variant in JS; the markup is shared) -->
+<div id="cta" class="cta">
+  <div class="card">
+    <div class="av"></div>
+    <div class="who"></div>
+    <div class="box"></div>
+    <div class="btn" data-layout-allow-overlap><span class="lbl"></span><span class="on"></span></div>
+  </div>
+  <svg class="cur" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2L16 21l-3 1.4-3.6-6.8L4 20z" fill="#fff" stroke="#111" stroke-width="1.4"/></svg>
+</div>
+
+<!-- JS -->
+<script>
+  function buildCtaCard(tl, o) {
+    const root = document.querySelector(o.el), who = root.querySelector(".who"), box = root.querySelector(".box"),
+          btn = root.querySelector(".btn"), lbl = root.querySelector(".lbl"), on = root.querySelector(".on"), cur = root.querySelector(".cur"),
+          av = root.querySelector(".av");
+    const v = o.variant || "follow", t0 = o.start;
+    const text = { follow: ["Follow", "Following ✓"], save: ["🔖 Save this", "Saved ✓"], comment: ["Post", "Posted ✓"] }[v];
+    lbl.textContent = text[0]; on.textContent = text[1];
+    if (v === "follow") { who.innerHTML = `@${o.handle || "__HANDLE__"}<small>${o.promise || "__PROMISE__"}</small>`; box.remove(); }
+    if (v === "save") { who.innerHTML = `${o.title || "Save it for later"}<small>${o.sub || "you'll want this again"}</small>`; av.remove(); box.remove(); }
+    if (v === "comment") { who.remove(); box.innerHTML = ""; [...(o.answer || "YES")].forEach((c) => { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; box.appendChild(s); }); }
+    if (o.avatar) av.style.setProperty("--avatar", `url(${o.avatar})`);
+
+    tl.set(root, { opacity: 0 }, 0);
+    tl.fromTo(root, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, t0);
+    let press = t0 + 1.2;
+    if (v === "comment") {
+      const chars = [...box.querySelectorAll(".ch")];
+      chars.forEach((c, i) => tl.set(c, { display: "inline" }, t0 + 0.5 + i * 0.12));
+      press = t0 + 0.6 + chars.length * 0.12 + 0.3;
+    }
+    // cursor glides to the button, presses, state flips (positions are relative to the card)
+    tl.set(cur, { opacity: 0, left: 700, top: 240 }, 0);
+    tl.to(cur, { opacity: 1, duration: 0.15 }, press - 0.65);
+    tl.to(cur, { left: 640, top: 80, duration: 0.6, ease: "power2.inOut" }, press - 0.65);
+    tl.to(btn, { scale: 0.94, duration: 0.08 }, press);
+    tl.to(btn, { scale: 1, duration: 0.15, ease: "power2.out" }, press + 0.08);
+    tl.set(on, { opacity: 1 }, press + 0.05);
+    tl.to(cur, { opacity: 0, duration: 0.25 }, press + 0.45);
+    if (o.end != null) tl.to(root, { opacity: 0, y: -10, duration: 0.22, ease: "power2.in" }, o.end);
+    return { root, press };
+  }
+</script>

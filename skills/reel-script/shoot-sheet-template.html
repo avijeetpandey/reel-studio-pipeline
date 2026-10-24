@@ -1,0 +1,321 @@
+<title>Why ChatGPT Makes Things Up</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Montserrat:wght@500;600;800;900&display=swap">
+<style>
+/* Layout: one phone-width column of "cards on a dark desk": header → hooks → script beats → framing + lighting diagrams → checklist. Brand: {brand} clean tech. */
+:root{
+  --bg:#081019; --surface:#0f1925; --surface-2:#142231; --fg:#e7f0f7; --muted:#8ea3b5;
+  --line:rgba(62,224,255,.22); --accent:#3ee0ff; --accent-ink:#04212a; --warn:#ff7a59; --ok:#5fe3a1;
+  --zone-ui:rgba(255,122,89,.20); --zone-gfx:rgba(62,224,255,.16); --zone-cap:rgba(255,255,255,.10);
+  --display:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]){
+  --bg:#eef4f8; --surface:#ffffff; --surface-2:#f4f8fb; --fg:#0b1722; --muted:#4f6476;
+  --line:rgba(8,120,150,.25); --accent:#0a8db0; --accent-ink:#ffffff; --warn:#c64a29; --ok:#178a55;
+  --zone-ui:rgba(198,74,41,.16); --zone-gfx:rgba(10,141,176,.14); --zone-cap:rgba(11,23,34,.08);
+  color-scheme:light;
+}}
+:root[data-theme="light"]{
+  --bg:#eef4f8; --surface:#ffffff; --surface-2:#f4f8fb; --fg:#0b1722; --muted:#4f6476;
+  --line:rgba(8,120,150,.25); --accent:#0a8db0; --accent-ink:#ffffff; --warn:#c64a29; --ok:#178a55;
+  --zone-ui:rgba(198,74,41,.16); --zone-gfx:rgba(10,141,176,.14); --zone-cap:rgba(11,23,34,.08);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--display);font-weight:500;line-height:1.55;font-size:15px}
+.wrap{max-width:760px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font-weight:900;font-size:clamp(28px,6vw,40px);line-height:1.08;letter-spacing:-.01em}
+h2{font-weight:800;font-size:19px;display:flex;align-items:baseline;gap:10px}
+h2 .k{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.muted{color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-family:var(--mono);font-size:12px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2)}
+.chip.good{border-color:var(--ok);color:var(--ok)}
+.chip.warn{border-color:var(--warn);color:var(--warn)}
+/* hooks */
+.hooks{display:grid;gap:10px}
+.hook{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;padding:12px 14px;border-radius:14px;background:var(--surface-2)}
+.hook b{font-family:var(--mono);color:var(--accent);font-size:13px;padding-top:3px}
+.hook p{margin:0;font-weight:800;font-size:17px;line-height:1.3}
+.hook small{display:block;font-weight:500;font-size:13px;color:var(--muted);margin-top:4px}
+.hook.pick{outline:2px solid var(--accent)}
+/* beats */
+.beats{display:flex;flex-direction:column}
+.beat{display:grid;grid-template-columns:62px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.beat:first-child{border-top:0;padding-top:0}
+.t{font-family:var(--mono);font-size:12px;color:var(--accent);padding-top:3px;font-variant-numeric:tabular-nums}
+.say{font-weight:700;font-size:16.5px;line-height:1.4;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:6px;font-size:13px;color:var(--muted)}
+.meta span b{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);margin-right:6px}
+.loop{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px;padding:12px 14px;border-radius:14px;border:1px dashed var(--accent)}
+.btn{font:700 13px var(--display);color:var(--accent-ink);background:var(--accent);border:0;border-radius:999px;padding:9px 16px;cursor:pointer;align-self:flex-start}
+.btn:focus-visible,input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+/* diagrams */
+.diagrams{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media (max-width:640px){.diagrams{grid-template-columns:1fr}}
+.fig{display:flex;flex-direction:column;gap:10px;min-width:0}
+.fig svg{width:100%;height:auto;max-width:100%;display:block}
+.fig figcaption{font-size:13px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:6px}
+svg text{font-family:var(--mono);font-size:9px;fill:var(--muted)}
+svg .lbl{fill:var(--fg);font-weight:700}
+/* lists */
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.check{display:flex;flex-direction:column;gap:2px}
+.check label{display:grid;grid-template-columns:22px 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid var(--line);cursor:pointer}
+.check label:first-child{border-top:0}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:2px 0 0}
+.check span b{font-weight:800}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+.li{white-space:pre-wrap;font-size:14.5px;line-height:1.6;padding:14px 16px;border-radius:14px;background:var(--surface-2);overflow-wrap:anywhere}
+.do,.dont{padding:12px 14px;border-radius:14px;background:var(--surface-2);font-size:13.5px}
+.do h3,.dont h3{font-size:12px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px}
+.do h3{color:var(--ok)} .dont h3{color:var(--warn)}
+.do ul,.dont ul{margin:0;padding-left:18px}
+@media (prefers-reduced-motion:no-preference){.btn{transition:transform .15s}.btn:active{transform:scale(.97)}}
+</style>
+
+<div class="wrap">
+
+  <!-- FILL: header -->
+  <header class="card" style="background:transparent;border:0;padding:0">
+    <div class="eyebrow">{brand} · shoot sheet · <span id="reelName">why_chatgpt_makes_things_up</span></div>
+    <h1>Why ChatGPT Makes Things Up</h1>
+    <div class="chips">
+      <span class="chip good">Broad AI curiosity</span>
+      <span class="chip">Format: Explainer</span>
+      <span class="chip">~32 s · 82 words</span>
+      <span class="chip">Post IG 7–9 PM (your timezone) · YT 12–2 PM (your timezone)</span>
+    </div>
+  </header>
+
+  <!-- FILL: hooks (3 options, mark the recommended one with .pick) -->
+  <section class="card">
+    <h2><span class="k">Hook</span>Film all three, 2 takes each</h2>
+    <div class="hooks">
+      <div class="hook pick"><b>A</b><p>ChatGPT doesn't know when it's lying.<small>Recommended. Bold claim, plain words, and it sets up the payoff.</small></p></div>
+      <div class="hook"><b>B</b><p>Every ChatGPT answer is a guess.<small>Shorter and punchier. Use it if A feels slow on camera.</small></p></div>
+      <div class="hook"><b>C</b><p>ChatGPT will lie to your face. Confidently.<small>Most emotional. Good for the Trial Reel test.</small></p></div>
+    </div>
+  </section>
+
+  <!-- FILL: script beats. Each beat = time, line to say, scene code (T/TC/TL/SP/FG/TB), on-screen text (≤ 5 words), graphic / b-roll, delivery -->
+  <section class="card">
+    <h2><span class="k">Script</span>Say it like this</h2>
+    <div class="beats" id="beats">
+      <div class="beat"><div class="t">0–2s</div><div><p class="say">ChatGPT doesn't know when it's lying.</p>
+        <div class="meta"><span><b>Scene</b>T + hook words</span><span><b>Screen</b>IT'S GUESSING</span><span><b>Delivery</b>Lean in, eyebrows up, no "hi guys"</span></div></div></div>
+      <div class="beat"><div class="t">2–8s</div><div><p class="say">By default it doesn't look facts up. It predicts the next word that sounds right.</p>
+        <div class="meta"><span><b>Scene</b>TC</span><span><b>Screen</b>next word → next word</span><span><b>Graphic</b>words appearing one by one</span></div></div></div>
+      <div class="beat"><div class="t">8–15s</div><div><p class="say">Like the autocomplete on your phone, but trained on the whole internet.</p>
+        <div class="meta"><span><b>Scene</b>FG</span><span><b>Screen</b>AUTOCOMPLETE × INTERNET</span><span><b>B-roll</b>your phone keyboard suggesting words</span></div></div></div>
+      <div class="beat"><div class="t">15–23s</div><div><p class="say">So when it doesn't know, it doesn't stop. It writes the most likely-sounding answer anyway.</p>
+        <div class="meta"><span><b>Scene</b>T</span><span><b>Screen</b>SOUNDS RIGHT ≠ IS RIGHT</span><span><b>Delivery</b>Slow down on "anyway"</span></div></div></div>
+      <div class="beat"><div class="t">23–28s</div><div><p class="say">That's a hallucination. Confident, fluent, and wrong.</p>
+        <div class="meta"><span><b>Scene</b>T (twist)</span><span><b>Screen</b>HALLUCINATION</span><span><b>Graphic</b>punch-in 1.13 on "wrong"</span></div></div></div>
+      <div class="beat"><div class="t">28–32s</div><div><p class="say">Would you trust it with your medical report? Yes or no. Because remember…</p>
+        <div class="meta"><span><b>Scene</b>T</span><span><b>Screen</b>YES or NO?</span><span><b>Delivery</b>Point at the camera, then hold 1 s of silence</span></div></div></div>
+    </div>
+    <div class="loop"><span class="chip">Loop</span>"Because remember…" flows straight back into "ChatGPT doesn't know when it's lying."</div>
+    <button class="btn" id="copyScript" type="button">Copy script for teleprompter</button>
+    <span class="muted" id="copyMsg" role="status" style="font-size:13px"></span>
+  </section>
+
+  <!-- FILL: format + format-specific shot list -->
+  <section class="card">
+    <h2><span class="k">Format</span>Explainer, with one live demo</h2>
+    <p class="muted" style="margin:0">Why: a single clear idea with an everyday analogy. Alternative: <b>Myth or fact</b> ("ChatGPT checks facts before answering: myth or fact?").</p>
+    <ul class="plain">
+      <li><b>A-roll:</b> talking head, standard framing below. Hooks first (2 takes each), then the full script in one go.</li>
+      <li><b>Demo shot:</b> screen-record your phone keyboard autocomplete (5 s) for beat 3.</li>
+      <li><b>Proof shot:</b> screen-record ChatGPT inventing a source, then opening the link (10 s) for beat 4.</li>
+      <li><b>Reaction:</b> one 2-second "really?" face after the demo, used as a cutaway.</li>
+    </ul>
+  </section>
+
+  <!-- FILL: edit brief (read by reel-edit): treatment + reason, signature move, music mood, assets to capture -->
+  <section class="card">
+    <h2><span class="k">Edit brief</span>How this reel will be edited</h2>
+    <ul class="plain">
+      <li><b>Look:</b> Notebook (paper cards, red-pen circles) — the analogy is everyday, and the last 2 reels were Clean Tech.</li>
+      <li><b>Signature move:</b> "next word" gets circled in red pen as you say it.</li>
+      <li><b>Music mood:</b> curious, low under the voice.</li>
+      <li><b>Capture for the edit:</b> phone keyboard autocomplete (5 s) · ChatGPT inventing a source, then opening it (10 s).</li>
+    </ul>
+  </section>
+
+  <!-- STATIC: shooting visuals (keep; adjust only the captions if the setup differs) -->
+  <section class="card">
+    <h2><span class="k">Setup</span>Frame and light it like this</h2>
+    <div class="diagrams">
+      <figure class="fig" style="margin:0">
+        <svg viewBox="0 0 280 500" role="img" aria-labelledby="fr-t">
+          <title id="fr-t">9:16 framing guide: graphics in the top band, face in the middle third, captions below the chin, platform buttons on the bottom and right edges</title>
+          <rect x="5" y="5" width="270" height="480" rx="18" fill="var(--surface-2)" stroke="var(--line)" stroke-width="1.5"/>
+          <rect x="5" y="5" width="270" height="3" fill="var(--accent)"/>
+          <rect x="15" y="35" width="250" height="140" rx="10" fill="var(--zone-gfx)" stroke="var(--accent)" stroke-dasharray="4 3"/>
+          <text x="25" y="52" class="lbl">GRAPHICS BAND</text><text x="25" y="65">cards, b-roll · y 120–680</text>
+          <line x1="5" y1="165" x2="275" y2="165" stroke="var(--muted)" stroke-dasharray="2 4"/>
+          <line x1="5" y1="325" x2="275" y2="325" stroke="var(--muted)" stroke-dasharray="2 4"/>
+          <path d="M70 330 Q75 282 140 276 Q205 282 210 330 L210 385 L70 385 Z" fill="var(--muted)" opacity=".35"/>
+          <ellipse cx="140" cy="228" rx="38" ry="46" fill="var(--muted)" opacity=".5"/>
+          <line x1="105" y1="220" x2="175" y2="220" stroke="var(--accent)" stroke-width="1.5"/>
+          <text x="180" y="223" class="lbl">eyes</text>
+          <text x="180" y="236">upper-middle</text>
+          <rect x="45" y="300" width="190" height="24" rx="6" fill="var(--zone-cap)"/>
+          <text x="140" y="316" text-anchor="middle" class="lbl">CAPTIONS · y≈1230</text>
+          <rect x="5" y="390" width="270" height="95" fill="var(--zone-ui)"/>
+          <rect x="240" y="280" width="35" height="110" fill="var(--zone-ui)"/>
+          <text x="20" y="420" class="lbl">PLATFORM UI · keep clear</text>
+          <text x="20" y="433">handle, caption, music · bottom 380 px</text>
+          <text x="243" y="300" class="lbl">♥</text><text x="243" y="322" class="lbl">💬</text><text x="243" y="344" class="lbl">↗</text>
+          <text x="10" y="160">⅓</text><text x="10" y="320">⅔</text>
+        </svg>
+        <div class="legend"><span><i style="background:var(--zone-gfx)"></i>graphics</span><span><i style="background:var(--zone-cap)"></i>captions</span><span><i style="background:var(--zone-ui)"></i>keep clear</span></div>
+        <figcaption>Phone upright, eyes on the upper-middle line, head-and-shoulders crop, about 15 cm of space above your head for the graphic cards.</figcaption>
+      </figure>
+      <figure class="fig" style="margin:0">
+        <svg viewBox="0 0 300 320" role="img" aria-labelledby="li-t">
+          <title id="li-t">Top-down lighting plan: window or key light 45 degrees in front of you, camera at eye level 60 to 80 centimetres away, wall at least one metre behind</title>
+          <rect x="10" y="10" width="280" height="300" rx="16" fill="var(--surface-2)" stroke="var(--line)"/>
+          <rect x="30" y="285" width="240" height="8" rx="3" fill="var(--muted)" opacity=".5"/>
+          <text x="150" y="280" text-anchor="middle">wall · ≥ 1 m behind you</text>
+          <circle cx="150" cy="210" r="22" fill="var(--muted)" opacity=".55"/>
+          <text x="150" y="214" text-anchor="middle" class="lbl">YOU</text>
+          <rect x="136" y="58" width="28" height="18" rx="4" fill="var(--accent)"/>
+          <text x="150" y="50" text-anchor="middle" class="lbl">PHONE · eye level</text>
+          <line x1="150" y1="78" x2="150" y2="186" stroke="var(--accent)" stroke-dasharray="4 3"/>
+          <text x="156" y="135">60–80 cm</text>
+          <rect x="34" y="70" width="44" height="30" rx="5" fill="var(--zone-gfx)" stroke="var(--accent)" transform="rotate(-45 56 85)"/>
+          <text x="40" y="128" class="lbl">KEY LIGHT</text>
+          <text x="40" y="140">window / ring light</text>
+          <text x="40" y="152">45°, slightly above</text>
+          <line x1="72" y1="104" x2="132" y2="194" stroke="var(--accent)" stroke-width="1.5"/>
+          <path d="M126 186 L132 194 L122 192" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+          <rect x="232" y="180" width="10" height="56" rx="3" fill="var(--fg)" opacity=".35"/>
+          <text x="226" y="252" text-anchor="end">white wall /</text>
+          <text x="226" y="264" text-anchor="end">reflector fill</text>
+          <circle cx="166" cy="228" r="4" fill="var(--ok)"/>
+          <text x="174" y="232">lav mic</text>
+        </svg>
+        <figcaption>Face the light, never sit with a window behind you. A white wall or reflector on the other side softens shadows. Clip the mic about a hand's width below your chin.</figcaption>
+      </figure>
+    </div>
+    <div class="two">
+      <div class="do"><h3>Do</h3><ul>
+        <li>Back camera, 4K 30 fps, HDR off, lock exposure on your face</li>
+        <li>Clean lens; plain background with some depth</li>
+        <li>Talk about 10% faster and louder than feels natural</li>
+        <li>Pause half a second between sentences (clean cut points)</li>
+        <li>Say "again" before a retake, then redo the whole sentence</li>
+        <li>Say brand names a touch slower: Claude, ChatGPT, LLM</li>
+      </ul></div>
+      <div class="dont"><h3>Avoid</h3><ul>
+        <li>Window or lamp behind you</li>
+        <li>Front camera, digital zoom, beauty filters</li>
+        <li>Echoey empty rooms, fans, AC noise</li>
+        <li>Starting with "Hi guys" or "So today…"</li>
+        <li>Clearing your throat or "umm" between takes</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- FILL: b-roll / screen recordings to capture -->
+  <section class="card">
+    <h2><span class="k">B-roll</span>Record these after the talking part</h2>
+    <ul class="plain">
+      <li><b>Your phone keyboard</b> suggesting the next word while you type "The capital of…" (screen record, 5 s).</li>
+      <li><b>ChatGPT on your laptop</b> (Cmd+Shift+5): ask it for 3 sources on a niche topic, then open one that doesn't exist (10 s).</li>
+      <li>Real page to capture: Wikipedia, "Hallucination (artificial intelligence)".</li>
+    </ul>
+  </section>
+
+  <!-- STATIC: pre-shoot checklist (ticks are saved on this device only) -->
+  <section class="card">
+    <h2><span class="k">Before you hit record</span>Checklist</h2>
+    <div class="check" id="checklist">
+      <label><input type="checkbox" id="c1"><span><b>Script read aloud twice</b>, under 35 s with a timer</span></label>
+      <label><input type="checkbox" id="c2"><span><b>Light in front</b>, face evenly lit, no window behind</span></label>
+      <label><input type="checkbox" id="c3"><span><b>Phone at eye level</b>, upright 9:16, eyes on the upper-middle line</span></label>
+      <label><input type="checkbox" id="c4"><span><b>Mic clipped</b>, test 5 s and play it back with headphones</span></label>
+      <label><input type="checkbox" id="c5"><span><b>4K 30 fps, HDR off</b>, exposure locked, lens wiped</span></label>
+      <label><input type="checkbox" id="c6"><span><b>Do Not Disturb on</b>, fans/AC off</span></label>
+      <label><input type="checkbox" id="c7"><span><b>Each hook 2 takes</b>, then the full script in one go</span></label>
+      <label><input type="checkbox" id="c9"><span><b>Press record, wait 1 s, then say the hook straight into the lens</b> (the first frame must be you talking)</span></label>
+      <label><input type="checkbox" id="c10"><span><b>"Again" before every retake</b>, no throat-clearing between takes</span></label>
+      <label><input type="checkbox" id="c8"><span><b>B-roll recorded</b> right after, while the setup is fresh</span></label>
+    </div>
+  </section>
+
+  <!-- FILL: LinkedIn post (full text, ready to paste) -->
+  <section class="card">
+    <h2><span class="k">LinkedIn</span>Post the morning after, Tue–Thu 8–10 AM (your timezone)</h2>
+    <div class="li" id="liPost">Most AI mistakes I review aren't model bugs. They're trust bugs.
+
+A language model doesn't check facts by default. It predicts the next word that is most likely to fit, one word at a time.
+
+That's why it can write a confident paragraph, with a citation, that is completely wrong. Researchers call this a hallucination. To the model, "sounds right" and "is right" look the same.
+
+What this means for engineering teams:
+• Treat AI output like a pull request from a new teammate. Review it before it ships.
+• Ask for sources, then open them.
+• Use retrieval or tools for facts. Use the model for language.
+
+How does your team check AI output before it reaches users?
+
+#ArtificialIntelligence #SoftwareEngineering #GenerativeAI</div>
+    <button class="btn" id="copyLi" type="button">Copy LinkedIn post</button>
+    <span class="muted" id="liMsg" role="status" style="font-size:13px"></span>
+  </section>
+
+  <!-- FILL: packaging ideas -->
+  <section class="card">
+    <h2><span class="k">Packaging</span>Covers and titles</h2>
+    <ul class="plain">
+      <li><b>Cover A (curiosity):</b> "IS CHATGPT LYING?"</li>
+      <li><b>Cover B (claim):</b> "IT'S JUST GUESSING"</li>
+      <li><b>YouTube title:</b> Why does ChatGPT make things up? (AI hallucinations)</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function(){
+  var KEY = 'shoot-sheet:' + document.getElementById('reelName').textContent;
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) {}
+  document.querySelectorAll('#checklist input').forEach(function(box){
+    box.checked = !!saved[box.id];
+    box.addEventListener('change', function(){
+      saved[box.id] = box.checked;
+      try { localStorage.setItem(KEY, JSON.stringify(saved)); } catch (e) {}
+    });
+  });
+  function copier(btnId, msgId, getText, okText){
+  var btn = document.getElementById(btnId), msg = document.getElementById(msgId);
+  btn.addEventListener('click', function(){
+    var text = getText();
+    var done = function(){ msg.textContent = okText; };
+    var fallback = function(){
+      var ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { msg.textContent = 'Select the lines above and copy them.'; }
+      ta.remove();
+    };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  });
+  }
+  copier('copyScript', 'copyMsg', function(){
+    return Array.prototype.map.call(document.querySelectorAll('#beats .say'), function(p){ return p.textContent.trim(); }).join('\n\n');
+  }, 'Copied. Paste it into your teleprompter app.');
+  copier('copyLi', 'liMsg', function(){ return document.getElementById('liPost').textContent.trim(); }, 'Copied. Paste it into LinkedIn.');
+})();
+</script>

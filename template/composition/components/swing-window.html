@@ -1,0 +1,49 @@
+<!--
+COMPONENT: swing-window — a clean app-window card that swings in/out in 3D (rotateY + slide + blur).
+Ported from the Remotion `Swing` + `Win` (Desktop/animated-reels). Use for screen-card b-roll, a product/app shot, a terminal.
+Seek-safe: GSAP tweens only. Put a REAL screenshot/recording in .win-body (never a fake product UI).
+
+USE: paste CSS into <style>, markup into a `.g.clip` layer, JS after the timeline is created.
+  buildSwing(tl, { el: "#sw-demo", start: 4.3, end: 7.0 })
+RULES: x 60–930 and y 250–1420 only; never over the face box. One at a time (never two cards at once).
+FEEL: "a window sliding in on a hinge": 0.55 s expo-out in, exit faster (0.3 s) with a drift. Use at most once or twice per reel — it is a signature-level move.
+SIZE: 780 px wide (≈ 25% smaller than the Remotion original's 900). Title text ≥ 34 px not needed (chrome only); body text ≥ 34 px.
+-->
+
+<!-- CSS -->
+<style>
+  .swing { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; perspective: 1800px; pointer-events: none; }
+  .swing .win { position: absolute; left: 150px; width: 780px; border-radius: 24px; background: var(--surface, #fff);
+                border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 24px 60px rgba(0,0,0,0.38); overflow: hidden;
+                transform-origin: 50% 50%; opacity: 0; }
+  .swing .win-bar { height: 56px; display: flex; align-items: center; gap: 9px; padding: 0 22px; position: relative;
+                    background: linear-gradient(#f6f4ef, #ece9e2); border-bottom: 1px solid rgba(20,20,19,0.08); }
+  .swing .dot { width: 15px; height: 15px; border-radius: 50%; }
+  .swing .win-title { position: absolute; left: 0; right: 0; text-align: center; font: 600 22px Montserrat, sans-serif; color: #8e8b82; }
+  .swing .win-body { padding: 28px 34px; color: #1b1b1a; font: 600 36px Montserrat, sans-serif; }
+</style>
+
+<!-- MARKUP -->
+<div id="sw-demo" class="swing">
+  <div class="win" style="top: 420px">
+    <div class="win-bar">
+      <span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span>
+      <span class="win-title">app · screen</span>
+    </div>
+    <div class="win-body"><!-- real screenshot: <img src="assets/broll/x.png" style="width:100%"> --></div>
+  </div>
+</div>
+
+<!-- JS -->
+<script>
+  function buildSwing(tl, o) {
+    const win = document.querySelector(o.el + " .win");
+    const dir = o.from === "left" ? -1 : 1;
+    tl.set(win, { opacity: 0 }, 0);
+    tl.fromTo(win,
+      { opacity: 0, x: 240 * dir, rotationY: -34 * dir, scale: 0.9, filter: "blur(14px)" },
+      { opacity: 1, x: 0, rotationY: 0, scale: 1, filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, o.start);
+    tl.to(win, { opacity: 0, x: -300 * dir, rotationY: 40 * dir, scale: 0.92, filter: "blur(16px)", duration: 0.3, ease: "power3.in" }, o.end);
+    return win;
+  }
+</script>

@@ -1,0 +1,74 @@
+<!--
+COMPONENT: code-window — a dark code/terminal card that types its lines at reading speed with a cursor.
+Ported from the Remotion typing window + `typed()` (Desktop/animated-reels). Use for dev/AI explainers (a prompt, a snippet, a command).
+Seek-safe with NO callbacks: every character is a span revealed by a timeline `set` at its own time, and the cursor is a
+child of the current character (shown/hidden by sets; the final blink is a finite-repeat tween). Scrubbing or seeking backwards just works.
+
+USE: paste CSS, markup (inside a `.g.clip` layer) and JS; combine with swing-window for the entrance if wanted.
+  buildCodeWindow(tl, { el: "#cw-demo", start: 4.3, end: 8.0, cps: 18 })
+  Lines come from data-lines (JSON array). Keep ≤ 6 lines, ≤ 28 chars/line so text stays ≥ 34 px inside the 780 px card.
+RULES: real code/command from the reel's topic (never lorem); x 60–930, y 250–1420; not over the face box.
+FEEL: "types at reading speed": ~14–18 chars/s, cursor blink 0.5 s, card enters with pop-blur feel and exits in 0.25 s.
+-->
+
+<!-- CSS -->
+<style>
+  .cw { position: absolute; left: 150px; width: 780px; border-radius: 24px; background: #14171c; opacity: 0;
+        border: 1px solid rgba(255,255,255,0.10); box-shadow: 0 24px 60px rgba(0,0,0,0.38); overflow: hidden; }
+  .cw .bar { height: 52px; display: flex; align-items: center; gap: 9px; padding: 0 22px; background: #1d2128; position: relative; }
+  .cw .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .cw .ttl { position: absolute; left: 0; right: 0; text-align: center; font: 600 22px Montserrat, sans-serif; color: #7d8590; }
+  .cw .code { padding: 26px 32px 30px; font: 500 36px/1.5 "JetBrains Mono", "SF Mono", Menlo, monospace; color: #e6e9ee; white-space: pre; min-height: 120px; }
+  .cw .ch { display: none; position: relative; }
+  .cw .cur { position: absolute; right: -5px; top: 0.12em; width: 4px; height: 1.2em; background: var(--accent); opacity: 0; }
+</style>
+
+<!-- MARKUP -->
+<div id="cw-demo" class="cw" style="top: 440px"
+     data-title="prompt.txt"
+     data-lines='["Explain tokens","like I am five."]'>
+  <div class="bar"><span class="dot" style="background:#ff5f57"></span><span class="dot" style="background:#febc2e"></span><span class="dot" style="background:#28c840"></span><span class="ttl"></span></div>
+  <div class="code"></div>
+</div>
+
+<!-- JS -->
+<script>
+  function buildCodeWindow(tl, o) {
+    const root = document.querySelector(o.el);
+    const code = root.querySelector(".code");
+    const full = JSON.parse(root.dataset.lines).join("\n");
+    const cps = o.cps ?? 16, delay = o.delay ?? 0.35;
+    root.querySelector(".ttl").textContent = root.dataset.title || "";
+    code.innerHTML = "";
+
+    tl.set(root, { opacity: 0 }, 0);
+    tl.fromTo(root, { opacity: 0, y: 36, scale: 0.94, filter: "blur(10px)" },
+      { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", duration: 0.4, ease: "power3.out" }, o.start);
+
+    const chars = [...full].map((c) => {
+      const s = document.createElement("span");
+      s.className = "ch";
+      s.textContent = c;
+      const cur = document.createElement("i");
+      cur.className = "cur";
+      s.appendChild(cur);
+      code.appendChild(s);
+      return { s, cur };
+    });
+    const t0 = o.start + delay;
+    chars.forEach(({ s, cur }, i) => {
+      const t = t0 + i / cps;
+      tl.set(s, { display: "inline" }, t);
+      tl.set(cur, { opacity: 1 }, t);
+      if (i < chars.length - 1) tl.set(cur, { opacity: 0 }, t0 + (i + 1) / cps);
+    });
+    // after the last character the cursor blinks (finite repeats) until the exit
+    const typedEnd = t0 + chars.length / cps;
+    const holdEnd = o.end ?? typedEnd + 1.5;
+    const blinks = Math.max(0, Math.floor((holdEnd - typedEnd) / 0.5));
+    const last = chars[chars.length - 1].cur;
+    if (blinks > 0) tl.fromTo(last, { opacity: 1 }, { opacity: 0, duration: 0.01, repeat: blinks, repeatDelay: 0.49 }, typedEnd);
+    if (o.end != null) tl.to(root, { opacity: 0, y: -10, filter: "blur(8px)", duration: 0.25, ease: "power2.in" }, o.end);
+    return root;
+  }
+</script>
