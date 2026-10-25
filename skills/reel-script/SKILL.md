@@ -28,6 +28,9 @@ Input: a topic (and optionally an angle, a target length, or notes). Output: `sc
 ## 3. Topic check
 Label it **Broad AI curiosity / career** (good) or **Dev-only** (post rarely). **Phrase it as the viewer's problem first, the tool second** (round 3: "how you look on camera" / "AI stole my job" got 25K–51K likes; "this one skill installs skills" / "MCPs you need" got 143–737): "Your ChatGPT forgets everything → here's the fix", never "X tool does Y". If dev-only, propose a broader angle of the same idea ("prompt caching" → "Why ChatGPT replies faster the second time") and write the script for the broader one unless the creator said otherwise.
 
+## 3a. Read your own numbers (when they exist)
+If `$STUDIO/reports/` has a report, read the latest one (and `reels/performance.json`): prefer formats / hook shapes that beat the creator's median (n ≥ 3), say in the reply when the choice came from his own data, and still keep the weekly mix varied. No report yet → skip this.
+
 ## 3b. Pick the format
 Suggest the format that fits the topic best (unless the creator named one) and one alternative, with a one-line reason. Write the script and the shoot plan for that format. Avoid repeating the format of the last 2 reels in `$STUDIO/reels/` (check their `script.md`) so the weekly mix stays varied (Mon explainer · Tue experiment/comparison · Wed myth-or-fact/hot take · Thu explainer · Fri skit/family/vox-pop · Sat news/reaction · Sun story/reply).
 

@@ -1,0 +1,46 @@
+<!--
+COMPONENT: flash-open — a rapid "flicker" of 6–8 upcoming shots, two frames each (≈ 0.07 s at 30 fps), as a section
+opener: a visual hook that previews what's coming (round 5, kalylsfilms 25K "the flicker effect… a great visual hook";
+WINNING_PATTERNS.md §29). Section opener ONLY: never at frame 0 (the face opens every reel), never over a line that must
+be understood, at most once per reel, total ≤ 0.6 s.
+Seek-safe with NO callbacks: each still is shown/hidden with timeline `set`s at exact frame times; the stills are plain
+<img> files (extract them first), so nothing depends on video decode timing.
+
+USE:
+  1. Extract stills of the upcoming shots (1080×1920):  ffmpeg -ss 14.2 -i assets/main.mp4 -frames:v 1 assets/flash/1.jpg  (repeat per shot)
+  2. buildFlashOpen(tl, { el: "#fo", start: 9.8, images: ["assets/flash/1.jpg", …], fps: 30, hold: 2, white: true })
+     hold = frames per still (2 = classic flicker); white = a 1-frame white flash between every other still.
+RULES: 6–8 stills; place it on a beat (work/beats.json) right before the section's first line; pair with ONE
+  `digital-sweep` or `whoosh-air` SFX across the whole flicker (not one per still); safe for viewers: total ≤ 0.6 s,
+  no more than 4 white frames.
+FEEL: "a camera shutter firing through the next 10 seconds": hard cuts only, no fades, no zoom.
+-->
+
+<!-- CSS -->
+<style>
+  .fo { position: absolute; inset: 0; width: 1080px; height: 1920px; pointer-events: none; }
+  .fo img { position: absolute; inset: 0; width: 1080px; height: 1920px; object-fit: cover; opacity: 0; }
+  .fo .w { position: absolute; inset: 0; background: #fff; opacity: 0; }
+</style>
+
+<!-- MARKUP -->
+<div id="fo" class="fo"><div class="w"></div></div>
+
+<!-- JS -->
+<script>
+  function buildFlashOpen(tl, o) {
+    const root = document.querySelector(o.el), fps = o.fps || 30, f = 1 / fps, hold = o.hold || 2, white = root.querySelector(".w");
+    root.querySelectorAll("img").forEach((n) => n.remove());
+    const imgs = o.images.map((src) => { const im = document.createElement("img"); im.src = src; root.insertBefore(im, white); return im; });
+    let t = o.start, whites = 0;
+    imgs.forEach((im, i) => {
+      tl.set(im, { opacity: 1 }, t);
+      tl.set(im, { opacity: 0 }, t + hold * f);
+      t += hold * f;
+      if (o.white && i % 2 === 1 && whites < 4) {
+        tl.set(white, { opacity: 1 }, t); tl.set(white, { opacity: 0 }, t + f); t += f; whites++;
+      }
+    });
+    return { root, end: t };
+  }
+</script>

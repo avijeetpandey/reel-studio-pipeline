@@ -1,6 +1,6 @@
 ---
 name: make-content
-description: End-to-end {brand} pipeline from ANY topic (or straight from existing footage, or a study of reference reels) — script + shoot sheet + LinkedIn post (reel-script), a paired carousel (generate-carousel), then after the creator AirDrops the footage, the fully edited reel + A/B thumbnails + posting kit (reel-edit), all uploaded to one Drive folder. Works for any topic they gives; the 30-day playbook is optional context, used only when a topic matches one of its ideas. Runs in parallel with helper agents, tracks every stage in a resumable manifest, and stops only for filming and the two approvals. Use when the creator says "make <topic>", "make: <topic>; <topic>", "make R03", "footage ready", "edit: <video>", "study: <reel links>", "continue <reel>", or "pipeline status".
+description: End-to-end {brand} pipeline from ANY topic (or straight from existing footage, or a study of reference reels) — script + shoot sheet + LinkedIn post (reel-script), a paired carousel (generate-carousel), then after the creator AirDrops the footage, the fully edited reel + A/B thumbnails + posting kit (reel-edit), all uploaded to one Drive folder. Works for any topic they gives; the 30-day playbook is optional context, used only when a topic matches one of its ideas. Runs in parallel with helper agents, tracks every stage in a resumable manifest, and stops only for filming and the two approvals. Use when the creator says "make <topic>", "make: <topic>; <topic>", "make R03", "footage ready", "edit: <video>", "study: <reel links>", "continue <reel>", "pipeline status", "posted <reel> …", "stats: …", "report: …" or "trends:".
 ---
 
 # make-content (orchestrator)
@@ -25,6 +25,12 @@ This skill only orchestrates. The work itself follows `reel-script`, `generate-c
 | `study: <links>` (reference reels the creator likes) | **Learning mode** below |
 | `continue <reel>` | `P status <reel>` → resume at `P next <reel>` |
 | `pipeline status` | `P status` → one line per topic |
+| `posted <reel> <instagram url> <youtube url>` | `P posted <reel> --ig <url> --yt <url>` (both platforms; ask for whichever link is missing) |
+| `stats: <reel>` / `stats: all` | **Stats mode** below: read Instagram Insights + YouTube Studio for that reel (or every reel `P due` lists) + a channel snapshot of both |
+| `report:` / `report: 2026-11` | **Report mode** below: `channel_report.py` → monthly report + `performance.json` |
+| `trends:` | **Trends mode** below: 3 topic suggestions from this week's AI / career trends |
+
+**On demand only.** `stats:`, `report:` and `trends:` run ONLY when the creator types them. Never create a scheduled task, cron, loop or background job for them, and never start one on your own: they cost tokens and need the creator's signed-in browser. `P due` only *lists* what is due; it runs nothing.
 
 ## Setup per topic
 - **Resolve the topic (any topic works):**
@@ -59,7 +65,7 @@ This skill only orchestrates. The work itself follows `reel-script`, `generate-c
 4. **qa**: `reel-edit` step 6 — auto-fix loop up to 3 rounds: `hyperframes lint` + `check --snapshots` + both UI-zone checks, `qa_reel.py` (enhance budget, static stretches, read time, face box), `qa_reel.py --cover` on covers A + B, `beat_grid.py --check`, **frame grading** (every 1 s frame scored, all ≥ 8/10), AI-slop tells, frame-0 gate, the creator's taste checks (music energetic in the first 3 s, last 4 s is the best-looking frame, ≤ 1 emoji, nothing templated), draft render via `P locked render -- npx hyperframes render … --quality draft`, Studio preview started for checkpoint 2.
 5. **checkpoint2**: `reel-edit`'s checkpoint message (Studio preview + review.html draft, storyboard, hook A/B, covers A/B, posting kit, QA report). Approval → `P approve <reel> checkpoint2`. Notes → `reel-edit` step 11 (fix + rule update) → show again.
 6. **final**: `P locked final -- npx hyperframes render -o renders/raw.mp4 -f 30 -q delivery -w 2` → finalize → SRT → re-check frame 0 + `qa_reel.py --audio` → `P file <reel> video <final.mp4>` and `srt`.
-7. **upload2**: `P upload <reel> half2` (video, both thumbnails, SRT, posting kit — size-verified). Then log the reel in `reels/style_log.md`, mark it posted-ready, and reply with the Drive folder + posting times.
+7. **upload2**: `P upload <reel> half2` (video, both thumbnails, SRT, posting kit — size-verified). Then log the reel in `reels/style_log.md`, record its features (`P features …`, reel-edit step 7), mark it posted-ready, and reply with the Drive folder + posting times + "after posting, tell me `posted <reel> <instagram link> <youtube link>`".
 Several reels with footage: run Half 2 one reel at a time (helpers parallel inside each); queue their final renders under `P locked final`.
 
 ## Edit-only mode (`edit: <video>` — footage without a script)
@@ -74,12 +80,32 @@ Several reels with footage: run Half 2 one reel at a time (helpers parallel insi
 4. Write `research/refs_<date>/NOTES.md`, append a new round to `template/WINNING_PATTERNS.md`, then push each rule into the skill that owns it (reel-script, reel-edit + treatments/motion/sound/qa, generate-carousel, posting kit, choose_style/pick_music/qa_reel when it can be automated).
 5. Delete the downloaded videos; keep notes, transcripts and sheets. Report what changed in each stage.
 
+## Stats mode (`stats: <reel>` / `stats: all` — Instagram + YouTube Shorts)
+1. Which reels: `P due` (posted reels whose 48 h / 7 d numbers aren't recorded yet), or the one the creator named. A reel without `posts` → ask the creator for both links (`posted`). Same content goes to both platforms, so always do both.
+2. **YouTube Studio** (built-in browser, signed in; if it shows a sign-in page, stop and ask the creator): open `https://studio.youtube.com/video/<id>/analytics/tab-overview/period-default` (the id is in the Shorts URL; Studio → Content → Shorts lists them) and the Engagement + Audience tabs; the numbers render late, so wait ~5 s, then read with `get_page_text` / a screenshot. **Studio often shows a "Verify that it's you" dialog on analytics pages: that is a sign-in step — never click through it; stop and ask the creator to complete it in the browser pane, then continue.** The channel dashboard (`studio.youtube.com`) shows latest-Short views, average % viewed and 28-day totals without that step. Record `views`, `stayed_pct` (Shorts: "stayed to watch"), `avg_viewed_pct`, `avg_view_s`, `likes`, `comments`, `shares`, `subs_gained`, plus `impressions`/`ctr` when shown and `shorts_feed_pct` (traffic source). Window: 48 h or 7 d after posting (use Studio's date range; say which).
+3. **Instagram** (built-in browser, signed in): the reel page itself has no insights on the web (only likes/comments). Use the professional dashboard: account level at `https://www.instagram.com/accounts/insights/?timeframe=30` (views, viewers, follower vs non-follower %, interactions, accounts engaged, profile visits, follower change; `timeframe=7` for 7 days) and per reel at `https://www.instagram.com/accounts/insights/content/?media_type=all&metric=views&sort_by=highest&timeframe=30&view_type=card` (cards load slowly — wait, scroll, then open the reel's card for its detail). Record `views` (plays), `reach`, `likes`, `comments`, `shares`, `saves`, `avg_view_s`, `follows`, and `skip_rate` / `non_follower_pct` if shown. If the web doesn't show a field, record it as `na`, never estimate; if it shows nothing, ask the creator for screenshots of the app's Insights screen and read the numbers from them.
+4. Save each: `P stats <reel> yt --window 48h views=… stayed_pct=… …` and `P stats <reel> ig --window 48h …` (prints the target verdict and appends `reels/stats_log.md`).
+5. **Channel snapshot (both)**: YouTube Studio → Analytics (last 7 + 28 days): `subscribers`, `subs_7d`, `views_7d`, `views_28d`, `watch_h_28d`, top 5 Shorts, traffic sources (`shorts_feed_pct`, `search_pct`, `channel_pct`), `india_pct`, `returning_pct`. Instagram → professional dashboard / Insights (last 7 + 30 days): `followers`, `followers_7d`, `reach_7d`, `reach_30d`, `engaged_30d`, top 5 reels, `india_pct`, `non_follower_reach_pct`. Save with `P channel yt …` / `P channel ig …`.
+6. Reply: a 2-platform table per reel (target verdicts), channel growth since the last snapshot, and anything that beat the median 3× (→ suggest 2–3 follow-ups, CHANNEL_RULES.md).
+
+## Report mode (`report:` / `report: <YYYY-MM>` / `report: all`)
+1. `python3 -I $STUDIO/template/scripts/channel_report.py --month <YYYY-MM>` → `reports/<month>.md` + `reels/performance.json` (per-feature scores, only groups with ≥ 3 reels).
+2. Needs `features` on each reel (written in reel-edit step 7; for older reels fill them from `script.md` + `style_plan.json` with `P features <reel> format=… hook_shape=… treatment=… length_s=… wpm=… series=… cta=…`).
+3. Reply with the headline findings: medians per platform, the winning and losing format / hook shape / treatment / length, where Instagram and YouTube disagree (→ platform-specific title / cover / caption next time), post-time notes (suggestions only — the CHANNEL_RULES.md slots stay until the creator changes them), follow-up topics for 3× winners.
+4. From then on `choose_style.py` reads `performance.json` automatically (a capped nudge, rotation still wins) and `reel-script` reads the latest report when picking a format and hooks.
+
+## Trends mode (`trends:` — only when asked)
+1. 6–10 web searches (mode "extended" for freshness) for the last 7 days: AI launches and viral AI claims, AI + jobs/careers news for your audience's country (layoffs, hiring, salaries, new roles), what tech-career creators are posting this week; optionally browse Instagram Explore / YouTube Shorts search for 2–3 terms in the signed-in browser (read only).
+2. Filter: broad AI curiosity / career > dev-only (CHANNEL_RULES.md); skip anything already made (`reels/` folders, `style_log.md`) or older than 14 days; check each claim against a primary source.
+3. Write `research/trends/<YYYY-MM-DD>.md`: **3 topic suggestions**, each with the trend + source links + date, the viewer's-problem framing, 3 hooks in proven shapes (WINNING_PATTERNS §1, §11, §16, §22, §27), the best format (reel-script table), series fit (Fact or Hype? / How does X work? / Day N), and the paired carousel format; plus a short "skipped and why" list.
+4. Reply with the 3 suggestions; the creator starts one with `make: <topic>`. Never start `make:` from trends by yourself, never schedule this.
+
 ## Music library (never an interruption)
 - Only YouTube Audio Library "Attribution not required". To grow the library: in YouTube Studio → Audio Library (signed-in browser) list tracks through the page's `creator_music/list_tracks` call (licence YOUTUBE; genres hip-hop / pop / dance & electronic / R&B; moods funky / happy / bright; drums), get download links with `get_tracks` (`includeDownloadUrl`), score candidates with `template/scripts/music_energy.py`, keep energy ≥ 72 and add rows (bpm, energy, best start) to `music/INDEX.md`. `pick_music.py` does the per-reel choice + trim.
 
 ## Learning loop (every reel)
 - Every note the creator gives → fix + "which rule would have prevented this?" → write it into the owning skill/QA script → tell the creator (reel-edit step 11). Durable preferences also go to memory.
-- 48 h after posting: log the numbers; a reel ≥ 3× the channel median → suggest 2–3 follow-ups on that topic (CHANNEL_RULES.md).
+- After posting: the creator says `posted <reel> <ig> <yt>`; when he asks `stats:` (48 h / 7 d), record both platforms; a reel ≥ 3× the channel median → suggest 2–3 follow-ups on that topic (CHANNEL_RULES.md). `report:` monthly (when he asks) turns the numbers into `performance.json` for the style picker.
 
 ## Robustness rules
 - A failed stage: retry it twice (fresh helper), then `P set … failed --note`, **keep the other branches going**, and list the failure in the next checkpoint. Never stop silently, never hide a failure.

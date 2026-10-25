@@ -1,0 +1,58 @@
+<!--
+COMPONENT: split-frame — 2–4 rounded panels of footage on screen at once (the same take at different moments, or b-roll),
+sliding in on the beat. Makes static tripod footage feel edited (round 5, kalylsfilms 25K "my 3 go-to edits": the
+split-frame edit; WINNING_PATTERNS.md §29). Use ONCE per reel, for a "look at all of these" / list moment, 1.5–3 s.
+Seek-safe with NO callbacks: the panels are ordinary framework-owned <video class="clip"> elements (HyperFrames plays,
+seeks and renders them); this component only moves their frames with timeline tweens.
+
+USE:
+  1. In the composition, place one panel per shot. Every <video> follows hyperframes-core: class="clip", its own
+     data-start / data-duration on the timeline, data-media-start = where in the SOURCE that panel's moment begins,
+     muted (data-has-audio="false"; the creator's voice stays on the a-roll), a free data-track-index:
+       <div id="sf" class="sf">
+         <div class="sf-p"><video class="clip" src="assets/main.mp4" muted playsinline data-has-audio="false"
+              data-start="12.0" data-duration="2.4" data-media-start="3.1" data-track-index="6"></video></div>
+         <div class="sf-p"> … data-media-start="7.8" … </div>
+         <div class="sf-p"> … data-media-start="15.2" … </div>
+       </div>
+  2. buildSplitFrame(tl, { el: "#sf", start: 12.0, end: 14.4, layout: "row3", beats: [12.0, 12.25, 12.5] })
+     layout: "row2" | "row3" | "grid4" | "stack2" (two rows); beats = when each panel lands (snap to work/beats.json).
+RULES: once per reel; 2–4 panels; start and end exactly on the panels' data-start / data-start + data-duration;
+  the face must be visible in at least one panel; 24 px gaps, 18 px radius, panels never cover the caption zone
+  (stay above y 1420); hard cut out (no exit animation) back to the a-roll.
+FEEL: "contact sheet snapping together": each panel slides 60 px from its side and settles in 0.22 s (power3.out),
+  one panel per beat; tiny scale 1.04 → 1 on landing; no blur, no glow.
+-->
+
+<!-- CSS -->
+<style>
+  .sf { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: var(--sf-bg, #0b0d12); opacity: 0; }
+  .sf-p { position: absolute; overflow: hidden; border-radius: 18px; background: #000; opacity: 0; }
+  .sf-p video { width: 100%; height: 100%; object-fit: cover; }
+</style>
+
+<!-- MARKUP (panels hold the composition's own <video class="clip"> elements, see USE) -->
+<div id="sf" class="sf"><div class="sf-p"></div><div class="sf-p"></div><div class="sf-p"></div></div>
+
+<!-- JS -->
+<script>
+  function buildSplitFrame(tl, o) {
+    const root = document.querySelector(o.el), ps = [...root.querySelectorAll(".sf-p")];
+    const g = 24, W = 1080, top = 230, bottom = 1420, H = bottom - top;   // keep panels out of the caption zone
+    const boxes = {
+      row2: [[g, top, (W - 3 * g) / 2, H], [g * 2 + (W - 3 * g) / 2, top, (W - 3 * g) / 2, H]],
+      row3: [0, 1, 2].map((i) => [g + i * ((W - 4 * g) / 3 + g), top, (W - 4 * g) / 3, H]),
+      stack2: [[g, top, W - 2 * g, (H - g) / 2], [g, top + (H - g) / 2 + g, W - 2 * g, (H - g) / 2]],
+      grid4: [0, 1, 2, 3].map((i) => [g + (i % 2) * ((W - 3 * g) / 2 + g), top + Math.floor(i / 2) * ((H - g) / 2 + g), (W - 3 * g) / 2, (H - g) / 2]),
+    }[o.layout || (ps.length === 2 ? "row2" : ps.length === 4 ? "grid4" : "row3")];
+    ps.forEach((p, i) => { const b = boxes[i % boxes.length]; Object.assign(p.style, { left: b[0] + "px", top: b[1] + "px", width: b[2] + "px", height: b[3] + "px" }); });
+    tl.set(root, { opacity: 1 }, o.start);
+    ps.forEach((p, i) => {
+      const t = (o.beats && o.beats[i] != null) ? o.beats[i] : o.start + i * 0.25;
+      const fromX = (o.layout === "stack2" || o.layout === "grid4") ? 0 : (i % 2 ? 60 : -60), fromY = (o.layout === "stack2") ? (i ? 60 : -60) : 0;
+      tl.fromTo(p, { opacity: 0, x: fromX, y: fromY, scale: 1.04 }, { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.22, ease: "power3.out" }, t);
+    });
+    if (o.end != null) tl.set(root, { opacity: 0 }, o.end);
+    return root;
+  }
+</script>

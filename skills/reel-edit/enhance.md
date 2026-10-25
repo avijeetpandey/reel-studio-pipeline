@@ -24,6 +24,9 @@ Components live in `T/composition/components/` (see `INDEX.md`, header comment o
 | lists 3–5 short things it does / you do ("it adds the zooms, the sound, the captions") | live checklist | `check-card` | empty circles visible from the start, each ticks on its spoken word; ≤ 5 items, ≤ 3 words each |
 | "master these to become a…" / a role's skill list (8–12 items) | screenshot card | `pill-list` | one card per role, 2.5–4 s, sourced salary line; left side, face clear |
 | names a tool combo ("Claude + Figma") for the whole reel | equation header | `list-header` with the title "Claude + X = result" (mode chip, no items) | pinned from frame 0 |
+| places things in tiers ("X is S tier", a tier list) | tier board | `tier-board` | one per reel; empty board from the first placement; each chip on its spoken word |
+| "look at all of these" / several visual things at once / a list of shots | split screen of footage | `split-frame` | once per reel, 1.5–3 s; panels = muted `<video class="clip">` of the same take (`data-media-start`) or b-roll; panels land on beats |
+| opens a new section after the hook ("here's how", "step one") | rapid flicker preview | `flash-open` | at most once per reel, ≤ 0.6 s, on a beat, never frame 0, never over a line that must be understood; stills extracted from the cut |
 | says a big or growing number (stars, installs, users, $) | rolling counter | `count-roll` | real figure only (source in the plan); max 2 per reel; on the spoken number |
 | points at a real object ("this light", "right here", "behind me") | hand-drawn annotation | `hand-annotate` | circle + arrow + 2–3-word label drawn on the real frame; position from a frame grab; max 3; never over the face |
 | is the hook and has a strong verb (`hook_image` in `style_plan.json`) | literal hook image | registry block or hand-built | ~1 s, right after frame 0, then back to the face |
@@ -31,7 +34,7 @@ Components live in `T/composition/components/` (see `INDEX.md`, header comment o
 | has a chart, map, counter or diagram | registry block | `npx hyperframes catalog` | adapt to the treatment; tag `data-component="<block name>"` |
 
 ## 2. Budget (hard limits)
-- ≤ 1 signature move per reel (treatment's own) + ≤ 2 heavy components (swing-window / code-window). `step-progress`, `list-header`, `check-card`, `pill-list`, `count-roll`, `hand-annotate` and `cta-card` don't count toward the heavy budget. Everything else is pop-blur or plain.
+- ≤ 1 signature move per reel (treatment's own) + ≤ 2 heavy components (swing-window / code-window). `step-progress`, `list-header`, `check-card`, `pill-list`, `tier-board`, `split-frame`, `flash-open`, `count-roll`, `hand-annotate` and `cta-card` don't count toward the heavy budget. Everything else is pop-blur or plain.
 - At least 2 quiet beats stay motion-free (twist, pre-CTA). Never a heavy component in the first 2 s or on the last 4 s.
 - Component colours/fonts come from the treatment variables, never inline hexes. Min text 34 px, nothing over the face box, safe box x 60–930, y 250–1420.
 - If the reel is mostly personal opinion with no named thing, ship it plain and say so at the checkpoint — fewer effects is the brand.

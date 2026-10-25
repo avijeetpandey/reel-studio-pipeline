@@ -109,6 +109,7 @@ When the creator hands over a video (with or without notes), run the whole pipel
 - `T/scripts/finalize.sh renders/raw.mp4 renders/<name>_final.mp4` → −14 LUFS, −1.5 dBTP. Verify with ffprobe (1080×1920, 30 fps, audio + video) and re-run the frame-0 gate + `qa_reel.py --audio` on the final file.
 - `node T/scripts/make_srt.js index.html renders/<name>.srt`.
 - Append to `reels/style_log.md`: date, reel, treatment, signature move, scene mix, caption highlight, music track.
+- Record what the reel IS for the channel report: `P features <reel> format="<script format>" hook_shape="<claim|question|persona twist|if I started|list number|…>" treatment="<treatment>" signature="<move>" length_s=<final s> wpm=<qa_reel pace> music="<track>" cta=yesno series="<series or none>" episode=<n> components="<comma list>"` (P = `python3 -I T/scripts/pipeline.py`).
 
 ## 8. Two covers (A/B)
 Covers are separate image files — **never put a cover into the video**. Instagram: upload as the reel's cover in the post flow ("Edit cover" → "Add from camera roll"). YouTube: custom thumbnail where allowed, otherwise pick the most expressive frame in the app. The posting kit says which file goes where.

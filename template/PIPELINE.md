@@ -11,16 +11,16 @@ HALF 1  make:      research (facts + trending claim for Fact-or-Hype) → script
                    ∥ carousel (recipe-list / formats.md, SEO caption) ∥ LinkedIn → CHECKPOINT 1 → upload half 1
 FILM               the creator films + AirDrops → `footage ready`      (or `edit: <video>` = edit-only mode, no Half 1)
 HALF 2             footage → review (raw-vs-graded HDR check) → cut (pauses out, qa --audio: repeats, fillers, pace ≥ 190 WPM)
-                   → face map → choose_style.py (10 treatments, rotation) → beat map + motion briefs → enhance pass (11 components + beat grid,
+                   → face map → choose_style.py (10 treatments, rotation) → beat map + motion briefs → enhance pass (14 components + beat grid,
                    budget) → on-screen facts checked → pick_music.py (energetic track, trimmed to its drop) + 2–3 signature SFX
                    → build (helpers per beat) ∥ covers A/B ∥ posting kit (hook, list, trust line, yes/no, SEO keyword line, tags)
                    → QA auto-fix ×3 (lint, check, UI zones, qa_reel: enhance/static/read-time/face, --cover, beat_grid --check, frame grading ≥ 8/10, frame-0, taste:
                    music first 3 s · ending · ≤1 emoji) → draft + Studio preview → CHECKPOINT 2 → final render → −14 LUFS → SRT
                    → upload half 2 → style_log row
-LOOP               the creator's notes → rule in the owning skill; 48 h numbers → follow-ups when ≥ 3× median
+LOOP               the creator's notes → rule in the owning skill; on request: posted → stats: (Instagram + YouTube, 48 h / 7 d + channel) → report: (monthly, performance.json → style picker) → follow-ups when ≥ 3× median; trends: = 3 topic ideas. Nothing runs on a schedule.
 ```
 Scripts in `scripts/`: pipeline.py (manifest/locks/uploads) · analyze.sh · make_cut.py (`--exposure --saturation --no-grade`) · envelope.py ·
-choose_style.py · pick_music.py · music_energy.py · beat_grid.py · qa_reel.py (`--audio`, `--cover`) · analyze_reference.py · render_cover.sh · finalize.sh · make_srt.js.
+choose_style.py · pick_music.py · music_energy.py · beat_grid.py · channel_report.py · qa_reel.py (`--audio`, `--cover`) · analyze_reference.py · render_cover.sh · finalize.sh · make_srt.js.
 Components in `composition/components/` (INDEX.md). Music in `composition/assets/audio/music/` (INDEX.md: bpm, energy, best start).
 
 ## Commands

@@ -1,0 +1,49 @@
+<!--
+COMPONENT: tier-board — an S / A / B / C / F tier list that fills as each item is PLACED on its spoken word, for
+tier-list reels ("Cold calling is S tier… LinkedIn is F tier"; round 5, olli.rasmussen tier list; WINNING_PATTERNS.md §27).
+The empty board is visible from the first placement so viewers wait to see where their favourite lands.
+Seek-safe with NO callbacks: every chip is pre-built and revealed with timeline tweens at its own time.
+
+USE: paste CSS + markup into a `.g.clip` layer (graphics band, y 250–1000), then
+  buildTierBoard(tl, { el: "#tb", title: "Getting clients, 2026", start: 1.2, end: 26.0,
+    items: [ { tier: "S", text: "Cold calling", at: 1.6 }, { tier: "F", text: "LinkedIn", at: 3.4 },
+             { tier: "C", text: "Upwork", at: 5.1 }, { tier: "A", text: "Meta ads", at: 9.8 }, { tier: "S", text: "Cold email", at: 12.0 } ] })
+  tiers default ["S","A","B","C","F"]; pass `tiers` to change. `at` = the word where the item is named.
+RULES: one per reel; ≤ 3 chips per tier, ≤ 2 words per chip; stays above the face (graphics band) or the reel uses the
+  Editorial Split framing; the last placement can be the twist (a surprise in S or F) — give it a 0.3 s hold before;
+  pair each placement with `digital-tick` (0.15) and the S-tier ones with `soft-hit`.
+FEEL: "a sticker slapped on a whiteboard": the chip drops 24 px into its row and lands with a 2 % overshoot (0.22 s),
+  the row's letter tile pulses once; nothing else moves.
+-->
+
+<!-- CSS -->
+<style>
+  .tb { position: absolute; left: 60px; width: 960px; top: 260px; opacity: 0; }
+  .tb .ttl { font: 800 46px Montserrat, sans-serif; color: var(--ink-on-video, #fff); margin-bottom: 14px; text-shadow: 0 2px 12px rgba(0,0,0,.45); }
+  .tb .row { display: flex; align-items: stretch; height: 92px; margin-bottom: 8px; background: rgba(15, 17, 22, 0.78); border-radius: 14px; overflow: hidden; }
+  .tb .lt { width: 92px; display: grid; place-items: center; font: 900 52px Montserrat, sans-serif; color: #111; flex: none; }
+  .tb .chips { display: flex; align-items: center; gap: 10px; padding: 0 14px; }
+  .tb .chip { background: #fff; color: #111; font: 700 32px Montserrat, sans-serif; padding: 10px 18px; border-radius: 10px; opacity: 0; white-space: nowrap; }
+</style>
+
+<!-- MARKUP -->
+<div id="tb" class="tb"></div>
+
+<!-- JS -->
+<script>
+  function buildTierBoard(tl, o) {
+    const root = document.querySelector(o.el), tiers = o.tiers || ["S", "A", "B", "C", "F"];
+    const colors = { S: "#FF7F7F", A: "#FFBF7F", B: "#FFDF7F", C: "#BFFF7F", D: "#7FFFFF", F: "#C9A7FF" };
+    root.innerHTML = (o.title ? `<div class="ttl"></div>` : "") + tiers.map((t) => `<div class="row" data-t="${t}"><div class="lt" style="background:${colors[t] || "#ddd"}">${t}</div><div class="chips"></div></div>`).join("");
+    if (o.title) root.querySelector(".ttl").textContent = o.title;
+    tl.fromTo(root, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" }, o.start);
+    o.items.forEach((it) => {
+      const row = root.querySelector(`.row[data-t="${it.tier}"]`); if (!row) return;
+      const c = document.createElement("span"); c.className = "chip"; c.textContent = it.text; row.querySelector(".chips").appendChild(c);
+      tl.fromTo(c, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: 0.22, ease: "back.out(1.4)" }, it.at);
+      tl.fromTo(row.querySelector(".lt"), { scale: 1 }, { scale: 1.08, duration: 0.1, yoyo: true, repeat: 1 }, it.at);
+    });
+    if (o.end != null) tl.to(root, { opacity: 0, duration: 0.2, ease: "power2.in" }, o.end);
+    return root;
+  }
+</script>

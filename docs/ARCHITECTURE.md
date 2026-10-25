@@ -14,7 +14,7 @@ reel-studio-pipeline/            (this repo = the Claude Code plugin)
     WINNING_PATTERNS.md          lessons from reference reels (grows with study:)
     PIPELINE.md · WORKFLOW.md    spec + map
     scripts/                     see below
-    composition/                 reference-index.html (code patterns) · components/ (11 motion components + INDEX.md)
+    composition/                 reference-index.html (code patterns) · components/ (14 motion components + INDEX.md)
     carousel/                    deck.html (all layouts, incl. finding · dodont · roadmap · photo) · render.sh · examples/sampler/slides.js
     thumbnail/                   cover-template.html (A, curiosity) · cover-template-b.html (B, bold claim)
     review/review.html           timestamped-notes player
@@ -27,13 +27,14 @@ Your data (never in the repo): `~/.config/reel-studio/config.json` and `<studio>
 ## Scripts (`<studio>/template/scripts/`)
 | Script | Role |
 |---|---|
-| `pipeline.py` | manifest per reel (`init/set/file/approve/status/next`), footage pickup + pre-flight, machine-wide render locks (max 4 + 1 final), approval-gated Drive upload with size verification |
+| `pipeline.py` | manifest per reel (`init/set/file/approve/status/next`, plus `features`, `posted`, `stats`, `channel`, `due` for your numbers), footage pickup + pre-flight, machine-wide render locks (max 4 + 1 final), approval-gated Drive upload with size verification |
 | `analyze.sh` | silences + per-island whisper transcription with word timings |
 | `envelope.py` | audio envelope to cut at real dips |
 | `make_cut.py` | bakes the cut: HLG→SDR tone-map (`--exposure`, `--saturation`, `--no-grade`), 9:16, upscale, voice chain, 0.3 s end pad (the reel ends on the last word) |
 | `choose_style.py` | picks the treatment from the script (signals + format label + rotation in `style_log.md`), signature move, music mood, per-line component plan, CTA variant, list device (step-progress / list-header), count-roll + hand-annotate lines, literal hook image |
 | `pick_music.py` | picks the most energetic approved track not used in the last 3 reels, trims it to its best start with fades |
 | `beat_grid.py` | tempo + beat phase of the trimmed bed (whole-track comb, no drift), beats/bars in reel time; `--check` lists graphic entrances / b-roll cuts off the beat with the snapped time |
+| `channel_report.py` | monthly report from your Instagram + YouTube stats: medians, each format / hook / style / length vs median per platform, platform disagreements, post times, 3× winners; writes `performance.json` for the style picker |
 | `music_energy.py` | scores tracks: BPM, hit density, intro length, best start, energy 0–100 |
 | `qa_reel.py` | timeline QA (flash, read time, face flash, face box, scene variety, static stretches, component budget), `--audio` (repeats, fillers, pauses > 0.25 s, first word, pace WPM, tail after the last word), `--cover` (near-blank) |
 | `analyze_reference.py` | reference reels → metrics.json, transcripts, hook strip + sheets |
@@ -53,4 +54,6 @@ Your data (never in the repo): `~/.config/reel-studio/config.json` and `<studio>
 Clean Tech · Notebook · Newsroom · Terminal · Data · Cinematic Cutout · Editorial Split · Studio Kinetic · Fact-or-Hype Reaction · Halftone Collage — chosen automatically, never the same as the last 2 reels. Looks (what you film): A lo-fi selfie · B cinematic studio · C graphic top / face box · D reaction/stitch · E prop as screen.
 
 ## Learning
+Your own numbers: `pipeline.py posted/stats/channel` store Instagram + YouTube results per reel (`reels/stats_log.md`, `reels/channel_log.json`); `channel_report.py` → `reports/<month>.md` + `reels/performance.json`; `choose_style.py` reads it (capped nudge, ≥ 3 reels per style). Nothing is scheduled.
+
 `WINNING_PATTERNS.md` holds the rules learned from reference reels (hooks, structure, pace, layouts, captions, CTA cards, covers, sound, captions/tags). Every skill reads it; `study:` appends a round. Your own notes go straight into the skill files ("which rule would have prevented this?").

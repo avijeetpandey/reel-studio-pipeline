@@ -47,8 +47,8 @@ Then add the treatment's **feel paragraph** verbatim. Describe feelings like a d
 - Sources, in order: the creator's own recordings (`broll/` and the b-roll index `$STUDIO/broll/INDEX.md` when it exists), real page captures, real screenshots. AI-generated b-roll only if the creator asks.
 - Each b-roll shot: 1.2–3 s, hard cut in and out, covers any nearby jump cut (planning rule 7), matches the exact meaning of the line.
 - Footage shot in a log profile (S-Log, D-Log) → convert to Rec.709 + gentle contrast before use.
-- **Split-frame** (round 5, 25K edit reel): 2–4 framed panels of the same take or of b-roll at once (panels slide in on the beat, 16–24 px gaps, rounded 12 px) to make tripod footage dynamic. Use once per reel for a list or a "look at all of these" moment. Build the panels as separate `<video>` clips of the same source with different crops; the framework owns playback.
-- **Flicker opener** (round 5): 6–8 two-frame flashes of upcoming shots as a section opener (never at frame 0, never over speech that must be understood). Max once per reel.
+- **Split-frame** (round 5, 25K edit reel; component `split-frame.html`): 2–4 framed panels of the same take or of b-roll at once (panels slide in on the beat, 16–24 px gaps, rounded 12 px) to make tripod footage dynamic. Use once per reel for a list or a "look at all of these" moment. Build the panels as separate `<video>` clips of the same source with different crops; the framework owns playback.
+- **Flicker opener** (round 5; component `flash-open.html`): 6–8 two-frame flashes of upcoming shots as a section opener (never at frame 0, never over speech that must be understood). Max once per reel.
 - After the reel, add any new b-roll/screen recording to `broll/INDEX.md` (file, what it shows, keywords, length) so future reels reuse it.
 
 ## Layouts and life in the frame (from the reference reels)

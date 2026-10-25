@@ -13,3 +13,8 @@
 | `study:` can't download a reel | sign in to Instagram in the built-in browser; private posts can't be studied |
 | Music sounds calm | grow the library (docs/MUSIC.md); `pick_music.py` prefers energy ≥ 75 |
 | A session ended mid-reel | `continue <reel_name>` |
+| `stats:` stops at "Verify that it's you" in YouTube Studio | a security step only you can do — finish it in the browser pane, then say `continue` |
+| Instagram per-reel numbers missing | the reel page has none on the web; stats come from `instagram.com/accounts/insights/content/…` — if a field is app-only, send a screenshot of the app's Insights |
+| `report:` says "no posted reels with stats" | record links with `posted <reel> <ig> <yt>` and numbers with `stats:` first |
+| Style picker ignores your results | it only uses a style after ≥ 3 posted reels with stats, and the nudge is capped; run `report:` to refresh `performance.json` |
+| Worried about background token use | nothing is scheduled: `stats:`, `report:` and `trends:` only run when you type them |

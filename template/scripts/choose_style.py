@@ -13,7 +13,8 @@ and a breather after every 2 upgraded lines.
 Also picks the in-video CTA card variant (follow / save), the list device for list reels (step-progress for 2–3 items,
 list-header for 4+), a count-roll for big numbers, hand-annotate when a line points at a real object, and a 1 s literal
 hook image when the hook has a strong verb (WINNING_PATTERNS.md §16–18, round 3), and a check-card for a line that
-lists 3–5 short items (§23, round 4), and a pill-list card for each "master these to become a…" line (§27, round 5).
+lists 3–5 short items (§23, round 4), a pill-list card for each "master these to become a…" line (§27, round 5), tier-board / split-frame lines (§27, §29), and (with reels/performance.json from channel_report.py) a capped nudge toward the
+treatments that beat the creator's own median over ≥ 3 posted reels.
 """
 import argparse, json, os, re, sys
 CFG_PATH = os.path.expanduser(os.environ.get("REEL_STUDIO_CONFIG", "~/.config/reel-studio/config.json"))
@@ -45,9 +46,12 @@ NUM = re.compile(r"\d|\b(percent|million|billion|trillion|lakh|crore|thousand)\b
 APP = re.compile(r"\b(chatgpt|claude|gemini|google|linkedin|youtube|instagram|app|website|page|screen|dashboard|settings|docs?|sheet|browser|notification)\b", re.I)
 CODE = re.compile(r"\b(prompt|command|type[sd]?|code|script|terminal|query|config|sql|regex)\b", re.I)
 TWIST = re.compile(r"\b(but|actually|the truth|here'?s the thing|turns out|the catch|except|in reality|surprise)\b", re.I)
+PERF = {}  # filled in main() from reels/performance.json
 QUESTION = re.compile(r"\?\s*$")
 BIGNUM = re.compile(r"\b\d{1,3}(,\d{3})+\b|\b\d{4,}\b|\b\d+(\.\d+)?\s*(k|m|million|billion|lakh|crore|stars|installs|downloads|users)\b", re.I)
 POINT = re.compile(r"\b(this (light|lamp|lens|mic|camera|setup|button|line|part|corner|tab|icon)|look at (this|that)|right here|see this|over here|behind me)\b", re.I)
+TIER = re.compile(r"\b([SABCDF] tier|tier list|top tier|bottom tier)\b")
+SPLIT = re.compile(r"\b(all of these|look at (all )?these|every one of (these|them)|side by side|at the same time)\b", re.I)
 ROLE = re.compile(r"\b(master these|skills you need|to become an? [\w-]+ (engineer|developer|scientist|analyst|designer|manager))\b", re.I)
 HOOK_VERB = re.compile(r"\b(murder(ed|s)?|kill(ed|s)?|dead|died|stole|steal(s|ing)?|replac(ed|es|ing)|broke|break(s|ing)?|destroy(ed|s)?|ended|exposed|leaked|banned|wrong|lied|lying|fired|hacked|cheat(ed|ing)?)\b", re.I)
 
@@ -140,6 +144,12 @@ def choose(text, script_text, log, force):
     recent = [n for h in hist[-6:] for n in h]
     for n in NAMES:
         score[n] -= 1.5 * recent.count(n)  # frequency penalty: stop one look from dominating
+    perf_note = []
+    for n, row in (PERF.get("treatment") or {}).items():  # the creator's own results (channel_report.py), n >= 3 only
+        if n in score and row.get("n", 0) >= 3 and isinstance(row.get("all"), (int, float)):
+            adj = max(-1.5, min(1.5, (row["all"] - 1.0) * 2.0))  # capped: real numbers nudge, never override content
+            score[n] += adj
+            perf_note.append(f"{n} {adj:+.1f} (your median {row['all']:.2f}× over {row['n']} reels)")
     banned = set(last2)
     if any("Cinematic Cutout" in h for h in hist[-4:]):
         banned.add("Cinematic Cutout")
@@ -148,7 +158,7 @@ def choose(text, script_text, log, force):
     else:
         ok = [n for n in NAMES if n not in banned] or NAMES
         pick = max(ok, key=lambda n: (score[n], -NAMES.index(n)))
-        why = f"best score among allowed ({', '.join(f'{n} {score[n]:.1f}' for n in NAMES)}); banned (last 2 / cooldown): {', '.join(sorted(banned)) or 'none'}"
+        why = (f"your results: {'; '.join(perf_note)}. " if perf_note else "") + f"best score among allowed ({', '.join(f'{n} {score[n]:.1f}' for n in NAMES)}); banned (last 2 / cooldown): {', '.join(sorted(banned)) or 'none'}"
     return pick, why, counts, nums, score
 
 
@@ -159,8 +169,9 @@ def plan_components(lines, treatment):
     for i, l in enumerate(lines):
         t, comp, why = l["text"], "-", "no upgrade (default)"
         quiet = None
-        if i == 0 and ROLE.search(t):  # round 5: screenshot-card reels show the first card on the hook itself
-            plan.append({**l, "i": i, "comp": "pill-list", "why": "hook names a role's skill list -> first screenshot card on the hook", "quiet": False})
+        if i == 0 and (ROLE.search(t) or TIER.search(t)):  # round 5: card / tier-list reels show their device on the hook itself
+            comp0 = "pill-list" if ROLE.search(t) else "tier-board"
+            plan.append({**l, "i": i, "comp": comp0, "why": f"hook opens the {'skill list' if comp0 == 'pill-list' else 'tier list'} -> {comp0} starts on the hook", "quiet": False})
             continue
         if i == 0:
             quiet = "hook: hook words own this line"
@@ -174,6 +185,10 @@ def plan_components(lines, treatment):
         words = len(t.split())
         if CODE.search(t) and re.search(r"[\"'“”`]|/|\bprompt|command|code\b", t, re.I):
             comp, why = "code-window", "line quotes a prompt/command/code -> typed card"
+        elif TIER.search(t):
+            comp, why = "tier-board", "places items in tiers -> tier board that fills on each spoken placement"
+        elif SPLIT.search(t):
+            comp, why = "split-frame", "shows several things at once -> 2–4 footage panels landing on the beat"
         elif ROLE.search(t):
             comp, why = "pill-list", "names a role's skill list -> screenshot card (8–12 skills + sourced salary line)"
         elif listy(t):
@@ -198,7 +213,10 @@ def plan_components(lines, treatment):
     for p in plan:
         if p["comp"] in ("code-window", "swing-window") and (p["start"] < 2.0 or p["end"] > total - 4.0):
             p["comp"], p["why"] = "pop-blur", p["why"] + " (heavy move not allowed in first 2 s / last 4 s)"
-    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3), ("check-card", 1), ("pill-list", 6)):
+    tiers = [p for p in plan if p["comp"] == "tier-board"]
+    for p in tiers[1:]:
+        p["comp"], p["why"] = "-", "placement on the tier board (board already on screen)"
+    for name, cap in (("roll-text", 2), ("count-roll", 2), ("hand-annotate", 3), ("check-card", 1), ("pill-list", 6), ("split-frame", 1)):
         for p in [p for p in plan if p["comp"] == name][cap:]:
             p["comp"], p["why"] = "pop-blur", p["why"] + f" (max {cap} {name})"
     run = 0  # breather after every 2 upgraded lines
@@ -220,7 +238,16 @@ def main():
     ap.add_argument("--treatments", default=os.path.join(PLUGIN, "skills/reel-edit/treatments.md"))
     ap.add_argument("--force")
     ap.add_argument("--out", default="style_plan.json")
+    ap.add_argument("--performance", help="channel_report.py output (default: performance.json next to the style log)")
     a = ap.parse_args()
+    global PERF
+    pp = a.performance or os.path.join(os.path.dirname(a.log), "performance.json")
+    if pp and os.path.exists(pp):
+        try:
+            PERF = json.load(open(pp))
+        except (OSError, ValueError):
+            PERF = {}
+
 
     lines = parse_lines(a.lines)
     if not lines:
