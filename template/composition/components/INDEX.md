@@ -18,3 +18,17 @@ Each file is self-contained (CSS + markup + a `buildX(tl, opts)` function that a
 - `tier-board.html` — S/A/B/C/F board whose chips land on each spoken placement (round 5: tier-list reels) — Editorial Split / any — not yet used.
 - `count-roll.html` — odometer number whose digits roll from one value to another + small label; for stars/installs/users/$ (round 3: hananazeez.ai) — Data / Clean Tech / any — not yet used.
 - `hand-annotate.html` — hand-drawn circle + arrow + handwritten label that draws itself onto the real frame, pointing at a real object (round 3: iamsarahsnow) — Notebook / Studio Kinetic / any (needs the Caveat font) — not yet used.
+
+## Round 6 — IG study 30 Oct 2026 (31 editing/sound/AI-edit reels; notes in `research/ig_study_2026-10-30/REPORT.md`)
+All verified by scrubbing the GSAP timeline in a browser (`components/_preview/gen.py` writes one test page per component exposing `window.TL` — serve the folder, `TL.seek(t)`, screenshot).
+- `kinetic-type-3d.html` — **faceless / cutaway reels only; never a full-screen beat in a talking-head reel (it replaced the creator's face in an example v2 draft and they rejected it)**. Words land on the spoken syllable on a staggered stair; a virtual camera follows each word (motion blur), one accent word per line, then pulls back to the full phrase (DfEJ6KaI9g2, DeyusrQMOmi) — faceless/cutaway beats, cream+red or graphite+gold — not yet used.
+- `sound-strip.html` — labelled waveform pills scroll past a fixed playhead; the lit pill = the sound you hear (Dd3r5DyxYxX 48.8K, Dd_EPp5RzRN, DcwZp1xM7Gi, DeKCJSlz5BX) — sound/tools/AI topics or a 2-s HUD when a sound family plays — not yet used.
+- `sfx-chip.html` — small card (equaliser + sound name + 00:03) that pops 60 ms before its sound (Viewcci "With This / Use This") — any teach-a-sound/tool beat — not yet used.
+- `select-caption.html` — top caption, current word bright / past words dim, meaning-words boxed with editor "selection handles" (speedy_devv 35M-view reel) — dark graphite treatments — not yet used.
+- `stamp-slap.html` — rubber stamp ("CHEAP?", "FAKE") slams in at an angle with shake; answers an objection (DeT79uPlMkH) — any, ≤ 2 per reel — not yet used.
+- `loading-hook.html` — "TUTORIAL LOADING 0→100 %" bar over the demo; bridges demo → how-to (Harry Allsop) — how-to reels only — not yet used.
+- `dm-toast.html` — phone notification + comment rows landing; CTA as proof-of-demand (speedy_devv). Use with the yes/no question, not a keyword — any — not yet used.
+- `stopwatch.html` — dial + "4 → 20 days" counter for time-claims; pairs with `count-roll` (speedy_devv) — any — not yet used.
+- `ab-header.html` — two pinned labels, the lit side swaps with the demo ("WITHOUT SFX | WITH SFX") (Viewcci) — A/B / before-after reels — not yet used.
+- `sticker-kit.html` — flat illustrated stickers (clock, server rack, cloud, satellite, atomic-clock tile, label chip, bubble, dashed link, cross, DB cylinder) + the pop/hands/blink/flow motion recipe; for concept explainers where graphics must ILLUSTRATE the sentence and the face stays on screen (an example reel v2, the creator's notes 30 Oct) — Sticker Pop world — used in an example reel.
+

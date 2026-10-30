@@ -27,7 +27,7 @@ When the creator hands over a video (with or without notes), run the whole pipel
 - Screen recordings: use any in `broll/`; if `script.md` lists missing ones, use a real captured page and mention it.
 - **The checkpoint** (one message): Studio preview link + `review/review.html` with the draft, safe-zone contact sheet, storyboard (one frame per beat), hook A/B, covers A + B, posting kit (+ LinkedIn post), QA report, review notes (footage issues for next shoot), and the choices made (treatment, signature move, music). the creator replies "approved" or timestamped notes → final render at full quality, finalize to −14 LUFS, upload to Drive. Approval of the checkpoint = approval of video and covers; any change = fix, re-check, show the changed parts, ask again.
 
-**Hard rules:** HyperFrames + ffmpeg only. Never spend money or use paid APIs without the creator's OK. Never use ripped footage/music. Music only from the YouTube Audio Library ("Attribution not required"); every reel gets music, which Claude downloads without asking. Never render the final before the creator approves the preview; never upload before they approves BOTH video and covers.
+**Hard rules:** the creator's face stays on screen the whole reel and graphics illustrate the sentence (`variety.md` §0); a re-edit is saved as `_v2` next to the first cut and never overwrites it. HyperFrames + ffmpeg only. Never spend money or use paid APIs without the creator's OK. Never use ripped footage/music. Music only from the YouTube Audio Library ("Attribution not required"); every reel gets music, which Claude downloads without asking. Never render the final before the creator approves the preview; never upload before they approves BOTH video and covers.
 
 ## Edit principles
 - **Frame 0 = the creator's face, already speaking the hook.** Face on screen, undimmed, from the very first frame; first word audible within 0.1 s. Never open on a title card, cover, logo, dark frame, screen recording or b-roll — covers are uploaded separately (Oct 2026 audit: 4 of 7 reels opened on a dark card and stalled at 79–184 views).
@@ -136,6 +136,9 @@ rclone copyto "linkedin_image.png" "{drive_remote}:{drive_folder}/<reel_name>/<r
 rclone lsl "{drive_remote}:{drive_folder}/<reel_name>"   # verify sizes match
 ```
 If rclone auth fails, ask the creator to run `rclone config reconnect {drive_remote}:`.
+
+## 10b. Re-edits (v2, v3…)
+Keep the first cut. Build in `video_v2/`, render to `renders/<reel>_v2_raw.mp4` → `finalize.sh` → `<reel>_v2_final.mp4`, copy the SRTs as `_v2`, covers as `<reel>_v2_thumbnail(.b).jpg`, `posting_kit_v2.md`. After the creator approves video AND thumbnails, create a NEW `v2` subfolder inside the reel's Drive folder and upload there (never over v1); verify sizes with `rclone lsl`.
 
 ## 11. Revisions and learning
 Fix the named beat, `npx hyperframes snapshot --range a,b --frames 6`, re-check, re-render as `_v2`. For **every** note the creator gives: ask "which instruction would have prevented this?" and write that rule into this skill or its reference files (add an automated check to `qa_reel.py` when possible), then tell them what changed. Save any reusable graphic as a component in `T/composition/components/` (one HTML file + one line in `components/INDEX.md`) and new b-roll in `$STUDIO/broll/INDEX.md`.

@@ -1,0 +1,25 @@
+<!--
+COMPONENT: stamp-slap — a rubber-stamp word ("CHEAP?", "FAKE", "SAVED", "BUG") slams onto the frame at a slight angle with a camera shake and ink ring.
+From the IG study 30 Oct 2026: DeT79uPlMkH (red "CHEAP?" stamp on the objection line), DfEJ-style punch cards. A STAMP is the cheapest way to make a reel feel hand-edited.
+USE: buildStampSlap(tl, { el:"#st", text:"CHEAP?", at:9.8, x:540, y:560, angle:-8, hold:1.2, color:"#e5383b" })   (fire the `stamp` SFX at `at`)
+RULES: ≤ 2 stamps per reel; text ≤ 8 characters; the stamp answers/denies the line being spoken; shake only the stamp + 6 px on #cam (pass shake:"#cam").
+FEEL: scale 2.4 → 1 in 0.14 s power4.in (it falls TOWARD the viewer), rotate to angle, 2-frame squash, ring expands + fades 0.35 s.
+-->
+<style>
+  .st { position:absolute; z-index:30; opacity:0; transform:translate(-50%,-50%); padding:8px 26px; border:8px solid var(--st-c,#e5383b); border-radius:10px; color:var(--st-c,#e5383b);
+        font:900 110px/1 Montserrat,sans-serif; letter-spacing:.03em; background:rgba(255,255,255,.9); mix-blend-mode:normal; }
+  .st::after { content:""; position:absolute; inset:-14px; border:3px solid var(--st-c,#e5383b); border-radius:16px; opacity:0; }
+</style>
+<div id="st" class="st"></div>
+<script>
+  function buildStampSlap(tl, o) {
+    const r = document.querySelector(o.el); r.textContent = o.text; r.style.left = (o.x || 540) + "px"; r.style.top = (o.y || 560) + "px";
+    if (o.color) r.style.setProperty("--st-c", o.color); const a = o.angle != null ? o.angle : -8, t = o.at;
+    tl.fromTo(r, { opacity: 0, scale: 2.4, rotate: a - 10 }, { opacity: 1, scale: 1, rotate: a, duration: 0.14, ease: "power4.in" }, t);
+    tl.to(r, { scaleX: 1.06, scaleY: 0.94, duration: 0.05, yoyo: true, repeat: 1 }, t + 0.14);
+    tl.fromTo(r, { "--ring": 0 }, { "--ring": 1, duration: 0.01 }, t + 0.14);
+    tl.fromTo(r, { x: 0 }, { x: 5, duration: 0.03, yoyo: true, repeat: 5, ease: "none" }, t + 0.14);
+    if (o.shake) tl.fromTo(o.shake, { y: 0 }, { y: 6, duration: 0.035, yoyo: true, repeat: 5, ease: "none" }, t + 0.14);
+    tl.to(r, { opacity: 0, scale: 0.96, duration: 0.2, ease: "power2.in" }, t + (o.hold || 1.2));
+  }
+</script>

@@ -1,0 +1,21 @@
+<!--
+COMPONENT: stopwatch — a round dial whose hand sweeps while a "N days" label counts; for time-claims ("in 20 days", "in 30 minutes", "in 10 s").
+From the IG study 30 Oct 2026: DeyusrQMOmi (stopwatch beside the "35M views in 20 days" odometer), DfChR8pgZuI ("29:59 MINS SECS" calendar timer).
+USE: buildStopwatch(tl, { el:"#sw", at:5.2, dur:1.6, from:4, to:20, unit:"days", x:760, y:330, size:220 })
+RULES: one per reel; pairs with count-roll (odometer) when the claim is "X in Y"; start with the spoken number; the hand makes exactly one revolution over `dur` (power2.inOut), ticking SFX = `counter-roll`.
+-->
+<style>
+  .sw { position:absolute; opacity:0; } .sw .face { width:100%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%,#f4f5f7,#aeb3bd); border:6px solid #d9dce3; box-shadow:0 10px 30px rgba(0,0,0,.45); position:relative; }
+  .sw .hand { position:absolute; left:50%; top:50%; width:5px; height:38%; margin-left:-2.5px; background:#f0a500; transform-origin:50% 100%; transform:translateY(-100%) rotate(0deg); border-radius:3px; }
+  .sw .lbl { text-align:center; margin-top:10px; font:700 28px "JetBrains Mono",monospace; color:#fff; height:34px; overflow:hidden; } .sw .lbl div { line-height:34px; }
+</style>
+<div id="sw" class="sw"><div class="face"><div class="hand"></div></div><div class="lbl"><div></div></div></div>
+<script>
+  function buildStopwatch(tl, o) {
+    const r = document.querySelector(o.el), s = o.size || 220; r.style.width = s + "px"; r.style.left = (o.x || 760) + "px"; r.style.top = (o.y || 330) + "px";
+    const n = o.to - o.from + 1, st = r.querySelector(".lbl div"); st.innerHTML = Array.from({ length: n }, (_, i) => `<div>${o.from + i} ${o.unit || "days"}</div>`).join("");
+    tl.fromTo(r, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(1.5)" }, o.at);
+    tl.fromTo(r.querySelector(".hand"), { rotation: 0 }, { rotation: 360, duration: o.dur || 1.6, ease: "power2.inOut" }, o.at + 0.1);
+    tl.fromTo(st, { y: 0 }, { y: -34 * (n - 1), duration: o.dur || 1.6, ease: `steps(${n - 1})` }, o.at + 0.1);
+  }
+</script>

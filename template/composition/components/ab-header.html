@@ -1,0 +1,20 @@
+<!--
+COMPONENT: ab-header — a two-label header ("WITH THIS" | "USE THIS") where the active side lights up in the accent while the other dims; for A/B comparisons, before/after, myth/fact.
+From the IG study 30 Oct 2026: DcmMnxXOxXo / DexrhhquL1J (Viewcci) — the pair of labels stays pinned all reel, the lit side swaps as the demo swaps.
+USE: buildAbHeader(tl, { el:"#ab", left:"WITHOUT SFX", right:"WITH SFX", y:90, swaps:[{at:0.2,side:"left"},{at:3.0,side:"right"}], end:9 })
+RULES: labels ≤ 2 words each, 54 px 800 weight; exactly one side lit at a time; swap on the beat of the demo cut; pairs with sfx-chip under the lit side.
+-->
+<style>
+  .ab { position:absolute; left:0; right:0; display:flex; justify-content:space-around; font:800 54px Montserrat,sans-serif; letter-spacing:.01em; opacity:0; }
+  .ab span { color:#fff; opacity:.4; transform:scale(.96); transition:none; }
+</style>
+<div id="ab" class="ab"><span class="l"></span><span class="r"></span></div>
+<script>
+  function buildAbHeader(tl, o) {
+    const r = document.querySelector(o.el); r.style.top = (o.y || 90) + "px"; const L = r.querySelector(".l"), R = r.querySelector(".r"); L.textContent = o.left; R.textContent = o.right;
+    const acc = o.accent || "#ffd600"; tl.to(r, { opacity: 1, duration: 0.2 }, o.swaps[0].at - 0.05);
+    o.swaps.forEach(s => { const on = s.side === "left" ? L : R, off = s.side === "left" ? R : L;
+      tl.to(on, { opacity: 1, color: acc, scale: 1, duration: 0.15, ease: "power2.out" }, s.at); tl.to(off, { opacity: 0.4, color: "#fff", scale: 0.96, duration: 0.15 }, s.at); });
+    if (o.end != null) tl.to(r, { opacity: 0, duration: 0.2 }, o.end - 0.2);
+  }
+</script>

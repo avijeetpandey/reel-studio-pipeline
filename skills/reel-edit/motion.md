@@ -56,3 +56,6 @@ Then add the treatment's **feel paragraph** verbatim. Describe feelings like a d
 - **Split (SP)** is the default for lists and tool demos; **PiP** (diagram 70 %, face in a rounded box at the bottom) for diagram-heavy explanations; full-graphic cutaways 2–4 s.
 - **Something visibly changes every 1–3 s** inside a graphic beat: a node appears, a tick lands, a counter rises, a cursor clicks. A graphic that sits still for > 2.5 s gets a small state change or ends.
 - **List reels:** pinned list title or the `step-progress` stepper for the whole list; the strongest item last after an open-loop line; an optional 1.2 s fast recap of all items right before the CTA (people pause or re-watch to read it).
+
+## Notes, 30 Oct 2026 (an example v2 re-edit) — face first, illustrations that match the topic
+Full rules in `variety.md` §0. In short: face never covered; draw the real objects of the sentence with `components/sticker-kit.html` (flat, ink-outlined, hard shadow), one persistent scene that evolves, ≤ 4 objects and ≤ 3 words per object, motion that shows the mechanism, pop with overshoot + idle micro-motion; no giant text, no generic cards, no terminal windows as explanation.

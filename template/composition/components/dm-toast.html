@@ -1,0 +1,26 @@
+<!--
+COMPONENT: dm-toast — a phone-style notification banner (avatar + "name · now" + message) that drops in from the top, optionally followed by a stack of comment rows
+("FOLDER", "FOLDER 🙏") like a live comment panel. The CTA lands as proof-of-demand instead of a spoken ask.
+From the IG study 30 Oct 2026: DeyusrQMOmi (speedy_devv: DM toast "here's the folder" + comments panel filling with "FOLDER"), DeT79uPlMkH ("Comment EDITOR" button card).
+NOTE (the creator, 24 Oct 2026): no keyword-for-DM CTAs. Use this with the yes/no question: toast text = the QUESTION, rows = "YES"/"NO" votes landing one by one.
+USE: buildDmToast(tl, { el:"#dm", name:"{brand}", msg:"Would you trust AI with your resume? YES / NO", at:27, rows:[{u:"meera.codes",t:"YES"},{u:"rahul.dev",t:"NO 😅"}], rowGap:0.45 })
+RULES: toast enters 0.32 s back.out(1.2), holds ≥ 1.6 s, leaves 0.2 s up; rows (≤ 4) land after the toast with a tick SFX each (notif-pop on the toast); real avatar = the creator's photo, never a stock face.
+-->
+<style>
+  .dm { position:absolute; left:40px; right:40px; top:70px; opacity:0; }
+  .dm .t { display:flex; gap:16px; align-items:center; padding:18px 22px; border-radius:26px; background:rgba(245,246,250,.94); color:#14161c; box-shadow:0 14px 40px rgba(0,0,0,.35); font:600 28px/1.25 Montserrat,sans-serif; }
+  .dm .av { width:62px; height:62px; border-radius:50%; background:#c6d3ff center/cover; flex:none; } .dm .t b { display:block; font-weight:700; } .dm .t em { font:500 22px Montserrat; color:#777; font-style:normal; float:right; }
+  .dm .rows { margin-top:14px; display:flex; flex-direction:column; gap:10px; } .dm .r { padding:12px 20px; border-radius:18px; background:rgba(20,22,28,.85); color:#fff; font:600 28px Montserrat; opacity:0; }
+  .dm .r u { text-decoration:none; color:#9aa3b8; margin-right:12px; font-weight:500; }
+</style>
+<div id="dm" class="dm"><div class="t"><div class="av"></div><div><b><span class="nm"></span><em>now</em></b><span class="ms"></span></div></div><div class="rows"></div></div>
+<script>
+  function buildDmToast(tl, o) {
+    const r = document.querySelector(o.el); r.querySelector(".nm").textContent = o.name; r.querySelector(".ms").textContent = o.msg;
+    if (o.avatar) r.querySelector(".av").style.backgroundImage = `url(${o.avatar})`; const rows = r.querySelector(".rows"); rows.innerHTML = "";
+    (o.rows || []).forEach(x => { const e = document.createElement("div"); e.className = "r"; e.innerHTML = `<u>${x.u}</u>${x.t}`; rows.appendChild(e); });
+    tl.fromTo(r, { opacity: 0, y: -90 }, { opacity: 1, y: 0, duration: 0.32, ease: "back.out(1.2)" }, o.at);
+    r.querySelectorAll(".r").forEach((e, i) => tl.fromTo(e, { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.2, ease: "power2.out" }, o.at + 0.7 + i * (o.rowGap || 0.45)));
+    const end = o.at + 0.7 + (o.rows || []).length * (o.rowGap || 0.45) + 1.2; tl.to(r, { opacity: 0, y: -40, duration: 0.2, ease: "power2.in" }, end);
+  }
+</script>

@@ -1,0 +1,72 @@
+<!--
+COMPONENT: sticker-kit — flat illustrated "sticker" objects (ink outline, hard offset shadow) built as DOM/SVG helpers: clock (hands as divs you can rotate),
+server rack (blinking LEDs), cloud, satellite, atomic-clock tile, label chip, speech bubble, dashed link, red cross, DB cylinder.
+Born in the an example reel v2 re-edit (30 Oct 2026) after the creator's notes: graphics must ILLUSTRATE the sentence (servers, clocks, satellite…), face stays on
+screen, one persistent scene that evolves, ≤ 4 objects at once, ≤ 3 words of text per object. Replaces generic cards / terminal windows for concept explainers.
+USE: paste CSS + the helpers into the composition script; call them once to create elements inside a scene wrapper
+  (`<div id="scene" style="position:absolute;inset:0;transform:scale(1.25);transform-origin:540px 250px">`), then animate with GSAP (transforms only — never left/top):
+  pop(sel, t)  = fromTo {opacity:0, scale:.45, y:14, rotation:r-7} → {opacity:1, scale:1, y:0, rotation:r}, 0.4 s, back.out(1.9)   (the "sticker lands" feel)
+  hands(id, a0, a1, t0, t1) = linear rotation of `#id .hm` (the minute/second hand); idle motion = LED blink (`.led` opacity steps) + dashed-link flow (strokeDashoffset).
+PALETTE (one World): ink #16213e, blue #2f6bff, sky #cfe0ff, orange #ff7a1a, yellow #ffd23f, green #19b36b (ok), red #ef3b3b (wrong); bright wall behind = good contrast.
+RULES: zone y 250–700 (above the head); keep art ≥ 60 px from the screen edges AFTER the wrapper scale; unique class names (`.w`, `.o` collided with caption/hidden-object
+  classes once — use `.wh`, `.or`); one idea per beat, the same objects (INDIA/US racks + clocks) carry several beats; sound: `pop` on each landing, `negation`/`glitch-negative` on errors.
+-->
+<style>
+      .o { position: absolute; opacity: 0; }
+      .stk { filter: drop-shadow(0 7px 0 rgba(22,33,62,0.22)); }
+      .mono { font-family: "JetBrains Mono", monospace; font-weight: 800; }
+
+      /* clocks */
+      .clk { position: absolute; opacity: 0; }
+      .clk .h { position: absolute; left: 50%; bottom: 50%; border-radius: 4px; transform-origin: 50% 100%; }
+      .clk .hh { width: 9px; margin-left: -4.5px; background: #16213e; }
+      .clk .hm { width: 6px; margin-left: -3px; background: #ff7a1a; }
+      .clk .dot { position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: #16213e; }
+      /* tags / stickers */
+      .tg { position: absolute; opacity: 0; white-space: nowrap; transform: translate(-50%, -50%); padding: 8px 24px 10px; border: 5px solid #16213e; border-radius: 20px; font: 900 38px/1.1 Montserrat, sans-serif; letter-spacing: 0.01em; }
+      .tg.y { background: #ffd23f; color: #16213e; } .tg.b { background: #2f6bff; color: #fff; } .tg.or { background: #ff7a1a; color: #fff; }
+      .tg.g { background: #19b36b; color: #fff; } .tg.r { background: #ef3b3b; color: #fff; } .tg.wh { background: #fff; color: #16213e; } .tg.k { background: #16213e; color: #fff; border-color: #fff; }
+      .tg.sm { font-size: 28px; padding: 5px 16px 6px; border-width: 4px; border-radius: 14px; }
+      .tg em { font-family: "Playfair Display", serif; font-style: italic; font-weight: 700; }
+      .bub { position: absolute; opacity: 0; transform: translate(-50%, -50%); padding: 8px 22px 10px; background: #fff; border: 5px solid #16213e; border-radius: 22px; font: 800 36px "JetBrains Mono", monospace; color: #16213e; white-space: nowrap; }
+      .bub::after { content: ""; position: absolute; left: 50%; bottom: -17px; width: 22px; height: 22px; margin-left: -11px; background: #fff; border-right: 5px solid #16213e; border-bottom: 5px solid #16213e; transform: rotate(45deg); }
+      .rklab { position: absolute; opacity: 0; transform: translateX(-50%); padding: 4px 18px 6px; border-radius: 12px; background: #16213e; color: #fff; font: 900 28px Montserrat, sans-serif; letter-spacing: 0.08em; }
+      .pkt { position: absolute; width: 30px; height: 30px; margin: -15px; border-radius: 50%; background: #ff7a1a; border: 4px solid #16213e; opacity: 0; }
+      .txc { position: absolute; width: 128px; height: 84px; margin: -42px 0 0 -64px; border: 5px solid #16213e; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0;
+             font: 900 34px Montserrat, sans-serif; color: #fff; }
+      .txc small { font: 800 24px "JetBrains Mono", monospace; opacity: 0.95; }
+      .txc.in { background: #ff7a1a; } .txc.us { background: #2f6bff; }
+      .txc .ck { position: absolute; right: -16px; top: -18px; width: 38px; height: 38px; border-radius: 50%; background: #19b36b; border: 4px solid #16213e; opacity: 0; display: grid; place-items: center; font-size: 22px; color: #fff; }
+
+
+</style>
+<script>
+        /* ---------- tiny illustration kit (all flat, ink outline) ---------- */
+        const add = (html, css) => { const d = document.createElement("div"); d.innerHTML = html.trim(); const e = d.firstElementChild; if (css) e.style.cssText += css; stage.appendChild(e); return e; };
+        function clock(id, cx, cy, d, fill) {
+          const r = d / 2; let ticks = "";
+          for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6, r1 = r * 0.8, r2 = i % 3 === 0 ? r * 0.64 : r * 0.71;
+            ticks += `<line x1="${r + Math.sin(a) * r1}" y1="${r - Math.cos(a) * r1}" x2="${r + Math.sin(a) * r2}" y2="${r - Math.cos(a) * r2}" stroke="${INK}" stroke-width="${i % 3 === 0 ? 6 : 3.5}" stroke-linecap="round"/>`; }
+          return add(`<div id="${id}" class="clk stk"><svg width="${d}" height="${d}" viewBox="0 0 ${d} ${d}"><circle cx="${r}" cy="${r}" r="${r - 4}" fill="${fill || "#fff"}" stroke="${INK}" stroke-width="8"/>${ticks}</svg><i class="h hh" style="height:${r * 0.5}px"></i><i class="h hm" style="height:${r * 0.74}px"></i><b class="dot"></b></div>`,
+            `left:${cx - r}px;top:${cy - r}px;width:${d}px;height:${d}px`);
+        }
+        function rack(id, cx, top, w, h) {
+          const slot = (y) => `<rect x="${w * 0.12}" y="${y}" width="${w * 0.76}" height="${h * 0.2}" rx="9" fill="${SKY}" stroke="${INK}" stroke-width="4"/><circle class="led" cx="${w * 0.24}" cy="${y + h * 0.1}" r="6.5" fill="${GRN}"/><rect x="${w * 0.4}" y="${y + h * 0.075}" width="${w * 0.4}" height="6" rx="3" fill="${INK}" opacity=".55"/><rect x="${w * 0.4}" y="${y + h * 0.125}" width="${w * 0.26}" height="6" rx="3" fill="${INK}" opacity=".35"/>`;
+          return add(`<div id="${id}" class="o stk"><svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><rect x="4" y="4" width="${w - 8}" height="${h - 8}" rx="20" fill="${BLUE}" stroke="${INK}" stroke-width="8"/>${slot(h * 0.1)}${slot(h * 0.4)}${slot(h * 0.7)}</svg></div>`,
+            `left:${cx - w / 2}px;top:${top}px;width:${w}px;height:${h}px`);
+        }
+        const label = (id, text, cx, y) => add(`<div id="${id}" class="rklab">${text}</div>`, `left:${cx}px;top:${y}px`);
+        const tag = (id, cls, html, cx, cy, extra) => add(`<div id="${id}" class="tg ${cls}">${html}</div>`, `left:${cx}px;top:${cy}px;${extra || ""}`);
+        const bub = (id, text, cx, cy) => add(`<div id="${id}" class="bub">${text}</div>`, `left:${cx}px;top:${cy}px`);
+        function dashLine(id, x1, y1, x2, y2, col) {
+          const x = Math.min(x1, x2) - 10, y = Math.min(y1, y2) - 10, w = Math.abs(x2 - x1) + 20, h = Math.abs(y2 - y1) + 20;
+          return add(`<svg id="${id}" class="o" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><path d="M${x1 - x + 0} ${y1 - y} L${x2 - x} ${y2 - y}" stroke="${col || INK}" stroke-width="7" stroke-linecap="round" stroke-dasharray="2 16" fill="none"/></svg>`, `left:${x}px;top:${y}px`);
+        }
+        const cross = (id, cx, cy, s, col) => add(`<svg id="${id}" class="o" width="${s}" height="${s}" viewBox="0 0 60 60"><path d="M10 10 L50 50 M50 10 L10 50" stroke="${INK}" stroke-width="16" stroke-linecap="round"/><path d="M10 10 L50 50 M50 10 L10 50" stroke="${col || RED}" stroke-width="9" stroke-linecap="round"/></svg>`, `left:${cx - s / 2}px;top:${cy - s / 2}px`);
+        const cloud = (id, cx, cy, w) => add(`<svg id="${id}" class="o stk" width="${w}" height="${w * 0.62}" viewBox="0 0 150 93"><path d="M38 84 Q8 84 10 58 Q12 36 38 38 Q44 10 78 14 Q108 18 110 44 Q142 44 140 66 Q138 84 112 84 Z" fill="#fff" stroke="${INK}" stroke-width="7" stroke-linejoin="round"/></svg>`, `left:${cx - w / 2}px;top:${cy - w * 0.31}px`);
+        const satellite = (id, cx, cy, w) => add(`<svg id="${id}" class="o stk" width="${w}" height="${w * 0.75}" viewBox="0 0 160 120"><g transform="rotate(-18 80 60)"><rect x="6" y="42" width="52" height="34" rx="4" fill="${BLUE}" stroke="${INK}" stroke-width="6"/><path d="M24 42 V76 M42 42 V76" stroke="${INK}" stroke-width="3"/><rect x="102" y="42" width="52" height="34" rx="4" fill="${BLUE}" stroke="${INK}" stroke-width="6"/><path d="M120 42 V76 M138 42 V76" stroke="${INK}" stroke-width="3"/><rect x="58" y="36" width="44" height="46" rx="10" fill="${YEL}" stroke="${INK}" stroke-width="6"/><circle cx="80" cy="59" r="9" fill="#fff" stroke="${INK}" stroke-width="4"/><path d="M80 36 V20" stroke="${INK}" stroke-width="5"/><circle cx="80" cy="16" r="7" fill="${ORG}" stroke="${INK}" stroke-width="4"/></g></svg>`, `left:${cx - w / 2}px;top:${cy - w * 0.375}px`);
+        const atom = (id, cx, cy, d) => add(`<svg id="${id}" class="o stk" width="${d}" height="${d}" viewBox="0 0 120 120"><rect x="5" y="5" width="110" height="110" rx="26" fill="#fff" stroke="${INK}" stroke-width="7"/><g fill="none" stroke="${BLUE}" stroke-width="5"><ellipse cx="60" cy="60" rx="40" ry="15"/><ellipse cx="60" cy="60" rx="40" ry="15" transform="rotate(60 60 60)"/><ellipse cx="60" cy="60" rx="40" ry="15" transform="rotate(120 60 60)"/></g><circle cx="60" cy="60" r="9" fill="${ORG}" stroke="${INK}" stroke-width="4"/></svg>`, `left:${cx - d / 2}px;top:${cy - d / 2}px`);
+        const dbCyl = (el, w) => { el.innerHTML = `<svg width="${w}" height="${w * 1.15}" viewBox="0 0 100 115"><path d="M10 22 V88 Q10 106 50 106 Q90 106 90 88 V22" fill="${BLUE}" stroke="${INK}" stroke-width="7"/><ellipse cx="50" cy="22" rx="40" ry="14" fill="${SKY}" stroke="${INK}" stroke-width="7"/><path d="M10 52 Q50 70 90 52 M10 76 Q50 94 90 76" fill="none" stroke="${INK}" stroke-width="5" opacity=".6"/></svg>`; };
+
+
+</script>
