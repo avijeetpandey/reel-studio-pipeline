@@ -1,0 +1,37 @@
+<!--
+COMPONENT: sound-strip — "see the sound": labelled waveform pills scroll right→left past a fixed playhead; the pill under the playhead glows
+and its label is the name of the sound being heard. From the IG study 30 Oct 2026: Dd3r5DyxYxX (Mr.Biss 48.8K likes), Dd_EPp5RzRN (12.6K), DcwZp1xM7Gi (9.3K),
+DeKCJSlz5BX, DfBT7LNuykR. Use when the reel is ABOUT sound/editing/AI-tools, or as a 2-s HUD when an SFX family plays (typing, whoosh, riser).
+USE: buildSoundStrip(tl, { el:"#ss", clips:[{label:"Typing",at:0.6,dur:1.0},{label:"Whoosh",at:1.8,dur:0.6}], start:0.4, end:6, pxPerSec:260 })
+OPTIONS: color (var(--accent,#c6ff3d)), y (px, default 520), pill height 84.
+RULES: the playhead is fixed at x=540; a clip's left edge reaches it at exactly its `at` (the moment the sound plays in the mix — fire the real SFX there);
+  labels ≤ 2 words; max 5 pills visible; keep it out of the face box (y 420–640 over a lower-half face).
+FEEL: calm conveyor, linear motion (ease:"none"), glow ramps 0.12 s when the pill hits the playhead.
+-->
+<style>
+  .ss { position:absolute; left:0; right:0; height:150px; opacity:0; overflow:hidden; }
+  .ss .ph { position:absolute; left:539px; top:0; width:3px; height:100%; background:var(--ss-color,#c6ff3d); box-shadow:0 0 18px var(--ss-color,#c6ff3d); z-index:2; }
+  .ss .p { position:absolute; top:34px; height:84px; border:2px solid rgba(255,255,255,.25); border-radius:42px; display:flex; align-items:center; gap:3px; padding:0 22px;
+           background:rgba(255,255,255,.06); transition:none; }
+  .ss .p b { width:4px; border-radius:2px; background:#fff; opacity:.85; }
+  .ss .p span { position:absolute; top:-30px; left:10px; font:600 26px Montserrat,sans-serif; color:#d8dbe2; white-space:nowrap; }
+</style>
+<div id="ss" class="ss"><div class="ph"></div></div>
+<script>
+  function buildSoundStrip(tl, o) {
+    const root = document.querySelector(o.el), pps = o.pxPerSec || 260; root.style.top = (o.y || 520) + "px";
+    if (o.color) root.style.setProperty("--ss-color", o.color);
+    root.querySelectorAll(".p").forEach(n => n.remove()); const t0 = o.start || 0, t1 = o.end || (o.clips[o.clips.length - 1].at + 3);
+    tl.to(root, { opacity: 1, duration: 0.2 }, t0);
+    o.clips.forEach((c, i) => {
+      const w = Math.max(150, c.dur * pps), p = document.createElement("div"); p.className = "p"; p.style.width = w + "px";
+      const bars = Math.round(w / 9); for (let b = 0; b < bars; b++) { const e = document.createElement("b"); e.style.height = (14 + Math.abs(Math.sin(b * 1.7 + i * 2.3)) * 48 * (1 - b / bars * 0.5)) + "px"; p.appendChild(e); }
+      const l = document.createElement("span"); l.textContent = c.label; p.appendChild(l); root.appendChild(p);
+      const x0 = 540 + (c.at - t0) * pps, x1 = x0 - (t1 - t0 + 1) * pps;
+      p.style.left = x0 + "px"; tl.fromTo(p, { x: 0 }, { x: x1 - x0, duration: t1 - t0 + 1, ease: "none" }, t0);
+      tl.to(p, { borderColor: "var(--ss-color,#c6ff3d)", backgroundColor: "rgba(198,255,61,.18)", boxShadow: "0 0 26px rgba(198,255,61,.55)", duration: 0.12 }, c.at);
+      tl.to(p, { borderColor: "rgba(255,255,255,.25)", backgroundColor: "rgba(255,255,255,.06)", boxShadow: "0 0 0 rgba(0,0,0,0)", duration: 0.25 }, c.at + c.dur);
+    });
+    tl.to(root, { opacity: 0, duration: 0.25 }, t1 - 0.25);
+  }
+</script>

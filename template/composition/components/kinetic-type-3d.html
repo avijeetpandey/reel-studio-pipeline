@@ -1,0 +1,50 @@
+<!--
+COMPONENT: kinetic-type-3d — words land one by one on a staggered "stair" layout while a virtual camera glides to follow each word
+(motion blur in, tight tracking, one RED/accent word per line), then pulls back to show the whole phrase.
+From the IG study 30 Oct 2026: DfEJ6KaI9g2 (mobilograph.dubai "Your type isn't boring. Your timing is."), DeyusrQMOmi (speedy_devv).
+USE: buildKinetic3D(tl, { el:"#kt", words:[{t:"Your",at:0.2},{t:"type",at:0.5},{t:"boring.",at:1.1,accent:true}], pullBackAt:4.2, end:6 })
+  `at` = the spoken time of the word (seconds on the main timeline). Words flow left→right and wrap; `br:true` on a word forces a new (stair-shifted) line; override with x,y,size.
+OPTIONS: ink (default var(--ink,#141414)), accent (var(--accent,#d7261e)), size (px, default 118), accentScale (1.45), step ({x:90,y:150}).
+RULES: ≤ 14 words per instance; accent on ≤ 1 word in 3; nothing over the face band — use it as a FULL-SCREEN beat (faceless / cutaway) or in the graphics band;
+  heavy grotesk (Montserrat 800) tracking -0.02em; land each word ON its spoken syllable; hold the pull-back ≥ 0.8 s.
+FEEL: "the camera is chasing the voice" — each word: 0.28 s power3.out from 60 px right + 14 px blur + 8° yaw; camera lags 0.12 s behind with power2.inOut.
+-->
+<style>
+  .kt { position:absolute; inset:0; overflow:hidden; perspective:1400px; opacity:0; }
+  .kt .cam { position:absolute; left:0; top:0; width:100%; height:100%; transform-origin:0 0; will-change:transform; }
+  .kt .kw { position:absolute; font:800 var(--kt-size,118px)/1 Montserrat,sans-serif; letter-spacing:-0.02em; color:var(--kt-ink,#141414);
+           white-space:nowrap; opacity:0; transform-origin:0 100%; }
+  .kt .kw.a { color:var(--kt-accent,#d7261e); }
+</style>
+<div id="kt" class="kt"><div class="cam"></div></div>
+<script>
+  function buildKinetic3D(tl, o) {
+    const root = document.querySelector(o.el), cam = root.querySelector(".cam");
+    const size = o.size || 118, step = o.step || { x: 90, y: 150 }, W = 1080, H = 1920;
+    root.style.setProperty("--kt-size", size + "px");
+    if (o.ink) root.style.setProperty("--kt-ink", o.ink); if (o.accent) root.style.setProperty("--kt-accent", o.accent);
+    cam.innerHTML = ""; const pos = []; let line = 0, cx = 90, cy = 470, lh = size * 1.3;
+    o.words.forEach((w) => {
+      const e = document.createElement("div"); e.className = "kw" + (w.accent ? " a" : ""); e.textContent = w.t;
+      const s = w.size || (w.accent ? size * (o.accentScale || 1.45) : size); e.style.fontSize = s + "px"; e.style.left = "-9999px"; cam.appendChild(e);
+      const wd = e.offsetWidth || w.t.length * s * 0.6;                       // measured; estimate if fonts/layout not ready
+      if (cx + wd > W - 60 && cx > 100) { line++; cx = 90 + (line % 4) * step.x * 0.5; cy += lh; }
+      const x = w.x != null ? w.x : cx, y = w.y != null ? w.y : cy; e.style.left = x + "px"; e.style.top = y + "px"; pos.push({ x, y, s, wd, w });
+      cx += wd + 0.28 * s; if (w.br) { line++; cx = 90 + (line % 4) * step.x * 0.5; cy += lh * (w.accent ? 1.25 : 1); }
+    });
+    const els = cam.querySelectorAll(".kw");
+    tl.set(root, { opacity: 1 }, o.start != null ? o.start : o.words[0].at - 0.1);
+    pos.forEach((p, i) => {
+      const t = p.w.at;
+      tl.fromTo(els[i], { opacity: 0, x: 60, rotateY: -8, filter: "blur(14px)" }, { opacity: 1, x: 0, rotateY: 0, filter: "blur(0px)", duration: 0.28, ease: "power3.out" }, t);
+      // camera follows: centre the word at ~(540, 760) with a mild zoom
+      const k = 1.2, tx = 540 - (p.x + p.wd / 2) * k, ty = 760 - (p.y + p.s / 2) * k;
+      tl.to(cam, { scale: k, x: tx, y: ty, duration: 0.5, ease: "power2.inOut" }, t + 0.12);
+    });
+    const pb = o.pullBackAt != null ? o.pullBackAt : pos[pos.length - 1].w.at + 0.9;
+    const x0 = Math.min(...pos.map(p => p.x)), x1 = Math.max(...pos.map(p => p.x + p.wd)), y0 = Math.min(...pos.map(p => p.y)), y1 = Math.max(...pos.map(p => p.y + p.s));
+    const k = Math.min(1, 940 / (x1 - x0), 1100 / (y1 - y0));                    // fit the whole phrase, centred
+    tl.to(cam, { scale: k, x: 540 - (x0 + x1) / 2 * k, y: 860 - (y0 + y1) / 2 * k, duration: 0.7, ease: "power3.inOut" }, pb);
+    if (o.end != null) tl.to(root, { opacity: 0, duration: 0.25, ease: "power1.in" }, o.end - 0.25);
+  }
+</script>

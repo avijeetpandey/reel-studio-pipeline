@@ -216,3 +216,23 @@ Notes + numbers: `$STUDIO/research/refs_2026-10b/NOTES.md`. These rules extend (
 - **6-shot b-roll vocabulary**: overhead · wide · close-up · POV · over-the-shoulder · standard. Plan 3–4 of them per shoot.
 - **Split-frame** (2–4 framed panels of the same take) to make tripod footage dynamic; **flicker** (6–8 two-frame flashes) only as a section opener, never at frame 0.
 - Tail after the last word ≤ 0.4 s in every talking reel (fifth round confirming §19).
+
+
+---
+# Round 7 (31 editing / sound / Claude-edit reels, 30 Oct 2026) — a 31-reel study
+
+## 34. What changed
+- **Sound is the biggest gap.** Study reels carry a named, deliberate sound every 1.5–3 s (sound-teaching reels every ~1 s), landed 30–60 ms before the visual, and SHOW the sound (labelled waveform pill under a fixed playhead — 48.8K, 12.6K, 9.3K likes; chip cards in Viewcci's "With This / Use This"). Rule + catalog: `reel-edit/variety.md` §4, `composition/assets/audio/sfx/CATALOG.md`.
+- **Every top reel is its own world** (palette + type + one signature gadget). The creator of DfF17ENhMGP says it outright: "same captions, same zooms, same sounds — we all look the same." Variety ledger in `reels/style_log.md`; five new Worlds in `variety.md` §1.
+- **Frame 0 = face + a proof object** (number contrast, real card, finished effect, odometer already rolling); voice starts ≤ 0.18 s in all 30.
+- **Demo first, then how-to**, bridged by a "TUTORIAL LOADING 0→100 %" bar (Harry Allsop). **Each rule demonstrated in the thing it names.** Example cards with real numbers (125K vs 16.6M).
+- **Colour = meaning in captions** (red negative/stop, yellow attention, green good); serif-italic accent; selection-box on the one word that matters; top-of-frame captions when the face sits low.
+- **Cadence:** 150–250 wpm (median ≈ 190), breath gaps cut, something visibly changing every ≤ 1.5 s (not "cuts per minute" — static screen reels have 0 cuts and still hold).
+- **Master −14 LUFS** (25/30 reels), bed 17–21 dB under voice when music is used; three Claude-made reels use no music at all (A/B it once).
+- **Physical texture beats overlays:** paper timeline props, wardrobe/location changes, words placed in the real scene, tap-ring + arrow overlays on screen demos.
+- **Comment-keyword CTAs dominate comment counts (up to 15.9K) but stay off-limits for the creator** (24 Oct decision); the yes/no question stays.
+- **Gap:** no Hinglish reel in the set; Hinglish rules are extrapolated (`variety.md` §6).
+
+## 35. the creator's notes on the v2 re-edit (30 Oct 2026) — rules, not preferences
+- Face on screen 100 %; never replace it with text. Graphics illustrate the sentence in ONE flat illustration style (Sticker Pop); one persistent scene that evolves; ≤ 4 objects, ≤ 3 words each; clean and energetic through motion that shows the mechanism, not through more elements. "Looks like a simple machine / AI did this" = failure. Details: `reel-edit/variety.md` §0, component `sticker-kit.html`.
+- Re-edits are `_v2` files beside the first cut and a `v2/` subfolder inside the reel's Drive folder.

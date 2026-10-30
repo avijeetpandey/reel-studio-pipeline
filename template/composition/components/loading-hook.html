@@ -1,0 +1,26 @@
+<!--
+COMPONENT: loading-hook — a "TUTORIAL LOADING 0 → 100 %" bar over the demo (first 3–5 s). Viewers wait for it to fill = retention trick.
+From the IG study 30 Oct 2026: DcOncy3sWZw & DcrBRrhsB9B (Harry Allsop, ~2K likes each, ~100 comments each) — the DEMO plays first, then "here's how", and the bar bridges them.
+USE: buildLoadingHook(tl, { el:"#lh", label:"TUTORIAL LOADING", start:0.2, dur:4.2, y:1480 })
+RULES: only for how-to / "I'll show you how" reels; bar ends on the exact beat the demo ends (then hard-cut to step 1); 0 → 100 must be monotone (no fake stall);
+  bottom-left safe area (y ≈ 1480, x 60–620), never over the face; fill uses steps(100) so the % reads as ticking, not smooth.
+FEEL: thin 3 px bar, white, label 24 px caps tracking .12em, percent in tabular mono.
+-->
+<style>
+  .lh { position:absolute; left:60px; width:760px; opacity:0; color:#fff; font:700 30px Montserrat,sans-serif; letter-spacing:.12em; }
+  .lh .row { display:flex; justify-content:space-between; margin-bottom:10px; text-shadow:0 1px 8px rgba(0,0,0,.6); }
+  .lh .pct { height:36px; overflow:hidden; font:600 32px "JetBrains Mono",monospace; letter-spacing:0; } .lh .pct div { line-height:36px; }
+  .lh .bar { height:5px; background:rgba(255,255,255,.3); } .lh .bar i { display:block; height:100%; width:100%; background:#fff; transform-origin:0 50%; transform:scaleX(0); }
+</style>
+<div id="lh" class="lh"><div class="row"><span class="lab"></span><span class="pct"><div></div></span></div><div class="bar"><i></i></div></div>
+<script>
+  function buildLoadingHook(tl, o) {
+    const r = document.querySelector(o.el); r.style.top = (o.y || 1480) + "px"; r.querySelector(".lab").textContent = o.label || "TUTORIAL LOADING";
+    const strip = r.querySelector(".pct div"); strip.innerHTML = Array.from({ length: 101 }, (_, i) => `<div>${i}%</div>`).join(""); strip.style.willChange = "transform";
+    const t = o.start || 0, d = o.dur || 4;
+    tl.set(r, { opacity: 1 }, t);
+    tl.fromTo(r.querySelector(".bar i"), { scaleX: 0 }, { scaleX: 1, duration: d, ease: "none" }, t);
+    tl.fromTo(strip, { y: 0 }, { y: -3636, duration: d, ease: "steps(100)" }, t);
+    tl.to(r, { opacity: 0, duration: 0.15 }, t + d);
+  }
+</script>

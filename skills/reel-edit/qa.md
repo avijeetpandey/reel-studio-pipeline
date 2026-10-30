@@ -46,3 +46,11 @@ All-caps centred text on a gradient · glow/neon on everything · 3D or cartoon 
 
 ## When the creator gives a note
 Fix it, then ask "which instruction would have prevented this?" and write that rule into SKILL.md / treatments / planning / motion / sound / qa (and add a check here if it can be automated). Tell the creator which rule changed.
+
+
+## Added 30 Oct 2026 (v2 re-edit notes)
+- **Face-visible gate:** at every 0.5 s snapshot the face is fully visible (nothing opaque over the face band except captions); a full-screen beat that hides the face = fail.
+- **Illustration gate:** each graphic is a drawing of something the line names; if it is a generic card / window / big type, redo it with `sticker-kit`.
+- **Load gate:** ≤ 4 objects and ≤ 3 words per object at any time; the same scene carries consecutive beats.
+- **Edge gate after scaling:** all art ≥ 60 px from the screen edge; read the full-size snapshot of every beat before showing the creator.
+- Known false positive: `qa_reel.py` "nothing new on screen" when all stickers live in one clip.

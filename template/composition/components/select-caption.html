@@ -1,0 +1,33 @@
+<!--
+COMPONENT: select-caption — top-centre word-by-word caption where the CURRENT word is bright, past words dim, and meaning-words get a
+"text-selection box" with four corner handles drawn around them (like the text is selected in an editor).
+From the IG study 30 Oct 2026: DeyusrQMOmi (speedy_devv 35M-views reel) — the most "designed-by-an-editor" caption in the set. Sits ABOVE the visual, never on the face.
+USE: buildSelectCaption(tl, { el:"#sc", lines:[ [{w:"Hand",at:12.2},{w:"that",at:12.4},{w:"folder",at:12.6},{w:"to",at:12.8},{w:"Claude,",at:12.9,sel:true}] ], y:150 })
+  `lines` = chunks (max 4 words each) shown one at a time; a chunk replaces the previous at its first word's time. `sel:true` draws the selection box.
+RULES: ≤ 2 selection boxes per reel-minute (rare = meaningful); box colour = accent; font 72–84 px Montserrat 700, line-height 1.1; never over the face.
+FEEL: word pops in 0.12 s (scale .96→1, +6 px), previous word fades to 45 % over 0.2 s; box draws 0.18 s power2.out then handles scale-pop.
+-->
+<style>
+  .sc { position:absolute; left:60px; right:60px; text-align:center; font:700 78px/1.12 Montserrat,sans-serif; color:#fff; }
+  .sc .c { position:absolute; left:0; right:0; opacity:0; } .sc .c span { display:inline-block; margin:0 .16em; opacity:0; position:relative; }
+  .sc .c span.sel::after { content:""; position:absolute; inset:-6px -10px; border:2.5px solid var(--sc-accent,#4f8cff); border-radius:4px; opacity:var(--o,0); }
+  .sc .c span .h { position:absolute; width:14px; height:14px; background:#fff; border:2.5px solid var(--sc-accent,#4f8cff); opacity:0; }
+</style>
+<div id="sc" class="sc"></div>
+<script>
+  function buildSelectCaption(tl, o) {
+    const r = document.querySelector(o.el); r.style.top = (o.y || 150) + "px"; r.innerHTML = ""; if (o.accent) r.style.setProperty("--sc-accent", o.accent);
+    o.lines.forEach((ln, li) => {
+      const c = document.createElement("div"); c.className = "c"; r.appendChild(c); const sp = [];
+      ln.forEach(wd => { const s = document.createElement("span"); s.textContent = wd.w + " "; if (wd.sel) { s.className = "sel"; [[-14, -14], ["calc(100% + 0px)", -14], [-14, "calc(100% + 0px)"], ["calc(100% + 0px)", "calc(100% + 0px)"]].forEach(([x, y]) => { const h = document.createElement("i"); h.className = "h"; h.style.left = typeof x === "number" ? x + "px" : "calc(100% - 4px)"; h.style.top = typeof y === "number" ? y + "px" : "calc(100% - 4px)"; s.appendChild(h); }); } c.appendChild(s); sp.push(s); });
+      const t0 = ln[0].at, t1 = (li + 1 < o.lines.length ? o.lines[li + 1][0].at : ln[ln.length - 1].at + 1.0);
+      tl.set(c, { opacity: 1 }, t0 - 0.02); tl.set(c, { opacity: 0 }, t1);
+      ln.forEach((wd, i) => {
+        tl.fromTo(sp[i], { opacity: 0, y: 6, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.12, ease: "power2.out" }, wd.at);
+        if (i > 0) tl.to(sp[i - 1], { opacity: 0.45, duration: 0.2 }, wd.at);
+        if (wd.sel) { tl.fromTo(sp[i], { "--o": 0 }, { "--o": 1, duration: 0.18, ease: "power2.out" }, wd.at + 0.05);
+          sp[i].querySelectorAll(".h").forEach((h, k) => tl.fromTo(h, { opacity: 0, scale: 0 }, { opacity: 1, scale: 1, duration: 0.14, ease: "back.out(2)" }, wd.at + 0.14 + k * 0.03)); }
+      });
+    });
+  }
+</script>

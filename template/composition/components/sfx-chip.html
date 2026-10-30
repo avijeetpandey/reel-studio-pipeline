@@ -1,0 +1,26 @@
+<!--
+COMPONENT: sfx-chip — a small rounded card (animated mini-equaliser + sound name + "00:03") that pops in next to the thing the sound belongs to.
+From the IG study 30 Oct 2026: DcmMnxXOxXo / DexrhhquL1J (Viewcci "With This / Use This": "Camera shutter 'Kasha' 00:01", "Deep woosh 00:03", "Typing Sound 00:05").
+Use when the reel teaches/names a sound, tool or effect — the viewer SEES what they HEAR.
+USE: buildSfxChip(tl, { el:"#chip", name:"Deep woosh", dur:"00:03", at:2.4, hold:1.6, x:40, y:760 })
+RULES: appears 40–80 ms BEFORE the sound (fire the SFX at `at`); ≤ 3 words; one chip at a time; exits faster than it enters.
+FEEL: rise 14 px + blur-clear 0.22 s back.out(1.4); equaliser bars bounce while visible (4 bars, 0.18 s yoyo, staggered).
+-->
+<style>
+  .chip { position:absolute; display:flex; align-items:center; gap:14px; padding:14px 22px 14px 16px; border-radius:18px; background:rgba(20,22,28,.88);
+          border:1.5px solid rgba(255,214,0,.55); color:#fff; font:600 34px Montserrat,sans-serif; opacity:0; backdrop-filter:blur(8px); }
+  .chip .eq { display:flex; align-items:flex-end; gap:4px; height:34px; width:34px; padding:6px; border-radius:10px; background:#ffd600; }
+  .chip .eq i { width:5px; height:100%; background:#14161c; border-radius:2px; transform-origin:bottom; transform:scaleY(.35); }
+  .chip small { display:block; font:500 24px "JetBrains Mono",monospace; color:#ffd600; margin-top:2px; }
+</style>
+<div id="chip" class="chip"><div class="eq"><i></i><i></i><i></i><i></i></div><div><span class="nm"></span><small class="du"></small></div></div>
+<script>
+  function buildSfxChip(tl, o) {
+    const r = document.querySelector(o.el); r.style.left = (o.x || 40) + "px"; r.style.top = (o.y || 760) + "px";
+    r.querySelector(".nm").textContent = o.name; r.querySelector(".du").textContent = o.dur || "00:01";
+    const t = o.at - 0.06, hold = o.hold || 1.4;
+    tl.fromTo(r, { opacity: 0, y: 14, filter: "blur(8px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.22, ease: "back.out(1.4)" }, t);
+    r.querySelectorAll(".eq i").forEach((b, i) => tl.fromTo(b, { scaleY: 0.3 }, { scaleY: 1, duration: 0.18, ease: "sine.inOut", repeat: Math.floor(hold / 0.18), yoyo: true }, t + 0.1 + i * 0.04));
+    tl.to(r, { opacity: 0, y: -8, filter: "blur(6px)", duration: 0.16, ease: "power2.in" }, t + hold);
+  }
+</script>

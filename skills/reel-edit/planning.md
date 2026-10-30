@@ -9,7 +9,7 @@ Changing the plan costs nothing; changing a finished graphic costs a lot. Write 
 | **TC** | Talk + top card | Card in the graphics band (y 250 → ≤ 700) above the face | A term, a number, a short visual |
 | **TL** | Talk + lower card | Card over the chest area (y ~1000–1400); only the area right behind the card darkens 35% and blurs 12 px; captions move above or hide for that beat | UI moments (a notification, a chat bubble, a setting) — "small things that pop up while I talk" |
 | **SP** | Split | Graphic fills the top half (0–960), face scaled into the bottom half, framed head-and-shoulders, head horizontally centred | A visual that needs room while my face stays on (comparisons, diagrams) |
-| **FG** | Full graphic / b-roll | Graphic or b-roll full screen, voice continues; max 3 s | The money visual, real screenshots/recordings, covering a jump cut |
+| **FG** | Full graphic / b-roll | Real b-roll / real screen recording full screen, voice continues; max 3 s. **Never typography or a full-screen graphic that replaces the creator's face (variety.md §0.1)** | The money visual, real screenshots/recordings, covering a jump cut |
 | **TB** | Text behind head | Big word/number behind the creator's cutout, background dimmed | One signature moment (hook or twist), Cinematic Cutout treatment or once per 3 reels otherwise |
 
 ## Rules
