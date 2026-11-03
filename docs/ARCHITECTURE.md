@@ -16,7 +16,7 @@ reel-studio-pipeline/            (this repo = the Claude Code plugin)
     scripts/                     see below
     composition/                 reference-index.html (code patterns) · components/ (14 motion components + INDEX.md)
     carousel/                    deck.html (all layouts, incl. finding · dodont · roadmap · photo) · render.sh · examples/sampler/slides.js
-    thumbnail/                   cover-template.html (A, curiosity) · cover-template-b.html (B, bold claim)
+    thumbnail/                   cover-real.html (A real photo + optional tool logos, B notebook) · cover-template*.html (old cut-out covers, superseded)
     review/review.html           timestamped-notes player
     posting-kit-template.md
   scripts/                       setup.sh (deps) · configure.py (config + rules + template install)
@@ -39,7 +39,7 @@ Your data (never in the repo): `~/.config/reel-studio/config.json` and `<studio>
 | `qa_reel.py` | timeline QA (flash, read time, face flash, face box, scene variety, static stretches, component budget), `--audio` (repeats, fillers, pauses > 0.25 s, first word, pace WPM, tail after the last word), `--cover` (near-blank) |
 | `analyze_reference.py` | reference reels → metrics.json, transcripts, hook strip + sheets |
 | `make_sfx.py` | synthesises an original SFX pack (whooshes, riser, hits, paper, pen, chime, tick, line-draw + a digital family: soft pluck, low pulse, digital sweep, digital tick, soft hit, check blip) |
-| `render_cover.sh` · `finalize.sh` · `make_srt.js` · `sample_frames.sh` · `safe_zone.sh` · `make_lut.py` | covers, −14 LUFS master, SRT, contact sheets, UI-zone overlay, HDR LUT |
+| `make_cover.py` (neutral-face picker, 4K crop, logos) · `render_cover.sh` (old) · `finalize.sh` · `make_srt.js` · `sample_frames.sh` · `safe_zone.sh` · `make_lut.py` | covers, −14 LUFS master, SRT, contact sheets, UI-zone overlay, HDR LUT |
 
 ## The edit (reel-edit) in stages
 1. **Review** — transcript, contact sheets, probe (HDR check: graded vs raw frame).

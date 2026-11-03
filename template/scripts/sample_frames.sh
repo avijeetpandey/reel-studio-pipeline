@@ -18,8 +18,10 @@ if [ "$GRID" = "1" ]; then
     VF="$VF,drawtext=text='$((r+1))':x=4:y=h*$r/6+20:fontsize=14:fontcolor=yellow:box=1:boxcolor=black@0.5"
   done
 fi
-# timestamp burned in so every frame can be referenced by time
+# timestamp burned in so every frame can be referenced by time (skipped when this ffmpeg has no drawtext; frame k is still t=(k-1)/fps)
+if ffmpeg -hide_banner -filters 2>/dev/null | grep -q " drawtext "; then
 VF="$VF,drawtext=text='%{pts\\:hms}':x=w-tw-6:y=h-th-6:fontsize=16:fontcolor=white:box=1:boxcolor=black@0.6"
+fi
 ffmpeg -v error -y -i "$VIDEO" -vf "$VF" -q:v 4 "$OUT/frames/f_%05d.jpg"
 # contact sheets: 4x4 tiles = 16 frames per sheet
 ffmpeg -v error -y -framerate 1 -i "$OUT/frames/f_%05d.jpg" -vf "scale=320:-2,tile=4x4:padding=4:color=black" -q:v 4 "$OUT/sheet_%03d.jpg"

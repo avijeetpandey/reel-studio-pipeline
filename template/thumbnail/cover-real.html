@@ -1,0 +1,56 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@800;900&family=Instrument+Serif:ital@1&family=Caveat:wght@600;700&display=swap">
+<style>
+/* Real-frame covers (round 6): a real photo of the creator, no cut-out, no glow, no gradient wash.
+   layout "photo": photo full-bleed, left-aligned heavy headline with ONE serif-italic accent word, small taped kicker.
+   layout "notebook": lined paper, taped photo, marker-underlined handwritten key phrase. Safe band for the 3:4 grid crop: y 240-1680. */
+:root{--ink:#111;--paper:#eceae4;--hi:#ffd84a;--white:#fff}
+*{box-sizing:border-box;margin:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#000;font-family:Archivo,"Helvetica Neue",Arial,sans-serif}
+#c{position:relative;width:1080px;height:1920px;overflow:hidden}
+.photo{position:absolute;inset:0;background-size:var(--zs,cover);background-position:var(--pos,50% 30%)}
+.shade{position:absolute;left:0;right:0;bottom:0;height:var(--sh,1100px);background:linear-gradient(to top,rgba(0,0,0,.78) 0,rgba(0,0,0,.55) 50%,rgba(0,0,0,0))}
+.tape{position:absolute;left:70px;top:var(--tt,330px);padding:16px 30px;background:#f3ecd2;color:#1a1a1a;font-weight:800;font-size:44px;letter-spacing:.01em;transform:rotate(-3deg);box-shadow:0 6px 14px rgba(0,0,0,.28);clip-path:polygon(0 4%,3% 0,97% 3%,100% 0,100% 96%,97% 100%,3% 97%,0 100%)}
+.head{position:absolute;left:70px;right:90px;top:var(--ht,880px);color:var(--white);text-shadow:0 3px 18px rgba(0,0,0,.45)}
+.head .l{display:block;font-weight:900;font-size:var(--hs,138px);line-height:.98;letter-spacing:-.02em;text-wrap:balance}
+.head .a{display:inline-block;font-family:"Instrument Serif",Georgia,serif;font-style:italic;font-weight:400;font-size:var(--as,176px);line-height:.9;color:var(--hi);margin-top:8px}
+.by{position:absolute;left:72px;bottom:var(--byb,250px);color:#fff;font-weight:800;font-size:34px;letter-spacing:.04em;opacity:.9}
+/* tool logos (round 8): white rounded badges in the empty band above the head, brand-coloured glyph from simple-icons */
+.logos{position:absolute;left:70px;right:70px;top:var(--lt,215px);height:250px;display:flex;align-items:center;justify-content:center;gap:40px}
+.lg{width:250px;height:250px;border-radius:58px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.lg svg{width:160px;height:160px}
+.plus{font-weight:900;font-size:120px;color:var(--hi);text-shadow:0 4px 14px rgba(0,0,0,.4);line-height:1}
+/* notebook */
+.nb{position:absolute;inset:0;background:var(--paper) repeating-linear-gradient(to bottom,transparent 0 79px,rgba(60,90,150,.28) 79px 81px);}
+.nb:before{content:"";position:absolute;left:150px;top:0;bottom:0;width:3px;background:rgba(200,60,60,.45)}
+.pol{position:absolute;left:150px;top:330px;width:640px;height:760px;background:#fff;padding:26px 26px 110px;transform:rotate(-3deg);box-shadow:0 14px 30px rgba(0,0,0,.25)}
+.pol .ph{width:100%;height:100%;background-size:cover;background-position:var(--pos,50% 25%)}
+.pol .cap{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-family:Caveat,cursive;font-size:56px;color:#222}
+.pol:before,.card2:before{content:"";position:absolute;left:50%;top:-34px;width:220px;height:62px;margin-left:-110px;background:rgba(243,236,210,.92);transform:rotate(2deg);box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.nbhead{position:absolute;left:170px;right:60px;top:1140px;font-family:Caveat,cursive;font-weight:700;color:#1b1b1b}
+.nbhead .l{display:block;font-size:122px;line-height:1.02}
+.nbhead .a{display:inline;font-size:140px;background:linear-gradient(transparent 62%,var(--hi) 62% 92%,transparent 92%);padding:0 10px}
+.nbtag{position:absolute;right:70px;top:300px;font-family:Caveat,cursive;font-weight:700;font-size:64px;transform:rotate(4deg);color:#c23a2b;border:5px solid #c23a2b;border-radius:14px;padding:6px 22px}
+</style>
+<div id="c"></div>
+<script>
+/*COVER_JSON*/
+const COVER={"layout":"photo","photo":"face.jpg","pos":"50% 30%","kicker":"No internet","lines":["Where does","a message"],"accent":"wait?","tag":"","caption":"it just saves","by":""}
+/*END*/;
+const c=document.getElementById("c");document.documentElement.style.setProperty("--pos",COVER.pos||"50% 30%");if(COVER.zoom){document.documentElement.style.setProperty("--zs",(COVER.zoom*100)+"% auto");document.documentElement.style.setProperty("--pos","50% 100%")}if(COVER.headTop)document.documentElement.style.setProperty("--ht",COVER.headTop+"px");for(const[k,v]of Object.entries({tapeTop:"--tt",logosTop:"--lt",headSize:"--hs",accentSize:"--as",byBottom:"--byb",shadeH:"--sh"}))if(COVER[k]!=null)document.documentElement.style.setProperty(v,COVER[k]+"px");
+const h=(t,a)=>{const e=document.createElement(t);for(const k in a)e[k==="cls"?"className":k]=a[k];return e};
+const lines=COVER.lines.map(t=>h("span",{cls:"l",textContent:t}));
+if(COVER.layout==="notebook"){
+  c.append(h("div",{cls:"nb"}));
+  const p=h("div",{cls:"pol"});const ph=h("div",{cls:"ph"});ph.style.backgroundImage=`url(${COVER.photo})`;p.append(ph,h("div",{cls:"cap",textContent:COVER.caption||""}));c.append(p);
+  if(COVER.tag)c.append(h("div",{cls:"nbtag",textContent:COVER.tag}));
+  const d=h("div",{cls:"nbhead"});d.append(...lines,h("span",{cls:"a",textContent:COVER.accent}));c.append(d);
+}else{
+  const ph=h("div",{cls:"photo"});ph.style.backgroundImage=`url(${COVER.photo})`;c.append(ph,h("div",{cls:"shade"}));
+  if(COVER.kicker)c.append(h("div",{cls:"tape",textContent:COVER.kicker}));
+  const d=h("div",{cls:"head"});d.append(...lines,h("span",{cls:"a",textContent:COVER.accent}));c.append(d);
+  c.append(h("div",{cls:"by",textContent:COVER.by||""}));
+  if(COVER.logos&&COVER.logos.length){const L=h("div",{cls:"logos"});COVER.logos.forEach((g,i)=>{if(i)L.append(h("div",{cls:"plus",textContent:"+"}));const b=h("div",{cls:"lg"});b.style.transform=`rotate(${i%2?3:-4}deg)`;b.innerHTML=`<svg viewBox="0 0 24 24"><path fill="#${g.hex}" d="${g.d}"/></svg>`;L.append(b)});c.append(L)}
+}
+</script>

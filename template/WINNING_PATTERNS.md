@@ -68,6 +68,7 @@ Visual rule: **the proof is already on screen at frame 0** (the real Connectors 
 - Winners use a **designed cover that states the promise**, often different from frame 0: "5 Claude skills barely anyone knows about" with 5 numbered tiles (#2), "these are the 5 MCP Servers you need right now" (#5), "The perfect structure for short-form" (#11), "Engaging Talking Heads pt.2" with the face (#15), "10 Claude systems you can build this weekend" over a lifestyle photo (#4).
 - Formula: **number + topic + benefit/scarcity, ≤ 8 words**, 2-level type (small lead-in + big key phrase), the face OR the hero visual, a series tag when it's a series ("pt.2").
 - The flop's cover (#9) is a blank grey frame with a play button. **Never upload a cover without a headline.**
+- **Cover face (round 8, K8s reel):** a neutral, still face — closed mouth, eyes on camera, no teeth, never mid-word. Whole head in frame, bright and sharp, headline under the chin. Tool/product topics carry the tools' logos (white badges + "+") above the head. Three covers were rejected on this before the rule existed.
 
 ## 8. Captions (post text) and tags
 - Line 1 = the hook / the keyword (and the CTA when it's a keyword CTA).
