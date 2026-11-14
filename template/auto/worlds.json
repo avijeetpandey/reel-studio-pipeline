@@ -1,0 +1,54 @@
+{
+  "_doc": "Worlds = the look + feel autodirect.py picks from the script. Each world is footage-first (face 100 %, nothing over it): grade preset (make_look.py), caption style, which camera effects it may use and how often, and its SFX palette. Round 8 (14 Nov 2026) numbers come from the 63-reel study (research/refs_<date>/REPORT.md).",
+  "clean_pop": {
+    "label": "Clean Pop — bright, energetic, tech explainer (default)",
+    "grade": "clean_bright",
+    "caption": {"style": "pop", "y": 1230, "accent": "#ffd23f", "size": 76},
+    "accent": "#ffd23f",
+    "punch": {"amt": 1.07, "per_10s": 2.2, "shake_every": 3},
+    "alt_scales": [1.0, 1.065],
+    "transitions": {"whip": 5, "shrink": 2, "blurIn": 2},
+    "max_transitions_per_30s": 3,
+    "rgb": false,
+    "hook_snap": 1.17,
+    "sfx_palette": "pop",
+    "music_moods": ["upbeat", "bright", "funky"],
+    "graphics": "optional-sticker"
+  },
+  "warm_cinema": {
+    "label": "Warm Cinema — story, career, opinion; amber practicals, teal shadows, serif captions",
+    "grade": "warm_cinema",
+    "caption": {"style": "serif", "y": 360, "accent": "#ffd7a0", "size": 70},
+    "accent": "#f3b552",
+    "punch": {"amt": 1.05, "per_10s": 1.4, "shake_every": 0},
+    "alt_scales": [1.0, 1.05],
+    "transitions": {"leak": 4, "blurIn": 3, "whip": 1},
+    "max_transitions_per_30s": 3,
+    "max_leaks": 2,
+    "rgb": false,
+    "hook_snap": 1.12,
+    "sfx_palette": "soft",
+    "music_moods": ["warm", "funky", "calm", "upbeat"],
+    "graphics": "none"
+  },
+  "hype_hero": {
+    "label": "Hype Hero — bold claims, news, 'stop doing X'; giant opening words, harder punches, shrink cards",
+    "grade": "punchy",
+    "caption": {"style": "hero", "y": 1230, "accent": "#ff5a36", "size": 80, "hero_until": 1.9},
+    "accent": "#ff5a36",
+    "punch": {"amt": 1.09, "per_10s": 2.8, "shake_every": 2},
+    "alt_scales": [1.0, 1.08],
+    "transitions": {"shrink": 4, "whip": 4, "blurIn": 1},
+    "max_transitions_per_30s": 3,
+    "rgb": true,
+    "hook_snap": 1.2,
+    "sfx_palette": "hit",
+    "music_moods": ["upbeat", "funky", "bright"],
+    "graphics": "optional-sticker"
+  },
+  "_selection": {
+    "warm_cinema_cues": ["career", "interview", "salary", "resume", "manager", "job", "layoff", "promotion", "zindagi", "story", "mistake", "lesson", "meri", "maine", "mera", "when i", "years ago", "mentor", "burnout", "growth"],
+    "hype_hero_cues": ["stop", "never", "mat karo", "galat", "myth", "truth", "banned", "launched", "just released", "free", "killed", "dead", "insane", "shocking", "warning", "scam", "secret", "nobody", "sach", "dhoka", "chhodo"],
+    "explainer_cues": ["how", "kaise", "kyun", "why", "works", "system", "server", "database", "api", "cache", "queue", "request", "kafka", "cdn", "token", "model", "agent", "pipeline"]
+  }
+}

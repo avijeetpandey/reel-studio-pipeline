@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Script gate: run on a reel's script.md BEFORE the shoot card is made. Catches what the 28 Oct analytics showed:
+"""Script ADVICE (advisory since round 8: the script is the creator's own — this never blocks and never rewrites it; pass --strict for the old exit code).
+Run on a reel's script.md. Catches what the 28 Oct analytics showed:
 jargon in the first 10 s (the 3-7 s retention cliff), too many words, soft hooks, and a CTA nobody reaches.
 
   python3 -I script_lint.py <reel folder or script.md>      exit 0 = pass, 1 = fix before filming
@@ -32,6 +33,8 @@ def spoken(md):
                 lines.append(t)
     if not lines:
         lines = [p for p in sec("Teleprompter").split("\n\n") if p.strip()]
+    if not lines:   # a raw pasted script has no headings: treat the whole text as speech, one sentence per line
+        lines = [x for x in re.split(r"(?<=[.?!])\s+", re.sub(r"\s+", " ", md).strip()) if x]
     return [re.sub(r"[*_`]", "", l).strip() for l in lines]
 
 
@@ -60,8 +63,8 @@ def main():
     if "?" not in before:
         bad.append("No question before the last 15%. Put a debatable line at the twist (about 12-15 s); most viewers never reach the end.")
     print(f"{p}: {len(lines)} lines, {n} words (~{n / 3.0:.0f} s at 180 wpm)")
-    print("PASS" if not bad else "\n".join("FIX: " + b for b in bad))
-    sys.exit(1 if bad else 0)
+    print("PASS" if not bad else "\n".join("ADVICE: " + b for b in bad))
+    sys.exit(1 if (bad and "--strict" in sys.argv) else 0)
 
 
 if __name__ == "__main__":

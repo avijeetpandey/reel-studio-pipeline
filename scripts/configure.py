@@ -16,7 +16,7 @@ DEFAULTS = {
     "prefer": "broad curiosity and career topics", "avoid": "", "series": "", "length": "25–35 s of speech, hard cap 40 s",
     "cta": "one debatable yes/no question; never 'comment KEYWORD for a DM'", "timezone": "Asia/Kolkata",
     "slots": "Instagram 7–9 PM, YouTube 12–2 PM; one reel per day; never two on one platform within 12 h; never 11 PM–9 AM",
-    "music_rule": "YouTube Audio Library 'Attribution not required' only; the pipeline picks and downloads tracks without asking",
+    "music_rule": "free-licence, no-attribution music only (YouTube Audio Library 'Attribution not required' or Mixkit; never Instagram's in-app music); the pipeline picks and downloads tracks without asking",
     "gate_script": True, "gate_preview": True, "drive_remote": "gdrive", "drive_folder": "reels",
     "studio_dir": "~/Documents/reel-studio", "platforms": "Instagram Reels, YouTube Shorts, LinkedIn post, carousel",
     "whisper_model": "~/.cache/hyperframes/whisper/models/ggml-small.en.bin",

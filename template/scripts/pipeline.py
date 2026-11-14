@@ -27,7 +27,7 @@ LOCKS = os.path.join(ROOT, ".locks")
 INBOXES = [os.path.join(ROOT, "inbox"), os.path.expanduser("~/Downloads")]
 REMOTE = f'{_CFG.get("drive_remote", "gdrive")}:{_CFG.get("drive_folder", "reels")}'
 LIMITS = {"render": 4, "final": 1}
-STAGES = ["research", "script", "carousel", "linkedin", "checkpoint1", "upload1",
+STAGES = ["script", "carousel", "linkedin", "checkpoint1", "upload1",
           "footage", "cut", "plan", "build", "covers", "posting_kit", "qa", "checkpoint2", "final", "upload2"]
 VIDEO_EXT = (".mov", ".mp4", ".m4v")
 STATS_LOG = os.path.join(REELS, "stats_log.md")
@@ -66,6 +66,12 @@ def cmd_init(a):
          "created": now(), "stages": {s: {"status": "pending"} for s in STAGES},
          "files": {}, "drive": f"{REMOTE}/{a.reel}", "errors": []}
     m["stages"]["footage"]["status"] = "waiting"
+    if getattr(a, "script", None):   # the creator's own script is the input (round 8): no research / script-writing stage
+        dst = os.path.join(REELS, a.reel, "script.md")
+        if not (os.path.exists(dst) and os.path.samefile(a.script, dst)):   # the script may already sit in the reel folder
+            shutil.copy(a.script, dst)
+        m["stages"]["script"] = {"status": "done", "note": "provided by the creator", "at": now()}
+        m["files"]["script"] = dst
     save(a.reel, m); print(mpath(a.reel))
 
 
@@ -360,7 +366,7 @@ def cmd_due(a):
 
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 sub = ap.add_subparsers(dest="cmd", required=True)
-p = sub.add_parser("init"); p.add_argument("reel"); p.add_argument("--topic"); p.add_argument("--playbook"); p.add_argument("--carousel"); p.set_defaults(fn=cmd_init)
+p = sub.add_parser("init"); p.add_argument("reel"); p.add_argument("--topic"); p.add_argument("--script"); p.add_argument("--playbook"); p.add_argument("--carousel"); p.set_defaults(fn=cmd_init)
 p = sub.add_parser("set"); p.add_argument("reel"); p.add_argument("stage"); p.add_argument("status", choices=["pending", "running", "done", "failed", "waiting"]); p.add_argument("--note"); p.set_defaults(fn=cmd_set)
 p = sub.add_parser("file"); p.add_argument("reel"); p.add_argument("key"); p.add_argument("path"); p.set_defaults(fn=cmd_file)
 p = sub.add_parser("approve"); p.add_argument("reel"); p.add_argument("checkpoint", choices=["checkpoint1", "checkpoint2"]); p.set_defaults(fn=cmd_approve)

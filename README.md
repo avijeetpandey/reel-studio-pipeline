@@ -1,12 +1,17 @@
 # Reel Studio — an end-to-end short-form content pipeline for Claude Code
 
-Turn **any topic** into a ready-to-post **Instagram Reel / YouTube Short** — plus a matching **carousel** and **LinkedIn post** — with Claude Code doing the writing, editing, motion graphics, music, captions, covers, QA and upload. You only do two things: **film** and **approve**.
+Turn **your script and footage** into a ready-to-post **Instagram Reel / YouTube Short** — plus a matching **carousel** and **LinkedIn post** — with Claude Code doing the writing, editing, motion graphics, music, captions, covers, QA and upload. You only do two things: **film** and **approve**.
+
+> **Round 8 — script in, automatic edit out.** You paste **your own script**; the pipeline never writes one. Footage arrives → `autodirect.py` picks the world, colour look, captions, camera moves,
+> transitions, sound effects and music from your script (no style instructions from you) → `compose.py` builds the HyperFrames reel → QA → one checkpoint. Camera craft (punch-ins on the words that matter,
+> whips, focus pulls, light leaks, per-shot face matching) replaces overlay decoration. Learned from 59 reels downloaded with `yt-dlp` and analysed frame by frame — see
+> [`skills/reel-edit/humanize.md`](skills/reel-edit/humanize.md) and [`template/auto/README.md`](template/auto/README.md).
 
 ```
-you:     make: why ChatGPT agrees with everything
-Claude:  research → script (3 hooks, timed beats) → shoot sheet on your phone → carousel → LinkedIn post   ← checkpoint 1
+you:     make: <your pasted script>        (or: edit: <video> + <script>)
+Claude:  carousel + LinkedIn post from your words   ← checkpoint 1
 you:     film it, AirDrop it, say "footage ready"
-Claude:  cut → style → beat map → motion graphics → captions → music + SFX → QA (auto-fix ×3) → covers A/B → posting kit
+Claude:  cut (+ colour look) → auto-director (world, captions, camera, transitions, SFX, music) → compose → QA (auto-fix ×3) → covers A/B → posting kit
                                                                                                ← checkpoint 2 (Studio preview)
 you:     "approved"
 Claude:  final render (−14 LUFS) → SRT → upload everything to a new Drive folder → log
@@ -38,7 +43,7 @@ Everything runs only when you ask: there are no scheduled or background jobs.
 | Skill | Say | Does |
 |---|---|---|
 | `studio-setup` | "set up reel studio" | First-run interview → config + your channel rules, installs the template, checks dependencies, SFX, music library |
-| `make-content` | `make: <topic>` · `make: a; b; c` · `footage ready` · `edit: <video>` · `study: <links>` · `posted <reel> <ig> <yt>` · `stats:` · `report:` · `trends:` · `continue <reel>` · `pipeline status` | The orchestrator: runs everything below in parallel with helper agents, tracks every stage in a resumable manifest, stops only for filming and the two approvals |
+| `make-content` | `make: <your script>` · `make: <script 1> --- <script 2>` · `footage ready` · `edit: <video>` · `study: <links>` · `posted <reel> <ig> <yt>` · `stats:` · `report:` · `trends:` · `continue <reel>` · `pipeline status` | The orchestrator: runs everything below in parallel with helper agents, tracks every stage in a resumable manifest, stops only for filming and the two approvals |
 | `make-cartoon-content` | `cartoon: <topic>` + a voice file | No filming: voiceover → storyboard → an animated cartoon host (jointed arms, blinking, lip-sync from your words) with stage cards, captions, SFX and music → cover → posting kit. Open source only (ffmpeg, whisper.cpp, HyperFrames, vtracer) |
 | `reel-script` | "script a reel about …" | Format pick (10 formats incl. **Fact or Hype?**, identity reframe, mantra, skit, experiment, myth-or-fact…), 3 hooks, timed 25–35 s script (≈ 200 WPM), edit brief, b-roll list, covers, LinkedIn post + image, a **shoot sheet** artifact for your phone (framing, lighting for the chosen look, checklist) |
 | `reel-edit` | "edit this reel" | Senior-editor workflow on HyperFrames: review → tight cut → face map → **automatic style** (10 treatments, rotated) → beat map → motion components → captions → **automatic energetic music** + signature SFX → QA auto-fix loop → Studio preview → final render → A/B covers → posting kit → Drive |
@@ -88,7 +93,7 @@ It then writes:
 ```
 make: 3 ChatGPT settings nobody uses
 ```
-1. Claude researches, writes `script.md`, publishes a **shoot sheet** (open it on your phone while filming), builds the carousel and LinkedIn post → **checkpoint 1** (reply "approved" or give notes).
+1. You paste your script; Claude saves it verbatim as `script.md` and builds the carousel and LinkedIn post from your words (add `reel only` to skip them) → **checkpoint 1** (reply "approved" or give notes).
 2. You film (one take is fine — retakes and pauses are cut), AirDrop to `~/Downloads`, say `footage ready`.
 3. Claude edits on autopilot → **checkpoint 2**: Studio preview link, draft video, storyboard, covers A/B, posting kit, QA report, the style it chose and why. Reply "approved" or timestamped notes ("0:12 move the card up").
 4. Final render, SRT, upload to `Drive/<folder>/<reel_name>/`, posting times.
@@ -100,11 +105,10 @@ After posting: `posted <reel> <instagram link> <youtube link>` → `stats: all` 
 ## How the pipeline works
 ```
 LEARN    study: <links> → frames + transcript + pace + music level + captions → WINNING_PATTERNS.md → rules in every skill
-HALF 1   research → script.md (format · look A–E · 95–120 words · proof by 5 s · reactions + verdict · yes/no CTA + loop)
-         → shoot sheet ∥ carousel ∥ LinkedIn → CHECKPOINT 1 → upload
+HALF 1   your script.md (verbatim; script_lint.py gives advice only) → carousel ∥ LinkedIn → CHECKPOINT 1 → upload
 FILM     you → footage ready   (or edit: <video>)
-HALF 2   review (HDR check) → cut (pace ≥ 190 WPM) → face map → choose_style.py (10 looks, rotation) → beat map → enhance pass
-         (11 components, budget, beat grid) → facts checked → pick_music.py (energetic, trimmed) + SFX → build ∥ covers ∥ posting kit
+HALF 2   review (HDR check) → cut with a colour look baked in (make_look.py) → autodirect.py plan (world · face-matched framing · camera track ·
+         transitions at idea changes · SFX by role · beat-aligned music) → compose.py + run.sh → optional drawn scenes → build ∥ covers ∥ posting kit
          → QA auto-fix ×3 (incl. ends on the last word, frame grading ≥ 8/10) → draft + Studio preview → CHECKPOINT 2 → final → −14 LUFS → SRT → upload → style_log
 LOOP     your notes → rules · posted → stats: (Instagram + YouTube) → report: → performance.json → style picker · trends: → ideas
          (all on demand — nothing is scheduled)

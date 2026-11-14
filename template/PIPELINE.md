@@ -1,5 +1,10 @@
 # make-content — end-to-end pipeline (built 22 Oct 2026)
 
+> **Round 8 change:** the pipeline no longer writes scripts. The creator pastes the script; Half 1 = carousel + LinkedIn from their words (skippable with `reel only`); Half 2 = **fully automatic edit**
+> (`skills/reel-edit/humanize.md`: `template/auto/autodirect.py` plan → `compose.py` → `run.sh`, colour looks via `make_look.py`, libraries in `composition/assets/audio/{sfx,music}` with `ROLES.json` / `INDEX.json`).
+> Stages `research` and the script-writing step are gone from the manifest (`pipeline.py init --script`). Everything below that mentions research, authoring script.md, shoot sheets or `choose_style` describes the earlier flow.
+
+
 Goal: one command per topic (or per week) → script, carousel, LinkedIn post, edited reel, covers, all in one Drive folder, with filming + 2 approvals as the only interruptions. Built on the existing skills: `reel-script`, `generate-carousel`, `reel-edit`. This file is the spec to build from. Since 24 Oct 2026 every stage also follows `WINNING_PATTERNS.md` (learned from the creator's reference reels), `reel-edit` picks the style itself with `scripts/choose_style.py` + the enhance pass, and QA includes `qa_reel.py --cover` and the static-frame check.
 
 ## Pipeline as of 25 Oct 2026 (after five reference studies + the first test edit)
