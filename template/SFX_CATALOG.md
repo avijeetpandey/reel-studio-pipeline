@@ -27,3 +27,6 @@ Vocabulary = what pro editors call the sounds in the reference reels (anderson.t
 - Layer a tiny tail: ≥ 10 % room reverb on the SFX bus; every SFX 20–40 ms fade-out. Voice stays on top: SFX −10…−16 dB under the voice peak (vol 0.15–0.35).
 - Two signature sounds per reel (e.g. `whip` = every scene change, `ding` = every fact) PLUS accents from the table so it doesn't sound like a loop.
 - Hinglish lines: the voice is fast and dense — keep SFX short (< 0.3 s) in dense stretches so words stay clear.
+
+## Round 8 — role catalog for the auto-director
+`template/scripts/fetch_free_audio.py sfx` downloads free-licence sounds (Mixkit, no attribution) on your machine; `template/auto/sfx_roles.py` rebuilds `sfx/ROLES.json`, which lists per ROLE (whip · whoosh · hit_soft · impact · riser · pop · tick · click · notif · success · error · negation · shutter · glitch · paper · scratch · sparkle) the candidates that fit its duration window — the original synthesized sounds first, then the downloaded ones. `autodirect.py` picks ONE file per role per reel (seeded by the reel name) and levels every file to the same peak (−10 dBFS) before the role volume, so a loud download never jumps out over a quiet original.

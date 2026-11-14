@@ -2,7 +2,10 @@
 
 Everything is driven by plain sentences in Claude Code. Start a session (CLI: `claude`; desktop app: Code tab) — any folder works; the pipeline moves itself to `<studio>/reels/<reel_name>/`.
 
-## 1. One reel, start to finish — `make: <topic>`
+## 1. One reel, start to finish — `make: <your script>` (round 8)
+Paste your own script (a reel name on the first line is optional). The pipeline saves it verbatim, builds the carousel and LinkedIn post from your words (add `reel only` to skip them), and waits for footage. After `footage ready` (or `edit: <video> + <script>`) the **automatic edit** runs: cut with a colour look → `autodirect.py` → `compose.py` → QA → checkpoint 2. You give no style instructions; a note like "make it moodier" switches the world. Details: `skills/reel-edit/humanize.md`.
+
+### Legacy topic-in flow (no longer part of `make-content`; the standalone `reel-script` skill still writes scripts on request)
 ```
 make: why AI agents fail at simple tasks
 ```

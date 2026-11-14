@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Step 2: bake the tightened, upscaled, graded A-roll from a list of kept source ranges.
-Usage: python3 -I make_cut.py <source.mp4> <segments.txt> <out.mp4> [--hold 0.3] [--size 1440x2560] [--exposure 0.92] [--saturation 1.1] [--no-grade]
+Usage: python3 -I make_cut.py <source.mp4> <segments.txt> <out.mp4> [--look clean_bright|warm_cinema|punchy] [--extra-vf "<ffmpeg filters>"] [--hold 0.3] [--size 1440x2560] [--exposure 0.92] [--saturation 1.1] [--no-grade]
 segments.txt: one "start-end" (seconds, source time) per line, in order.
 Pad each kept range ~0.06 s before the first word and ~0.08 s after the last word.
 Prints the cut-time position of every join (use these for punch-in zooms).
@@ -14,6 +14,17 @@ hold = float(sys.argv[sys.argv.index("--hold") + 1]) if "--hold" in sys.argv els
 expo = sys.argv[sys.argv.index("--exposure") + 1] if "--exposure" in sys.argv else "0.92"
 grade = "" if "--no-grade" in sys.argv else None  # --no-grade: skip the brighten/contrast pass (bright phone footage)
 sat = sys.argv[sys.argv.index("--saturation") + 1] if "--saturation" in sys.argv else "1.1"  # lower (0.85–0.95) for already-vivid footage
+EXTRA = (sys.argv[sys.argv.index("--extra-vf") + 1].rstrip(",") + ",") if "--extra-vf" in sys.argv else ""  # extra ffmpeg video filters, run after the base grade
+LOOK = sys.argv[sys.argv.index("--look") + 1] if "--look" in sys.argv else None  # a make_look.py preset: clean_bright | warm_cinema | punchy | neutral (applied inside this single encode)
+if LOOK and LOOK != "neutral":
+    _here = os.path.dirname(os.path.abspath(__file__))
+    _py = os.path.join(os.path.dirname(os.path.dirname(_here)), "tools", ".venv", "bin", "python")   # $STUDIO/tools/.venv (numpy) — scripts/setup.sh --install creates it
+    _py = _py if os.path.exists(_py) else sys.executable
+    _cube = os.path.abspath(out) + "." + LOOK + ".cube"
+    subprocess.run([_py, os.path.join(_here, "make_look.py"), LOOK, _cube], check=True)
+    _vf = subprocess.run([_py, "-c", "import sys;sys.path.insert(0,sys.argv[1]);import make_look as m;print(m.vf(sys.argv[2],sys.argv[3]))", _here, LOOK, _cube], capture_output=True, text=True, check=True).stdout.strip()
+    EXTRA = _vf + "," + EXTRA
+    print(f"look: {LOOK}")
 W, H = (sys.argv[sys.argv.index("--size") + 1] if "--size" in sys.argv else "1080x1920").split("x")  # --size 1440x2560: headroom so punch-ins in a 1080x1920 render stay sharp
 trc = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=color_transfer",
                       "-of", "default=nw=1:nk=1", src], capture_output=True, text=True, check=True).stdout.strip()
@@ -49,7 +60,7 @@ n = len(S)
 f.append("".join(f"[v{i}][a{i}]" for i in range(n)) + f"concat=n={n}:v=1:a=1[cv][ca]")
 # upscale + light sharpen + gentle grade; tpad holds the last frame for the CTA end card
 EQ = "" if grade == "" else f"eq=brightness=0.035:contrast=1.07:saturation={sat}:gamma=1.06,"
-f.append(f"[cv]{HDR}scale={W}:{H}:flags=lanczos,{SHARP}{EQ}"
+f.append(f"[cv]{HDR}scale={W}:{H}:flags=lanczos,{SHARP}{EQ}{EXTRA}"
          f"tpad=stop_mode=clone:stop_duration={hold},format=yuv420p[vo]")
 # voice chain (tested on vector_embeddings: identical transcript, +3 dB presence, room tail −11…−15 dB):
 # rumble cut → denoise → mud cut → presence + air → de-ess → compress → soft gate (shrinks room echo

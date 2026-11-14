@@ -1,6 +1,6 @@
 # Music
 
-**Rule:** only YouTube Audio Library tracks marked "Attribution not required" — free to use in your videos (including monetised), not to redistribute, which is why none ship with this repo.
+**Rule:** only free-licence, no-attribution music — the YouTube Audio Library ("Attribution not required") or similar (round 8 adds Mixkit via `template/scripts/fetch_free_audio.py music`) — free to use in your videos (including monetised), not to redistribute, which is why none ship with this repo. Never Instagram's in-app music (not licensed outside the app).
 
 ## Build your library (once, ≈ 10 min, Claude does it)
 1. Sign in to YouTube Studio in Claude's built-in browser (desktop app) when asked.
@@ -13,3 +13,9 @@
 
 ## Manual
 Drop any attribution-free Audio Library MP3 in the music folder, run `music_energy.py` on it and add its row to `INDEX.md`.
+
+## Round 8: machine-readable libraries (music + SFX)
+- `python3 template/scripts/fetch_free_audio.py music [--per 3] [--only hip-hop,funk]` and `… sfx [--per 12]` download from Mixkit (free licence, no attribution) into `composition/assets/audio/{music,sfx}/mixkit/` and log every file with its licence line. Nothing is downloaded until you run it, and the files are git-ignored.
+- `template/auto/music_index.py` (needs the studio venv) analyses every track into `music/INDEX.json`: BPM, full beat grid, energy 0–100, intro length, three bar-aligned best starts, moods, licence. `template/auto/pick_music2.py` picks the track: energetic from second 1, BPM 100–126 preferred, mood by world, never one of the last 3 reels' tracks, start rotated by reel name.
+- `template/auto/sfx_roles.py` files every sound under the job it does (whip, whoosh, hit_soft, impact, riser, pop, tick, click, notif, success, error, negation, shutter, glitch, paper, scratch, sparkle) in `sfx/ROLES.json`; the plan picks one file per role per reel and levels all of them to the same peak before the role volume.
+- Close the loop on a draft with `template/auto/balance.py`: it measures the voice against music + SFX and nudges the music volume until the voice sits ≈ 12 dB over everything else (target 10–14 dB).

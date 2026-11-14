@@ -5,3 +5,10 @@ node_modules/
 *.mp3
 *.wav
 __pycache__/
+template/auto/face_boxes
+*.cube
+ROLES.json
+INDEX.json
+mixkit_index.json
+tools/
+.venv/

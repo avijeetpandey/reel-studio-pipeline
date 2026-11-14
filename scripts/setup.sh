@@ -25,6 +25,20 @@ if [ -f "$M" ]; then ok "whisper model small.en"; else
   if [ $INSTALL = 1 ]; then mkdir -p "$(dirname "$M")" && curl -L -o "$M" https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin && ok "whisper model downloaded" || miss "whisper model" "see README"
   else miss "whisper model small.en (≈ 470 MB)" "bash scripts/setup.sh --install"; fi; fi
 if npx --yes hyperframes@latest --version >/dev/null 2>&1; then ok "HyperFrames CLI (npx)"; else miss "HyperFrames CLI" "needs network: npx --yes hyperframes@latest --version"; fi
+# round 8: Python venv for the analysis + auto-edit scripts (numpy, opencv, librosa) — lives in <studio>/tools/.venv
+STUDIO_DIR=$(python3 - <<'PY'
+import json, os
+try: c = json.load(open(os.path.expanduser(os.environ.get("REEL_STUDIO_CONFIG", "~/.config/reel-studio/config.json"))))
+except Exception: c = {}
+print(os.path.expanduser(c.get("studio_dir", "~/Documents/reel-studio")))
+PY
+)
+VENV="$STUDIO_DIR/tools/.venv"
+if [ -x "$VENV/bin/python" ] && "$VENV/bin/python" -c "import numpy, cv2, librosa, scipy, PIL, matplotlib" 2>/dev/null; then ok "Python venv for the auto-edit scripts ($VENV)"
+elif [ $INSTALL = 1 ]; then mkdir -p "$STUDIO_DIR/tools" && python3 -m venv "$VENV" && "$VENV/bin/pip" install -q numpy scipy opencv-python-headless pillow librosa soundfile matplotlib && ok "Python venv installed ($VENV)" || miss "Python venv" "python3 -m venv $VENV && $VENV/bin/pip install numpy scipy opencv-python-headless pillow librosa soundfile matplotlib"
+else miss "Python venv with numpy, opencv, librosa (auto-edit + study scripts)" "bash scripts/setup.sh --install"; fi
+[ -f ~/.cache/hyperframes/whisper/models/ggml-small.bin ] || echo "  ! optional: multilingual whisper model for code-mixed scripts (e.g. Hinglish): curl -L -o ~/.cache/hyperframes/whisper/models/ggml-small.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.bin"
+command -v swiftc >/dev/null && ok "swiftc (Apple Vision face boxes: captions and CTA stay off the face)" || echo "  ! optional: swiftc not found — face-aware caption placement falls back to the world defaults"
 ffmpeg -hide_banner -h filter=lut3d 2>&1 | grep -q "Filter lut3d" && ok "ffmpeg lut3d filter (HDR phone footage)" || miss "ffmpeg lut3d" "reinstall ffmpeg"
 rclone listremotes 2>/dev/null | grep -q . && ok "rclone remotes: $(rclone listremotes | tr '\n' ' ')" || echo "  ! no rclone remote yet — run 'rclone config' (Google Drive) if you want uploads"
 [ $MISSING = 0 ] && echo "All required tools found." || echo "Some tools are missing (see ✗ above). Re-run with --install to install via Homebrew."

@@ -237,3 +237,21 @@ Notes + numbers: `$STUDIO/research/refs_2026-10b/NOTES.md`. These rules extend (
 ## 35. the creator's notes on the v2 re-edit (30 Oct 2026) — rules, not preferences
 - Face on screen 100 %; never replace it with text. Graphics illustrate the sentence in ONE flat illustration style (Sticker Pop); one persistent scene that evolves; ≤ 4 objects, ≤ 3 words each; clean and energetic through motion that shows the mechanism, not through more elements. "Looks like a simple machine / AI did this" = failure. Details: `reel-edit/variety.md` §0, component `sticker-kit.html`.
 - Re-edits are `_v2` files beside the first cut and a `v2/` subfolder inside the reel's Drive folder.
+
+---
+# Round 8 (59 reels, downloaded with yt-dlp and analysed frame by frame, 14 Nov 2026) — research/refs_<date>/REPORT.md
+
+## 36. What the biggest reels do differently (numbers in the report)
+- **Shot length is the strongest measurable difference:** top-15 median average shot **3.2 s** vs 7.5 s for all speech reels (2.9 vs 0.95 cuts per 10 s); words per minute, first word (0.02–0.04 s) and tail (0.12 s) are identical. Cut often, but disguise every cut as a camera move.
+- **Camera craft, not overlays:** alternating 1.00/1.07 framing at jump cuts, a snap-in on frame 0, punches on number/negation/contrast words, directional whips with real motion blur, focus pulls, a handheld jolt, ONE chromatic split, a warm light leak that swallows a cut (kienobifilms 23K, liveairprod 52K), frame-as-object shrink/tilt transitions (messy_mummah), an aperture opener. All in `template/auto/fx.js`.
+- **The overlay is the demo** (bhavinipanjwanii 22K, samadsmett, robertmckeaveney 20.8K in 1.3 days): flat translucent boxes / red arrows / handwritten labels drawn on the live footage at the real thing's position. The freshest viral talking head is raw handheld footage at 283 wpm with a graph and one red arrow.
+- **Physical texture beats effects:** wardrobe + location jumps every ~2 s (celfstudies 157K / 141K), paper props from above with hands (iamsarahsnow), die-cut sticker on crumpled paper (ananyakhurana_30). We can't generate these: the plan suggests pickup shots.
+- **Type as a voice:** serif + one italic word above the frame (warm), giant stacked opening word (hype), small centred words (default); colour = meaning; a pinned title whose word swaps per item.
+- **Masters:** the two biggest reels were exported 1440×2560 at ≈ 5 Mbps (everything else 1080×1920 at ≈ 1.4 Mbps). A/B once with a 4K render; unverified.
+- **Keyword-comment CTAs** buy comments (0.76 per like vs 0.01) but not likes (median 1,550 vs 1,720): still not used.
+- **Sound:** −14 LUFS, bed ≈ 21.6 dB under the voice, loud non-speech events ≈ 1.7 per 10 s in the winners (all reels 2.3): few, well-placed hits, not constant SFX.
+- **Colour (41 talking heads, median):** luma 96 (top-12: 87), saturation 0.28, red−blue +17, contrast 26, warm highlights, neutral-to-teal shadows → `make_look.py` presets.
+- **The "Claude made this animation" showcase look** (3 … 8K likes) is the "edited by AI" tell: not adopted.
+
+## 37. Pipeline consequences (all in force)
+Script is the creator's (never written by the pipeline) → `autodirect.py` decides → `compose.py` builds → QA → checkpoint. `reel-edit/humanize.md` is the manual; `worlds.json` holds the three worlds; change a weight only after ≥ 3 reels per group.
