@@ -12,3 +12,6 @@ INDEX.json
 mixkit_index.json
 tools/
 .venv/
+template/auto/person_matte
+template/auto/premium/fonts/
+template/composition/assets/audio/sfx/earshot/

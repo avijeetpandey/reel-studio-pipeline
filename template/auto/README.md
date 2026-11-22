@@ -18,3 +18,17 @@ Script in → finished reel out. Manual: `$PLUGIN/skills/reel-edit/humanize.md`.
 
 Related: `template/scripts/make_look.py` (LUT looks, used by `make_cut.py --look`), `analyze_ref2.py` + `audio_events.py` (reference-reel study), `fetch_free_audio.py` (library growth).
 Python with numpy/opencv/librosa: `tools/.venv/bin/python`.
+
+## Premium layer (Rounds 14–17, default)
+| file | job |
+|---|---|
+| `person_matte.py` / `.swift` | cuts the speaker out of the cut once per reel (Apple Vision on macOS, `npx hyperframes remove-background` fallback) → `assets/fg.webm` (VP9 + alpha) so words/props can sit BEHIND the head |
+| `premium/premium.py` | the director for the layer: footage-derived accent colour, role-styled big words (emphasis budget), lead-line timing, props from sentence cues, lighting cues |
+| `premium/kinetic.js` + `premium.css` | the renderer: per-letter type with a sheen, word-timed leads, dot map + comet arc, timer ring, glass search card, server racks, VS logos, spotlight / light rays |
+| `premium/v4_finish.py` | a transition at every idea change + the earshot sound kit placed by each sound's peak (falls back to the ROLES.json sounds when earshot is absent) |
+| `premium/worlddots.json` | accurate world dot map rasterised from Natural Earth (public domain) by `premium/dotmap.py` |
+| `premium/fetch_fonts.sh` | fetches the three SIL-OFL fonts (Anton, Instrument Serif, Hanken Grotesk) with their licences from google/fonts; run once |
+| `music_space.py` | adds `voice_share` / `sub_share` to the music index so `pick_music2.py` prefers beds that leave room for the voice |
+| `../scripts/look_audit.py` | QA: runs the motionmaxxing `look.py` render audit (cut sync, end hold, empty frames, loudness); needs `git clone --depth 1 https://github.com/Tejashmakwana/motionmaxxing tools/ext/motionmaxxing` (Apache-2.0) |
+
+Optional sound generator: `python3 -m venv tools/ext/earshot/.venv`, then install earshot from GitHub (MIT; `pip install "git+https://github.com/Leonxlnx/earshot"` — the PyPI name belongs to another project) and symlink/copy its `earshot` entry point to `tools/ext/earshot/.venv/bin/earshot`. Switches: `PREMIUM=0` (old look), `KINETIC_V=3` (Round 16 look), `THEME=<accent>`, `PREMIUM_CARDS=1`, `HEADLINE="kick|word"`.

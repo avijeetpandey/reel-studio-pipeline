@@ -1,0 +1,222 @@
+{
+ "netflix": [
+  "netflix",
+  "E50914",
+  "Netflix"
+ ],
+ "spotify": [
+  "spotify",
+  "1DB954",
+  "Spotify"
+ ],
+ "swiggy": [
+  "swiggy",
+  "FC8019",
+  "Swiggy"
+ ],
+ "zomato": [
+  "zomato",
+  "E23744",
+  "Zomato"
+ ],
+ "kafka": [
+  "apachekafka",
+  "231F20",
+  "Kafka"
+ ],
+ "redis": [
+  "redis",
+  "DC382D",
+  "Redis"
+ ],
+ "docker": [
+  "docker",
+  "2496ED",
+  "Docker"
+ ],
+ "kubernetes": [
+  "kubernetes",
+  "326CE5",
+  "Kubernetes"
+ ],
+ "k8s": [
+  "kubernetes",
+  "326CE5",
+  "Kubernetes"
+ ],
+ "instagram": [
+  "instagram",
+  "E4405F",
+  "Instagram"
+ ],
+ "youtube": [
+  "youtube",
+  "FF0000",
+  "YouTube"
+ ],
+ "facebook": [
+  "facebook",
+  "0866FF",
+  "Facebook"
+ ],
+ "whatsapp": [
+  "whatsapp",
+  "25D366",
+  "WhatsApp"
+ ],
+ "google": [
+  "google",
+  "4285F4",
+  "Google"
+ ],
+ "uber": [
+  "uber",
+  "000000",
+  "Uber"
+ ],
+ "github": [
+  "github",
+  "181717",
+  "GitHub"
+ ],
+ "postgres": [
+  "postgresql",
+  "4169E1",
+  "Postgres"
+ ],
+ "postgresql": [
+  "postgresql",
+  "4169E1",
+  "Postgres"
+ ],
+ "mysql": [
+  "mysql",
+  "4479A1",
+  "MySQL"
+ ],
+ "mongodb": [
+  "mongodb",
+  "47A248",
+  "MongoDB"
+ ],
+ "graphql": [
+  "graphql",
+  "E10098",
+  "GraphQL"
+ ],
+ "nginx": [
+  "nginx",
+  "009639",
+  "Nginx"
+ ],
+ "cloudflare": [
+  "cloudflare",
+  "F38020",
+  "Cloudflare"
+ ],
+ "stripe": [
+  "stripe",
+  "635BFF",
+  "Stripe"
+ ],
+ "phonepe": [
+  "phonepe",
+  "5F259F",
+  "PhonePe"
+ ],
+ "flipkart": [
+  "flipkart",
+  "2874F0",
+  "Flipkart"
+ ],
+ "amazon": [
+  "amazon",
+  "FF9900",
+  "Amazon"
+ ],
+ "twitter": [
+  "x",
+  "000000",
+  "X"
+ ],
+ "linkedin": [
+  "linkedin",
+  "0A66C2",
+  "LinkedIn"
+ ],
+ "claude": [
+  "claude",
+  "D97757",
+  "Claude"
+ ],
+ "chatgpt": [
+  "openai",
+  "412991",
+  "ChatGPT"
+ ],
+ "openai": [
+  "openai",
+  "412991",
+  "OpenAI"
+ ],
+ "elasticsearch": [
+  "elasticsearch",
+  "005571",
+  "Elasticsearch"
+ ],
+ "rabbitmq": [
+  "rabbitmq",
+  "FF6600",
+  "RabbitMQ"
+ ],
+ "slack": [
+  "slack",
+  "4A154B",
+  "Slack"
+ ],
+ "discord": [
+  "discord",
+  "5865F2",
+  "Discord"
+ ],
+ "paytm": [
+  "paytm",
+  "00BAF2",
+  "Paytm"
+ ],
+ "razorpay": [
+  "razorpay",
+  "0C2451",
+  "Razorpay"
+ ],
+ "shazam": [
+  "shazam",
+  "0088FF",
+  "Shazam"
+ ],
+ "chrome": [
+  "googlechrome",
+  "4285F4",
+  "Chrome"
+ ],
+ "brave": [
+  "brave",
+  "FB542B",
+  "Brave"
+ ],
+ "firefox": [
+  "firefoxbrowser",
+  "FF7139",
+  "Firefox"
+ ],
+ "safari": [
+  "safari",
+  "006CFF",
+  "Safari"
+ ],
+ "edge": [
+  "microsoftedge",
+  "0078D7",
+  "Edge"
+ ]
+}

@@ -9,9 +9,16 @@ if [ -z "${SKIP_PLAN:-}" ]; then python3 -I "$A/autodirect.py" plan --reel "$R" 
 python3 -I "$A/compose.py" "$R/edit_plan.json" "$P" ${GRAPHICS:+--graphics "$GRAPHICS"} ${GRAPHICS_JS:+--graphics-js "$GRAPHICS_JS"} ${GRAPHICS_CSS:+--graphics-css "$GRAPHICS_CSS"} ${OVERLAY:+--overlay "$OVERLAY"}
 cd "$P"
 # shared @hyperframes/core (tools/hf-core, installed once) so a fresh project needs no npm install
-[ -d "$STUDIO/tools/hf-core"/node_modules/@hyperframes/core ] || (cd "$STUDIO/tools/hf-core" && npm i @hyperframes/core@0.9.44 --silent --no-audit --no-fund)
-if grep -q 'id="music"' index.html; then   # no music in the plan (empty library): nothing to carve
-  node ~/.claude/skills/hyperframes-audio/scripts/carve.mjs --comp index.html --bed music --voice voice --strength "${CARVE:-0.25}" --core "$STUDIO/tools/hf-core" | tail -2
-fi
+[ -d "$STUDIO/tools/hf-core/node_modules/@hyperframes/core" ] || (cd "$STUDIO/tools/hf-core" && npm i @hyperframes/core@0.9.44 --silent --no-audit --no-fund)
+node ~/.claude/skills/hyperframes-audio/scripts/carve.mjs --comp index.html --bed music --voice voice --strength "${CARVE:-0.25}" --core "$STUDIO/tools/hf-core" | tail -2
 npx --yes hyperframes@0.9.44 lint | tail -3
+# YouTube master (18 Nov 2026): same cut, same audio, but the end card says Subscribe, not Instagram's Follow. YT=0 skips it.
+if [ "${YT:-1}" = "1" ]; then
+  PY="$R/videos/${NAME}_yt"; mkdir -p "$PY"
+  [ -e "$PY/assets" ] || ln -s "$P/assets" "$PY/assets"
+  cp "$P/hyperframes.json" "$P/package.json" "$PY/" 2>/dev/null || true
+  python3 -I "$A/compose.py" "$R/edit_plan.json" "$PY" --platform yt ${GRAPHICS:+--graphics "$GRAPHICS"} ${GRAPHICS_JS:+--graphics-js "$GRAPHICS_JS"} ${GRAPHICS_CSS:+--graphics-css "$GRAPHICS_CSS"} ${OVERLAY:+--overlay "$OVERLAY"} | tail -1
+  (cd "$PY" && node ~/.claude/skills/hyperframes-audio/scripts/carve.mjs --comp index.html --bed music --voice voice --strength "${CARVE:-0.25}" --core "$STUDIO/tools/hf-core" | tail -1)
+  echo "yt master composed: $PY (render both: cd videos/$NAME && npx hyperframes render -o ../../renders/${NAME}_final.mp4 ; cd ../${NAME}_yt && npx hyperframes render -o ../../renders/${NAME}_youtube.mp4)"
+fi
 echo "next: npx hyperframes snapshot (transitions) -> render --quality draft -> python3 -I $A/mix_check.py review/draft.mp4 assets/audio/voice.wav"

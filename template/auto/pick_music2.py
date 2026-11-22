@@ -13,17 +13,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 MUSIC = os.path.join(ROOT, "template/composition/assets/audio/music")
 
 
-def used_recent(n=3):
+def used_recent(n=3, exclude=""):
     used = []
-    try:
-        used += [r.get("music") for r in json.load(open(os.path.join(ROOT, "reels/auto_style_log.json"))) if r.get("music")]
-    except Exception:
-        pass
     p = os.path.join(ROOT, "reels/style_log.md")
     if os.path.exists(p):
         for ln in open(p, encoding="utf-8"):
             if ln.startswith("| 20") and len(ln.strip().strip("|").split("|")) >= 7:
                 used.append(ln.strip().strip("|").split("|")[-1].strip().lower())
+    try:  # auto log LAST (newest) so [-n:] never pushes it out; a re-plan ignores its own row (14 Nov 2026: a test reel re-used a test reel's track)
+        used += [r.get("music") for r in json.load(open(os.path.join(ROOT, "reels/auto_style_log.json"))) if r.get("music") and r.get("reel") != exclude]
+    except Exception:
+        pass
     return [u for u in used if u][-n:]
 
 
@@ -31,15 +31,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--len", type=float, required=True); ap.add_argument("--moods", default="upbeat"); ap.add_argument("--reel", default="")
     ap.add_argument("--out"); ap.add_argument("--json", action="store_true"); ap.add_argument("--bpm", type=int, default=112)
+    ap.add_argument("--file", help="force this track (path inside music/, e.g. mixkit/x.mp3) instead of scoring"); ap.add_argument("--start-index", type=int, default=None)
     a = ap.parse_args()
     ip = os.path.join(MUSIC, "INDEX.json")
     if not os.path.exists(ip):
         sys.exit("no music index yet: run template/scripts/fetch_free_audio.py music, then template/auto/music_index.py (the reel is built without music until then)")
     idx = json.load(open(ip))
-    used = used_recent()
+    used = used_recent(exclude=a.reel)
     moods = [m.strip() for m in a.moods.split(",")]
     best = None
-    for f, t in idx.items():
+    if a.file:
+        best = (0, a.file, idx[a.file])
+    for f, t in ([] if a.file else idx.items()):
         if any(u and (u in f.lower() or f.lower().replace(".mp3", "") in u) for u in used):
             continue
         if t["duration"] < a.len + 12 or not t.get("starts"):
@@ -50,12 +53,14 @@ def main():
             s -= 30
         if t["intro_s"] > 8:
             s -= 4
+        if "voice_share" in t:   # 22 Nov 2026 (music_space.py): leave the 300 Hz-3 kHz band to the voice; a pulse in the sub reads energetic without masking words
+            s -= 260 * max(0.0, t["voice_share"] - 0.05) - 8 * t.get("sub_share", 0)
         if best is None or s > best[0]:
             best = (s, f, t)
     if not best:
         sys.exit("no unused track fits — run fetch_free_audio.py music or add a YouTube Audio Library track")
     _, f, t = best
-    k = sum(ord(c) for c in a.reel) % len(t["starts"])
+    k = a.start_index if a.start_index is not None else sum(ord(c) for c in a.reel) % len(t["starts"])
     start = t["starts"][k]
     if start + a.len + 1 > t["duration"]:
         start = t["starts"][0]

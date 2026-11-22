@@ -255,3 +255,13 @@ Notes + numbers: `$STUDIO/research/refs_2026-10b/NOTES.md`. These rules extend (
 
 ## 37. Pipeline consequences (all in force)
 Script is the creator's (never written by the pipeline) → `autodirect.py` decides → `compose.py` builds → QA → checkpoint. `reel-edit/humanize.md` is the manual; `worlds.json` holds the three worlds; change a weight only after ≥ 3 reels per group.
+
+---
+# Round 9 study ("Claude edited this" before/after reels, 41 analysed, 22 Nov 2026)
+
+## 38. Depth is what reads as premium — and restraint is what keeps it that way
+- The before/after edits (eightsenses "Kinetic Text Reels") share one stack: room relit into a colour set · a big word BEHIND the head · two-tier captions (small lead-in + hero line, key word in serif italic) · props that live in the room · zoom-blur / light-streak at idea changes · a riser → impact per scene change.
+- Copying that stack wholesale (tinted room + glass ribbon + orbs + generic frosted cards) read as flashy and empty on real footage. What survived: **a bold word behind the head (4–7 per reel, role-styled), a per-reel accent colour picked from the footage + script (never purple by default), a kinetic lead-line track timed to the spoken words, props drawn from what each sentence is about (map arc, timer ring, search card, server racks, VS logos), spotlight / light-ray lighting on the hero beats, a transition at every idea change, and a sound kit placed by each sound's peak.**
+- Music must leave the voice band free (`template/auto/music_space.py`): a dark sub-bass pulse sits under speech; a melodic/funky bed fights it.
+- The biggest talking heads in the study were the simplest edits: spend emphasis, do not spread it.
+- Now in the pipeline: `template/auto/person_matte.py`, `template/auto/premium/`, `template/auto/music_space.py`, `template/scripts/look_audit.py` (manual: `skills/reel-edit/humanize.md` Rounds 14–17).

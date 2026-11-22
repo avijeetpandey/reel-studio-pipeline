@@ -3,7 +3,7 @@
 
   python3 -I balance.py reels/<reel> reels/<reel>/videos/<reel>/review/draft.mp4
   → then:  SKIP_PLAN=1 template/auto/run.sh reels/<reel>   and render the draft again (max 2 rounds; usually 1)
-Calibrated 14 Nov 2026 on a test clip: carve 0.5 left the bed 21.9 dB under the voice (too quiet); carve 0.25 + vol 0.38 lands ≈ 12 dB.
+Calibrated 14 Nov 2026 on the a test reel clip: carve 0.5 left the bed 21.9 dB under the voice (too quiet); carve 0.25 + vol 0.38 lands ≈ 12 dB.
 """
 import json, os, subprocess, sys
 import numpy as np
