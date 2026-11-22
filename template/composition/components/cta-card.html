@@ -21,9 +21,9 @@ FEEL: "a real phone UI": card rises 30 px and settles (0.4 s power3.out); cursor
                box-shadow: 0 20px 50px rgba(0,0,0,0.35); color: #15171c; font: 600 34px Montserrat, sans-serif; }
   .cta .av { width: 84px; height: 84px; border-radius: 50%; background: center/cover no-repeat var(--avatar, #ccd); flex: none; }
   .cta .who { flex: 1; line-height: 1.15; }
-  .cta .who small { display: block; font: 500 26px Montserrat, sans-serif; color: #6b7080; }
-  .cta .btn { position: relative; padding: 18px 30px; border-radius: 18px; background: var(--accent); color: #0b0d12; font: 800 32px Montserrat, sans-serif; white-space: nowrap; }
-  .cta .btn .on { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 18px; background: #e9ebf0; color: #15171c; opacity: 0; }
+  .cta .who small { display: block; font: 500 28px Montserrat, sans-serif; color: #6b7080; }
+  .cta .btn { position: relative; min-width: 236px; text-align: center; box-sizing: border-box; padding: 18px 30px; border-radius: 18px; background: var(--accent); color: #0b0d12; font: 800 32px Montserrat, sans-serif; white-space: nowrap; }
+  .cta .btn .on { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 18px; background: #e9ebf0; color: #15171c; opacity: 0; white-space: nowrap; }
   .cta .box { flex: 1; min-height: 64px; display: flex; align-items: center; padding: 0 22px; border-radius: 18px; background: #f0f1f4; font: 800 40px Montserrat, sans-serif; }
   .cta .box .ch { display: none; }
   .cta .cur { position: absolute; width: 46px; height: 46px; opacity: 0; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
@@ -47,11 +47,12 @@ FEEL: "a real phone UI": card rises 30 px and settles (0.4 s power3.out); cursor
           btn = root.querySelector(".btn"), lbl = root.querySelector(".lbl"), on = root.querySelector(".on"), cur = root.querySelector(".cur"),
           av = root.querySelector(".av");
     const v = o.variant || "follow", t0 = o.start;
-    const text = { follow: ["Follow", "Following ✓"], save: ["🔖 Save this", "Saved ✓"], comment: ["Post", "Posted ✓"] }[v];
+    const text = { follow: ["Follow", "Following ✓"], save: ["🔖 Save this", "Saved ✓"], comment: ["Post", "Posted ✓"], subscribe: ["Subscribe", "Subscribed ✓"] }[v];
     lbl.textContent = text[0]; on.textContent = text[1];
-    if (v === "follow") { who.innerHTML = `@${o.handle || "__HANDLE__"}<small>${o.promise || "__PROMISE__"}</small>`; box.remove(); }
+    if (v === "follow" || v === "subscribe") { who.innerHTML = `@${o.handle || "__HANDLE__"}<small>${o.promise || "__PROMISE__"}</small>`; box.remove(); }
     if (v === "save") { who.innerHTML = `${o.title || "Save it for later"}<small>${o.sub || "you'll want this again"}</small>`; av.remove(); box.remove(); }
     if (v === "comment") { who.remove(); box.innerHTML = ""; [...(o.answer || "YES")].forEach((c) => { const s = document.createElement("span"); s.className = "ch"; s.textContent = c; box.appendChild(s); }); }
+    if (v === "subscribe") { btn.style.background = "#ff0033"; btn.style.color = "#fff"; }   // YouTube viewers see Subscribe, not an Instagram Follow card (18 Nov 2026)
     if (o.avatar) av.style.setProperty("--avatar", `url(${o.avatar})`);
 
     tl.set(root, { opacity: 0 }, 0);

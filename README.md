@@ -7,6 +7,8 @@ Turn **your script and footage** into a ready-to-post **Instagram Reel / YouTube
 > whips, focus pulls, light leaks, per-shot face matching) replaces overlay decoration. Learned from 59 reels downloaded with `yt-dlp` and analysed frame by frame — see
 > [`skills/reel-edit/humanize.md`](skills/reel-edit/humanize.md) and [`template/auto/README.md`](template/auto/README.md).
 
+> **Rounds 14–17 — premium layer (default).** The speaker is cut out of the frame so big keywords, props and lighting live *behind* them: role-styled words with a per-reel accent colour (from the footage + script), a kinetic lead-line track timed to the words, props drawn from each sentence (map, timer ring, search card, server racks, VS logos), spotlight / light-ray beats, a transition at every idea change, an [earshot](https://github.com/Leonxlnx/earshot) sound kit placed by peak, and a music pick that leaves the voice band free. See [`template/auto/README.md`](template/auto/README.md) and `skills/reel-edit/humanize.md` Rounds 14–17.
+
 ```
 you:     make: <your pasted script>        (or: edit: <video> + <script>)
 Claude:  carousel + LinkedIn post from your words   ← checkpoint 1

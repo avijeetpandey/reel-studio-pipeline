@@ -1,0 +1,15 @@
+{
+  "_doc": "Premium 'sets' (Round 14, 22 Nov 2026). The room behind the person is tinted (the person is the cut-out above it, so skin is untouched); one accent family per reel. premium.py rotates: never the same theme as the last two reels when another fits. word_style = default look of the word behind the head (numbers always use 'outline').",
+  "violet_studio": {"label": "Violet Studio — purple room, glass ribbon, serif-italic lilac words", "accent": "#7c5cff", "word": "#e9ddff", "glow": "rgba(150,110,255,.55)",
+    "tint_top": "rgba(36,14,78,.78)", "tint_bot": "rgba(10,4,26,.86)", "orb": "#a58bff", "orb2": "#4b2bb8", "rib1": "#9d7bff", "rib2": "#e2d6ff", "ring": "rgba(124,92,255,.28)", "ok": "#2fd27a", "ink2": "#5b3fd6",
+    "word_style": "serif", "music_moods": ["upbeat", "bright", "funky"]},
+  "lime_studio": {"label": "Lime Studio — soft green-cream room, lime ribbon, lime serif words", "accent": "#7fc900", "word": "#d8ff5c", "glow": "rgba(190,255,60,.45)",
+    "tint_top": "rgba(26,38,8,.62)", "tint_bot": "rgba(6,12,2,.82)", "orb": "#d8ff5c", "orb2": "#5c8f00", "rib1": "#b6f03a", "rib2": "#f2ffd0", "ring": "rgba(127,201,0,.3)", "ok": "#2fb86a", "ink2": "#4d7a00",
+    "word_style": "serif", "music_moods": ["upbeat", "bright"]},
+  "chrome_night": {"label": "Chrome Night — steel-blue room, chrome condensed words, cool rings", "accent": "#3fa9ff", "word": "#e6f2ff", "glow": "rgba(120,190,255,.45)",
+    "tint_top": "rgba(10,20,34,.8)", "tint_bot": "rgba(2,6,12,.9)", "orb": "#bfe2ff", "orb2": "#1e4f7a", "rib1": "#7cc4ff", "rib2": "#ffffff", "ring": "rgba(63,169,255,.28)", "ok": "#2fd27a", "ink2": "#1f6fb8",
+    "word_style": "chrome", "music_moods": ["upbeat", "funky", "bright"]},
+  "warm_gold": {"label": "Warm Gold — amber room, gold serif words (career / story scripts only)", "accent": "#f0a020", "word": "#ffe2a8", "glow": "rgba(255,180,70,.45)",
+    "tint_top": "rgba(48,24,6,.7)", "tint_bot": "rgba(14,6,2,.86)", "orb": "#ffd38a", "orb2": "#9a5a10", "rib1": "#ffbf5a", "rib2": "#fff1d6", "ring": "rgba(240,160,32,.28)", "ok": "#2fb86a", "ink2": "#a8650a",
+    "word_style": "serif", "music_moods": ["warm", "calm", "upbeat"]}
+}

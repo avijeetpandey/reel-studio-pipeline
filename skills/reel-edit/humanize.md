@@ -49,3 +49,102 @@ The creator pastes a **script** (and, when they have it, the footage). They give
 
 ## When something looks wrong
 Fix the plan, not the composition: edit `edit_plan.json` (change a transition type/time, drop a punch, swap an SFX role, switch `world`) and re-run `compose.py`; it is deterministic and takes seconds. Every note from the creator → which rule in `autodirect.py` / `worlds.json` / this file would have prevented it → write it there (SKILL.md §11).
+
+> Rounds 9–13 (frame-0 headline, logo chips, two platform masters, phrase captions, grade checks, look tests) shipped as code in `template/auto/`; their detailed notes are summarised in the docstrings of `autodirect.py` / `compose.py`.
+
+## Round 14 — the PREMIUM layer (22 Nov 2026; study `research/refs_<date>/REPORT.md`; "make it premium, polished, not monotonous")
+Why: every effect up to Round 13 moved the camera; nothing happened IN the scene, and with no person matte every graphic floated flat on top (the "AI-edited" note).
+The reference edits (eightsenses "Kinetic Text Reels") get their premium feel from DEPTH: the room becomes a set, words and a glass ribbon sit BEHIND the person.
+**It is ON by default** (`PREMIUM=0` = the Round 13 look). Files: `A/person_matte.py|.swift`, `A/premium/{premium.py, premium.js, premium.css, themes.json, fonts/}`.
+1. **Matte (after the cut, before `run.sh`):** `python3 -I A/person_matte.py reels/<reel>/videos/<reel>` → `assets/fg.webm` (Apple Vision person segmentation, VP9 + alpha,
+   ~3.5 min for 36 s at `--quality accurate`; cached; `--force` after a re-cut). Check one frame over magenta (hair, fingers, held objects) before composing.
+   Without `fg.webm` compose drops the word-behind + room tint and warns (they would cover the face).
+2. **Plan:** `autodirect.py plan` calls `premium.plan()`: theme (rotates; never the last two), room tint 0.58, back ribbon + 4 edge orbs, the frame-0 claim as the
+   WORD BEHIND THE HEAD (`HEADLINE="kick line|word"` — line 2 is the big word, line 1 the small kick above it; set it from the creator's hook as in Round 12),
+   numbers → outline word, "samjho X … phonebook hai" → X behind the head, two-tier captions, and ONE card per sentence that DOES something:
+   comparison (nahi…sirf) → ✕/✓ checklist · sequence of tech terms → node timeline · "kis server / kahan kam" → 3-stop slider · "hazaaron" → counter ·
+   "load ho jaati" → loading bar · a question (not the CTA) → search bar typing it · CTA "A ya B?" → **DM bubble with reply chips** (replaces the comment card;
+   the follow card stays). Each card kind once per reel (nodes twice), ≥ 1.2 s apart, one on screen. Transitions: `shrink` → `zoomBlur`; the join nearest the
+   first "samjho / matlab" becomes one theme-coloured `streak`; each gets riser → impact. Read the "Premium layer" block in `EDIT_PLAN.md`.
+   **Override anything** in `reels/<reel>/work/beats.json` (keys of `plan.premium`: `behind`, `cards`, `trans`, `theme`, `room`, `depth`…; given keys replace the auto ones).
+   `THEME=chrome_night` forces a theme.
+3. **Layout (automatic, from the Vision face box):** card band y 285 → caption row − 16 (cards shrink to fit: never over the face); caption block just above the hair;
+   the word's baseline sinks ~1/3 into the hair; captions skip a phrase the word/kick already shows and lift above a word on screen. Front ribbon is OFF
+   (a band across the chest covers his hands — test 22 Nov 2026); orbs stay at the frame edges.
+4. **QA additions:** snapshot the frame-0 word, each card, and every zoomBlur/streak (J−0.06, J+0.06); read: word legible ≥ 60 % above the hair, no card or
+   caption over the face, room tint looks like a lit set (not a filter) and skin is unchanged, streak ≤ 1 per reel.
+5. Rules that still stand: face 100 % on screen (no full-screen cards), only LIGHT frosted cards sized to their content (the dark glass HUD stays banned),
+   numbers are never invented (slider labels are names, not fake percentages), music stays (mixed under the voice as before).
+6. **Also built (same day):** face-in-circle iris (the first open-loop question after the hook: the frame irises to a circle round the face, ring + the
+   sentence on a circular path, themed set around it; one per reel) · split panel (the first node timeline of a ≥ 3 s sentence becomes a full-width panel
+   above the head, face 100 % below) · particle word (the outline number, else the 2nd word, assembles from particles) · logo row (≥ 2 brands in one
+   sentence; DM chips carry the brand logos too — `brands.json` now has chrome/brave/firefox/safari/edge) · photo fan (only when the creator drops stills in
+   `reels/<reel>/broll/`; never stock images).
+Test reel: `the first test reel` (not uploaded).
+
+## Round 14b — the creator's notes on the first premium draft (22 Nov 2026): "slow, not energetic, purple everywhere, flashy, ugly AI crap; the earlier cut was better"
+What he rejected: violet room tint, glass ribbon + orbs ("purple strips killing the vibe"), generic frosted cards / DM bubble / two-tier pills replacing the reel's own
+infographics, soft blur-in motion, a thin serif word that the head half-covered. What he liked in the ORIGINAL cut: natural room colour, the Sticker Pop scene telling
+the story beat by beat, ~50 sounds tied to what's on screen, punchy pop captions, the comment card typing "Chrome".
+**The premium layer is now ADDITIVE and small (defaults changed in code):**
+1. **Never tint the room, no ribbon, no orbs, no streak, no particles** (all off; `room/depth` stay null). The footage keeps its own colour (16 Nov rule stands).
+2. **Colour per reel, from the footage + script** — `premium.footage_palette()` reads the room's hue/saturation/lights from 3 frames; `pick_accent()` scores
+   yellow/lime/cyan/coral/orange/pink/mint/violet by contrast with the room, harmony with its lit details, the script's mood, and avoids the last two reels'
+   accents; violet is penalised. The accent colours the word, the caption highlights and the glow. (Olive/khaki dim room + tech script → cyan.)
+3. **The reel's own scene owns the story.** Generic cards are OFF (`PREMIUM_CARDS=1` turns them back on for a reel with no drawn scene). Keep the Sticker Pop scene;
+   a re-edit carries it over (`GRAPHICS*` env + its scene_events sounds, see `the first test reel/work/apply_v3.py`).
+4. **Word behind the head, done right:** heavy Anton block caps in the accent (white→accent gradient, hard shadow), ≤ 3 per reel, ≤ ~840 px wide, top at
+   hair − 0.74·size so the head covers only the lower ~25 % of the middle letters; it SLAMS in (1.55→1, 0.2 s, power4) with a camera bump + whoosh → impact,
+   drifts 6 %, snaps out in 0.16 s; ≥ 1.4 s on screen; captions step aside while it is up (`caption.skip`). Candidates: the hook claim (`HEADLINE="kick|word"`),
+   numbers (only when there is no drawn scene: the scene owns numbers), the defined term of a "samjho X … hai" sentence — but never a word the scene already
+   draws (visible text of `GRAPHICS*`) and never a generic word (internet, website, request, computer…): then the sentence's strongest other noun (PHONEBOOK).
+5. Captions: the approved pop style (never `hero`, never two-tier pills by default) in the reel's accent. CTA: the approved comment + follow cards; an "A ya B?"
+   question types A (Chrome). Transitions: the camera ones (whip / blurIn); `shrink` still becomes `zoomBlur` (no black void).
+6. Fixed on the way: `compose.py` dropped any SFX shorter than 30 ms, so `digital-tick.mp3` (the typing sound) was silent in every reel — now kept.
+
+## Round 15 — KINETIC DEPTH (22 Nov 2026, third pass after the creator: "you edited it the same as before; learn what the references actually do; use my background")
+What the references really do (re-studied at 5–10 fps): a CONTINUOUS kinetic-type track. Every phrase becomes designed type in the room: a small lead-in
+line + (when the phrase has one) a BIG keyword that blooms out of a light smear, sits behind the head, lights the wall and whips out; props live in the room
+behind the speaker; the room is graded darker so the type is the light source. One word twice per reel (Round 14b) is not that.
+**Now the default** (`KINETIC=0` turns it off): `premium/premium.py` `kinetic()` + `premium/kinetic.js`; captions are replaced by the lead lines.
+- Big keyword per phrase: number (+unit, "ek second" → 1 SECOND) > tech/brand pair (LOAD BALANCER, IP ADDRESS) > tech/brand > tagged word; never Hindi
+  function words (HSTOP), never generic words (GENERIC), never the same root twice within 4 s; ≥ 0.9 s apart, ≤ 2 s each, one on screen; width MEASURED in the
+  browser and fitted to 860 px; top = hair − 0.74·size. "X nahi, sirf Y" → X is struck in red, then Y lands.
+- Lead lines: the phrase minus the big word; a lead of ≤ 1 word is dropped, tiny phrases merge; above the big word, or at hair − 210 alone.
+- Props from what the sentence is about: map (duniya / a country; the arc launches ON that word, India → named place) · digits (an IP under "IP") ·
+  tilted search card (a "naam → IP / convert" sentence: types website.com → resolves the IP) · server racks either side of the head ("kis server / kahan kam";
+  the emptiest goes green on "kam"; no big word while racks are up) · light sweep ("load ho jaati") · VS + brand logos flanking the head (CTA "A ya B?").
+- Stage: room shade 0.42 behind the person (skin untouched), accent light spill that flares with every word, camera bump on each landing, whoosh → soft hit.
+- QA: 2 fps sheet of the whole draft + a snapshot at every big word and prop; read every frame: nothing clipped, nothing over the face, one big at a time,
+  lead never under a card, arc on its word. 
+## Round 16 — craft pass (22 Nov 2026, the creator: "right direction, but the effects / motion / illustrations look below average and the music is not okay")
+1. **Music must leave the voice band free.** `A/music_space.py` measures every track's energy share in 300 Hz–3 kHz (`voice_share`) and 30–150 Hz
+   (`sub_share`); `pick_music2.py` penalises voice_share > 0.05. Funky/guitar beds (gimme-that-groove 0.089) fight Hinglish speech; a dark minimal pulse
+   (minimal-techno-01-162: 0.033 / sub 0.87) sits under it. Re-run `music_space.py` after adding tracks. Always `balance.py` after the first draft
+   (the denser bed needed vol 0.19, median 12.0 dB).
+2. **Type craft (`premium/kinetic.js` v2):** big words rise letter by letter from the centre out of a light smear, then a sheen sweeps them; landings snap to
+   a music beat within −100/+40 ms; lead lines reveal word by word at the spoken word times; leads attach to the NEWEST big word in their window and sit
+   above its real (browser-measured) cap height — a lead placed against the glyph box vanished into the white top of "99%".
+3. **Illustrations rebuilt:** real Natural Earth dot map (`premium/worlddots.json`, `dotmap.py`) with a radial reveal from the origin, comet-trail arc,
+   arrival ripples and city pills; timer ring around the head for "N second(s)" (no counter label — it fought the word); glass search card in 3D tilt with a
+   sheen and a drawn check; load-balancer hub feeding 4 glass racks by animated dashed links + packets, the emptiest turns green; progress sweep with %
+   (no big word over it); VS logos with glow tiles.
+4. **Bugs that shipped in the previous draft and are now guarded:** the lead container kept `opacity:0` from v1 (leads were invisible except while fading out);
+   outer racks clipped at the frame edge once the camera zoomed (racks now x 84–996).
+5. Review loop that found all of the above: 2 fps sheet of the full draft + snapshots at every big word and prop, read at full size, fix, repeat.
+
+## Round 17 — DEFAULT since 22 Nov 2026 (approved on a test reel; study `research/refs_<date>/REPORT.md`)
+Tools in `tools/ext/` (each in its own venv): **earshot** (MIT, sound from code, CPU, offline), **claude-video-effects** (MIT, look reference only —
+rebuild good looks in HyperFrames; never put a file named `fx_private.py` in its scripts folder: fx.py executes it), **motionmaxxing** (Apache-2.0, rules + render audit).
+1. **Emphasis budget** (`premium.py`, `KINETIC_V=3` = Round 16): 4–7 big words chosen by role — hook claim (shown from 0.6 s, frame-0 rule), the struck
+   wrong word, the defined term, two-word terms; repeats of an earlier word score −6; ≥ 1.8 s apart; dropped words return to the lead line spoken over them
+   (never duplicated).
+2. **Role looks + room lighting** (`kinetic.js`): hook = neon serif + spotlight (room to near-black, he stays lit); struck = editorial serif + red strike;
+   defined term = chrome; hero (last two-word term) = light rays + twinkles; numbers = block + spotlight. No bounce easing, no % counters.
+3. **Transitions at every idea change** (`premium/v4_finish.py`): joins that start a sentence, ≥ 2.2 s apart, none in the first 3 s / last 4 s,
+   alternating whip h / zoomBlur / whip v.
+4. **Sound = shared earshot kit** (`composition/assets/audio/sfx/earshot/`, rendered once, `peaks.json`): every cue placed by the sound's PEAK
+   (whoosh per cut, blip per word, boom on spotlights, riser→boom→shine on the hero, keystrokes + knock on the search card). Falls back to ROLES.json
+   if earshot is missing. Then `balance.py` as always (v4 needed music 0.19).
+5. **QA adds** `python3 -I S/look_audit.py review/draft.mp4 --out review/look --expect <s> --expect-audio`: report cut sync and G2/G3 at the checkpoint;
+   motion energy reads low on a talking head (3.6) — note it, don't chase it.
