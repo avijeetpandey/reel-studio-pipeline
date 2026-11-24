@@ -64,6 +64,11 @@ def main():
     cap.update(plan.get("caption", {}))
     accent = plan.get("accent", cap["accent"])
     video = plan.get("video", "assets/main.mp4")
+    # relight.py (24 Nov 2026) writes a relit twin of the cut + of the matte; use them when they exist (RELIGHT=0 / LOOK=off removes them), never mix a relit room with an unlit person
+    LOOKV, LOOKFG = os.path.join(proj, "assets", "main_look.mp4"), os.path.join(proj, "assets", "fg_look.webm")
+    relit = os.path.exists(LOOKV) and os.path.exists(LOOKFG) and os.path.getmtime(LOOKV) >= os.path.getmtime(os.path.realpath(os.path.join(proj, "assets", "main.mp4")))   # a re-cut makes the old relit twin stale
+    if relit and "video" not in plan: video = "assets/main_look.mp4"
+    FGFILE = "assets/fg_look.webm" if relit else "assets/fg.webm"
     voice = plan.get("voice", "assets/audio/voice.wav")
     music = plan.get("music")
     os.makedirs(os.path.join(proj, "assets", "audio", "sfx"), exist_ok=True)
@@ -182,12 +187,12 @@ def main():
         pr_css = (":root { " + " ".join(f"--p-{k.replace('_', '-')}: {tv[k]};" for k in ("accent", "word", "glow", "tint_top", "tint_bot", "orb", "orb2", "rib1", "rib2", "ring", "ok", "ink2"))
                   + " --avatar-img: url(assets/img/avatar.png); }\n" + open(os.path.join(PD, "premium.css"), encoding="utf-8").read())
         pr_js = open(os.path.join(PD, "premium.js"), encoding="utf-8").read() + "\n" + open(os.path.join(PD, "kinetic.js"), encoding="utf-8").read()
-        has_fg = os.path.exists(os.path.join(proj, "assets", "fg.webm"))
+        has_fg = os.path.exists(os.path.join(proj, FGFILE))
         if not has_fg:
             print("WARN: no assets/fg.webm — run person_matte.py first; words behind the head and the room tint are dropped (they would cover the face)")
             P = dict(P, behind=[], room=None, depth=dict(P.get("depth") or {}, ribbon=False))
         pr_behind = ('<div id="behind"><div id="room"></div><div id="dots"></div><svg id="ribbonB" class="ribbon" viewBox="0 0 1080 1920"></svg><div id="wb"></div></div>'
-                     + (f'<div id="fgw"><video id="fg" class="clip" src="assets/fg.webm" data-start="0" data-duration="{END}" data-media-start="0" data-track-index="1" muted playsinline></video></div>' if has_fg else "")
+                     + (f'<div id="fgw"><video id="fg" class="clip" src="{FGFILE}" data-start="0" data-duration="{END}" data-media-start="0" data-track-index="1" muted playsinline></video></div>' if has_fg else "")
                      + '<div id="ribbonF"><svg class="ribbon" viewBox="0 0 1080 1920"></svg></div>')
         pr_front = '<div id="tier"></div><div id="cards"></div><div id="streak"></div>'
         pr_call = "makePremium(tl, " + json.dumps(P, ensure_ascii=False) + ", { end: END, words: WORDS });"

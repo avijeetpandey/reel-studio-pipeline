@@ -25,7 +25,8 @@ THEMES = {k: v for k, v in json.load(open(os.path.join(HERE, "themes.json"), enc
 
 TECH = re.compile(r"^(dns|ip|ips|server|servers|load|balancer|browser|api|apis|cache|cdn|database|db|request|requests|response|packet|packets|router|tcp|http|https|url|domain|"
                   r"website|internet|cloud|kafka|redis|queue|token|tokens|model|agent|ai|llm|gpu|cpu|ram|code|app|apps|data|network|wifi|chrome|brave|google|"
-                  r"netflix|swiggy|zomato|amazon|youtube|instagram|whatsapp|backend|frontend|latency|bandwidth|key|hash|index|shard|replica|node|cluster)$", re.I)
+                  r"netflix|swiggy|zomato|amazon|youtube|instagram|whatsapp|backend|frontend|latency|bandwidth|key|hash|index|shard|replica|node|cluster|"
+                  r"crawler|crawlers|bfs|ddos|frontier|queues|workers|worker|throughput|overload|traps)$", re.I)
 NUMTOK = re.compile(r"^\d[\d,.]*%?$")
 BIGCOUNT = re.compile(r"\b(hazaar\w*|hazaron|thousands?|lakhs?|crores?|millions?|billions?)\b", re.I)
 SEQ = re.compile(r"\b(phir|milte hi|convert|hit|bhej\w*|forward|then|after|uske baad|pehle)\b", re.I)
@@ -41,7 +42,8 @@ GENERIC = {"internet", "website", "websites", "request", "computer", "basically"
 
 
 def clean(t):
-    return re.sub(r"[^\w%+#.'-]", "", t).strip(".'")
+    t = re.sub(r"(?<=\d),(?=\d)", "\x01", t)        # 24 Nov 2026: keep the comma inside numbers ("10,000" showed as "10000" in the lead line)
+    return re.sub(r"[^\w%+#.'\x01-]", "", t).strip(".'").replace("\x01", ",")
 
 
 def terms(words):
@@ -394,8 +396,12 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
     """the whole-reel word track + props. Bigs hold until the next big (<= 2.8 s), >= 0.9 s each; leads change per phrase."""
     phs = phrases_of(words)
     lines, bigs = [], []
+    KW = json.load(open(os.environ["KEYWORDS"], encoding="utf-8")) if os.environ.get("KEYWORDS") and os.path.exists(os.environ["KEYWORDS"]) else None   # per-reel curation (web crawler reel, 22 Nov 2026): {"bigs":[{big,t0,t1,strike?,role?}], "props":[...]}
+    FORCED = bool(KW and KW.get("bigs"))
+    if KW and KW.get("cta_t0") is not None:         # a long question sentence (setup + question) starts the CTA zone far too early: the reel says where its cards really land
+        cta_t0 = float(KW["cta_t0"])
     for ph in phs:
-        if ph[0][1] >= cta_t0 - 0.05:
+        if FORCED or ph[0][1] >= cta_t0 - 0.05:
             break
         k, kt, ki = keyword(ph)
         root = lambda x: re.sub(r"s$", "", x.lower())
@@ -412,24 +418,35 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
             strong = bool(NUMTOK.match(k.split()[0]) or len(bigs) == 1)
             add_sfx("riser", bigs[-1]["t0"] - 0.34, 0.12, "kin-rise", False)
             add_sfx("impact" if strong else "hit_soft", bigs[-1]["t0"] + 0.02, 0.22 if strong else 0.18, "kin-hit", True)
-    for b in bigs:                                   # strike: "X nahi, sirf Y" -> X struck right before Y lands
-        pass
+    if FORCED:                                       # the reel's own list replaces the automatic picks (kept all: no budget, no spacing rule)
+        for f in KW["bigs"]:
+            k = f["big"].upper(); size = f.get("size") or word_size(k, "block")
+            b = dict(big=k, t0=round(f["t0"], 2), t1=round(min(f["t1"], cta_t0 - 0.1), 2), size=size, y=int(L["hair"] - size * 0.74 - f.get("lift", 0)), style=f.get("style", "block"))
+            if f.get("strike"):
+                b["strike"] = dict(t=round(f["strike"], 2))
+            if f.get("role"):
+                b["role"] = f["role"]
+            bigs.append(b)
+            add_sfx("riser", b["t0"] - 0.34, 0.12, "kin-rise", False)
+            add_sfx("hit_soft", b["t0"] + 0.02, 0.18, "kin-hit", True)
+    CT = end if (KW and KW.get("cta_leads")) else cta_t0   # cta_leads: keep the lead lines up while the CTA question is spoken (it is long; the cards only land at its end)
     for i, ph in enumerate(phs):
         t0 = ph[0][1]
-        if t0 >= cta_t0 - 0.05:
+        if t0 >= CT - 0.05:
             break
         t1 = phs[i + 1][0][1] - 0.03 if i + 1 < len(phs) else end
         big = next((b for b in bigs if b["t0"] - 0.1 <= t0 < b["t1"]), None)
-        txt = " ".join(clean(w[0]) for w in ph if not (big and clean(w[0]).upper() in big["big"].split()) and not (big and HINDI_NUM.get(clean(w[0]).lower()) and HINDI_NUM[clean(w[0]).lower()] in big["big"]))
+        onbig = lambda w: any(b["t0"] - 0.15 <= w[1] < b["t1"] and clean(w[0]).upper() in b["big"].split() for b in bigs)   # a word that a big word shows at that moment is not repeated in the lead
+        txt = " ".join(clean(w[0]) for w in ph if not (big and clean(w[0]).upper() in big["big"].split()) and not onbig(w) and not (big and HINDI_NUM.get(clean(w[0]).lower()) and HINDI_NUM[clean(w[0]).lower()] in big["big"]))
         if len(txt.split()) <= 1 and big:
             continue
         if lines and t0 - lines[-1]["t0"] < 0.5 and len(lines[-1]["lead"].split()) <= 2 and lines[-1]["lead_y"] == (int(big["y"] - 64) if big else int(L["hair"] - 210)):
-            lines[-1]["lead"] += " " + txt; lines[-1]["t1"] = round(min(t1, cta_t0 - 0.05), 2)
+            lines[-1]["lead"] += " " + txt; lines[-1]["t1"] = round(min(t1, CT - 0.05), 2)
             lines[-1]["words"] += [[clean(w[0]), round(w[1], 2)] for w in ph if clean(w[0]) and clean(w[0]) in txt.split()]; continue
         kept = [[clean(w[0]), round(w[1], 2)] for w in ph if clean(w[0]) and clean(w[0]) in txt.split()]
-        lines.append(dict(lead=txt, words=kept, t0=round(t0 - 0.03, 2), t1=round(min(t1, cta_t0 - 0.05), 2), lead_y=int(big["y"] - 64) if big else int(L["hair"] - 210)))
+        lines.append(dict(lead=txt, words=kept, t0=round(t0 - 0.03, 2), t1=round(min(t1, CT - 0.05), 2), lead_y=int(big["y"] - 64) if big else int(L["hair"] - 210)))
     # strike pairs
-    for s in sents:
+    for s in ([] if FORCED else sents):
         m = re.search(r"\b(\w+)\s+nahi\b.*\bsirf\b", s["text"], re.I)
         if m:
             neg = next((b for b in bigs if s["t0"] <= b["t0"] <= s["t1"]), None)
@@ -482,6 +499,8 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
             props.append(dict(kind="ring", t0=b["t0"], t1=round(b["t1"] + 0.05, 2), value=int(m.group(1)), unit="s", dur=1.0))
             for k in range(4):
                 add_sfx("tick", b["t0"] + 0.1 + k * 0.25, 0.12, "ring", True)
+    if KW and "props" in KW:                         # the reel's own props replace the automatic ones (e.g. no IP digits on a crawler reel)
+        props[:] = KW["props"]
     for p in props:
         if p["kind"] == "map":
             add_sfx("notif", p["arc_t"] + p.get("arc_d", 1.0), 0.14, "arrive", True)
@@ -506,12 +525,14 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
         budget = max(4, min(7, round(len(phs) * 0.2)))
         keep = []
         for i, b in ranked:
+            if FORCED:
+                keep.append(b); continue
             if len(keep) >= budget:
                 break
             if all(abs(b["t0"] - k["t0"]) >= 1.8 or b.get("strike") or k.get("strike") for k in keep):
                 keep.append(b)
         keep.sort(key=lambda b: b["t0"])
-        hero = max((b for b in keep[1:] if len(b["big"].split()) == 2 and not b.get("strike")), key=lambda b: b["t0"], default=None)
+        hero = next((b for b in keep if b.get("role") == "hero"), None) if FORCED else max((b for b in keep[1:] if len(b["big"].split()) == 2 and not b.get("strike")), key=lambda b: b["t0"], default=None)
         if hook is not None and hook in keep and hook["t0"] > 0.7:   # frame-0 claim (Round 12): the hook word is up from the first phrase
             hook["t0"] = 0.6
         for i, b in enumerate(keep):
@@ -522,7 +543,7 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
             elif b is hero:
                 b["style"] = "block"; lights.append(dict(kind="rays", t0=b["t0"], t1=b["t1"]))
                 add_sfx("impact", b["t0"] + 0.02, 0.26, "hero-boom", True)
-            elif any(DEFINE.search(s["text"]) and s["t0"] - 0.2 <= b["t0"] <= s["t1"] for s in sents):
+            elif b.get("role") == "chrome" or any(DEFINE.search(s["text"]) and s["t0"] - 0.2 <= b["t0"] <= s["t1"] for s in sents):
                 b["style"] = "chrome"
             elif NUMTOK.match(b["big"].split()[0]):
                 b["style"] = "block"; lights.append(dict(kind="spot", t0=b["t0"], t1=b["t1"]))
@@ -545,4 +566,4 @@ def kinetic(sents, words, L, end, cta_t0, add_sfx, beats=(), face=None):
         ln["lead_y"] = int(on["y"] - 64) if on else int(L["hair"] - 210)
         if any(r["t0"] <= ln["t0"] < r["t1"] for r in racks):
             ln["lead_y"] = int(L["hair"] - 210); ln["narrow"] = True
-    return dict(lines=sorted(bigs + lines, key=lambda x: x["t0"]), props=props, beats=[round(b, 3) for b in beats], face=face, lights=lights, v=4 if lights else 3)
+    return dict(lines=sorted(bigs + lines, key=lambda x: x["t0"]), props=props, beats=[round(b, 3) for b in beats], face=face, lights=lights, v=4 if lights else 3, maxw=(KW or {}).get("max_w"))

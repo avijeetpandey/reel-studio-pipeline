@@ -8,7 +8,8 @@ Script in → finished reel out. Manual: `$PLUGIN/skills/reel-edit/humanize.md`.
 | `worlds.json` | the three worlds (clean_pop, warm_cinema, hype_hero): grade, caption style, transition weights, punch strength, SFX palette, music moods |
 | `compose.py` | `edit_plan.json` → complete HyperFrames `index.html` (captions, `fx.js` effects, SFX, music, grain, progress, CTA, optional `#stage` graphics) |
 | `fx.js` | camera/lens effects: camTo, punch, whip, shrink, blurIn, leak, shake, aperture, rgb, grain, pulse |
-| `run.sh` | plan → compose → carve (shared `tools/hf-core`) → lint in one command; creates the project if missing (`SKIP_PLAN=1` keeps hand edits; `GRAPHICS/GRAPHICS_JS/GRAPHICS_CSS/OVERLAY` mount drawn scenes) |
+| `relight.py` + `lookstack.py` | **automatic look:** measures the footage + the script's world, PICKS teal_amber / studio_key / golden_hour, calibrates exposure, relights the room behind the person matte (skin natural) → `assets/main_look.mp4` + `fg_look.webm`, `work/look.json`. Run by `run.sh` before the plan; `LOOK=<name>` forces one, `LOOK=off` / `RELIGHT=0` skips it. Needs the venv python (OpenCV) and `person_matte.py` first. |
+| `run.sh` | relight → plan → compose → carve (shared `tools/hf-core`) → lint in one command (ONE master, `videos/<reel>` only; `YT_MASTER=1` rebuilds the dormant YouTube Subscribe master); creates the project if missing (`SKIP_PLAN=1` keeps hand edits; `GRAPHICS/GRAPHICS_JS/GRAPHICS_CSS/OVERLAY` mount drawn scenes) |
 | `selftest.sh` | smoke test of all three worlds on a synthetic clip (no render, no private footage) |
 | `pick_music2.py`, `music_index.py` | music choice + library analysis (`music/INDEX.json`) |
 | `sfx_roles.py` | files every SFX under the job it does (`sfx/ROLES.json`) |

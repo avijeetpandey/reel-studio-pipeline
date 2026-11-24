@@ -265,3 +265,23 @@ Script is the creator's (never written by the pipeline) → `autodirect.py` deci
 - Music must leave the voice band free (`template/auto/music_space.py`): a dark sub-bass pulse sits under speech; a melodic/funky bed fights it.
 - The biggest talking heads in the study were the simplest edits: spend emphasis, do not spread it.
 - Now in the pipeline: `template/auto/person_matte.py`, `template/auto/premium/`, `template/auto/music_space.py`, `template/scripts/look_audit.py` (manual: `skills/reel-edit/humanize.md` Rounds 14–17).
+
+
+---
+# Round 10 study ("AI-edited" effect demos, 23 links, 24 Nov 2026) — research/refs_<date>/REPORT.md (+ the visual page effects_study.html)
+
+## 39. Light, not tint (measured)
+- **Face-to-room brightness gap (L\*, Vision face box):** the creator's current look **4** (face 50, room 46: dim beige-olive wall as bright as the face); references **21–33** (3D-captions reel 33, realtor 21).
+  The references keep skin natural and rebuild the ROOM as a lit set (deep blacks, one light pool, one practical, one colour family, thin rim on the person). A global LUT cannot do that.
+- Tool built in the lab (not wired yet): `research/refs_2026-11-24/lab/lookstack.py`: person matte (`fg.webm`) → subject keeps tone + key + rim, room is rebuilt (duotone from its own luma, light pool, vignette, bloom, shafts).
+  8 looks; gaps 29–49; 0.29 s per frame per core. **Proposal, awaiting the creator's pick:** studio_key (explainers), teal_amber / golden_hour (story), spotlight (hook only). neon_night / lime_pop stay opt-in (22 Nov purple-tint rejection).
+
+## 40. In-room type and physical cuts (rebuilt as proofs in `lab/fxlab.py`)
+- Words live in the scene: tilted in perspective on the wall, between the room and the person (his head / hands cover them), outline text that follows the matte contour, one style per meaning.
+  Face-tracking HUD (brackets snap in, label = the term, never an invented number). 3D-shake radial cut (zoom + roll blur + jolt, ~0.4 s) and pixel-mosaic dissolve (data / glitch / AI topics only).
+  One in-room beat and one transition style per reel. Skip: cracked-wall captions, generic glass cards (the creator's 22 Nov notes), AI-generated rooms / x-ray / portal creatures (paid).
+- The 3D-captions reel: 15 cuts in 33 s (avg shot 2.1 s), five setups, first word 0.01 s, tail 0.16 s. Realtor reel: 15 sound events per 10 s, a hit on every cut.
+
+## 41. What the numbers cannot promise
+- The study reels' likes come with comments of 1–3× the likes (comment-keyword giveaways): they do not prove the look drives views. the creator's 1.4–1.6K reels match the audit's steady state; breakouts came from debate topics + a share CTA.
+  Expect a retention lift from the new look; test it with Instagram Trial Reels (old look vs new look, same script).
