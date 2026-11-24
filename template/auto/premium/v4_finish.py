@@ -54,13 +54,24 @@ def idea_joins(joins, sents, end):
 
 def finish(p, joins, sents, end):
     J = idea_joins(joins, sents, end)
-    kinds = [("whip", "h"), ("zoomBlur", None), ("whip", "v"), ("zoomBlur", None)]
+    # 24 Nov 2026: the transition mix follows the world (the realtor reel's 3D-shake cut is energy, so it stays out of calm story reels):
+    #   hype_hero  shake3d, whip h, shake3d, whip v       clean_pop  whip h, zoomBlur, shake3d, whip v       warm_cinema  whip h, zoomBlur, whip v, zoomBlur (unchanged)
+    world = p.get("world")
+    kinds = {"hype_hero": [("shake3d", None), ("whip", "h"), ("shake3d", None), ("whip", "v")],
+             "clean_pop": [("whip", "h"), ("zoomBlur", None), ("shake3d", None), ("whip", "v")]}.get(world, [("whip", "h"), ("zoomBlur", None), ("whip", "v"), ("zoomBlur", None)])
     plan_t = [(t, *kinds[i % len(kinds)]) for i, t in enumerate(J)]
+    signs = None
+    ov = os.environ.get("TRANS_AT")     # per-reel curation (dialogue reel, 23 Nov 2026): "6.33:whip:h:-1,14.57:zoomBlur,20.5:whip:h:1" = time:kind[:dir[:sign]] — whips on speaker changes ping-pong left/right
+    if ov:
+        plan_t, signs = [], []
+        for tok in ov.split(","):
+            f = tok.strip().split(":"); k = f[1] if len(f) > 1 else "zoomBlur"
+            plan_t.append((float(f[0]), k, (f[2] if len(f) > 2 else "h") if k == "whip" else None)); signs.append(int(f[3]) if len(f) > 3 else -1)
     p["fx"] = [f for f in p["fx"] if f["fn"] not in ("aperture", "whip", "shrink", "blurIn", "leak")]
-    p["fx"] += [dict(fn="whip", a=[t, {"dir": d, "sign": 1 if i % 2 else -1}]) for i, (t, k, d) in enumerate(plan_t) if k == "whip"]
+    p["fx"] += [dict(fn="whip", a=[t, {"dir": d, "sign": (signs[i] if signs else (1 if i % 2 else -1))}]) for i, (t, k, d) in enumerate(plan_t) if k == "whip"]
     p["fx"].sort(key=lambda f: f["a"][0])
     if p.get("premium"):
-        p["premium"]["trans"] = [dict(t=t, type=k) for t, k, _ in plan_t if k == "zoomBlur"]
+        p["premium"]["trans"] = [dict(t=t, type=k) for t, k, _ in plan_t if k in ("zoomBlur", "shake3d")]
     p["transitions"] = [dict(t=t, type=k) for t, k, _ in plan_t]
     peaks = kit()
     if not peaks:
@@ -72,7 +83,8 @@ def finish(p, joins, sents, end):
     drop = ("whip", "shrink", "focus", "leak", "leak-hit", "rise", "impact", "kin-rise", "kin-hit", "hero-boom", "cut", "word-land", "hero-rise", "hero-shine", "spot", "type", "resolve")
     p["sfx"] = [s for s in p["sfx"] if s.get("why") not in drop]
     for t, k, _ in plan_t:
-        p["sfx"].append(snd("whoosh_fast" if k == "whip" else "whoosh_pass", t, 0.3 if k == "whip" else 0.26, "cut"))
+        p["sfx"].append(snd("whoosh_fast" if k in ("whip", "shake3d") else "whoosh_pass", t, 0.3 if k in ("whip", "shake3d") else 0.26, "cut"))
+        if k == "shake3d": p["sfx"].append(snd("boom", t + 0.02, 0.2, "cut"))      # the hit that lands with the radial cut
     K = (p.get("premium") or {}).get("kinetic") or {}
     for ln in K.get("lines", []):
         if ln.get("big"):
@@ -86,6 +98,51 @@ def finish(p, joins, sents, end):
         if pr["kind"] == "search":
             p["sfx"] += [snd("keys", pr["t0"] + 0.38 + k * 0.095, 0.2, "type") for k in range(8)]
             p["sfx"].append(snd("ding", pr.get("result_t", pr["t0"] + 1.4), 0.3, "resolve"))
+        elif pr["kind"] == "flood":      # requests pile up (riser) and the IP-BLOCKED stamp lands on the boom
+            p["sfx"] += [snd("riser", pr["block_t"], 0.26, "flood-rise"), snd("boom", pr["block_t"] + 0.02, 0.4, "block")]
+        elif pr["kind"] == "urls":       # one key-click per URL row
+            p["sfx"] += [snd("keys", pr["t0"] + 0.12 + i * pr.get("gap", 0.3), 0.18, "type") for i in range(4)]
+        elif pr["kind"] == "queues":     # chips routed into lanes (pop), a blip per worker, a ding on the first two ticks
+            nq = len(pr.get("order") or [0] * 16)
+            p["sfx"] += [snd("pop", pr["route_t"] + 0.3 + j * pr.get("route_gap", 0.13), 0.12, "route") for j in range(0, nq, 2)]
+            p["sfx"] += [snd("blip", pr["worker_t"] + i * 0.1 + 0.15, 0.16, "worker") for i in range(4)]
+            p["sfx"] += [snd("ding", pr["pull_t"] + 0.62 + k * 0.8, 0.12, "done") for k in range(2)]
+        elif pr["kind"] == "shards":     # three ID rows pop in, the collision lands on a riser -> boom
+            p["sfx"] += [snd("pop", pr["t0"] + 0.5 + r * 0.3 + 0.05, 0.14, "shard-id") for r in range(3)]
+            p["sfx"] += [snd("riser", pr["hit_t"], 0.22, "collide-rise"), snd("boom", pr["hit_t"] + 0.02, 0.36, "collide")]
+        elif pr["kind"] == "pages":      # a soft blip per UUID landing (every other one), the SLOW WRITES stamp on a boom
+            s, i = pr["t0"] + 0.5, 0
+            stop = (pr.get("slow_t", pr["t1"] - 0.8)) - 0.25
+            while s < stop:
+                if i % 2 == 0:
+                    p["sfx"].append(snd("blip", s + 0.3, 0.1, "page"))
+                s += max(0.2, 0.44 - i * 0.03); i += 1
+            if pr.get("slow_t") is not None:
+                p["sfx"] += [snd("riser", pr["slow_t"], 0.2, "slow-rise"), snd("boom", pr["slow_t"] + 0.02, 0.34, "slow")]
+        elif pr["kind"] == "idbits":     # one pop per ID part as it is spoken
+            p["sfx"] += [snd("pop", pr[k], 0.16, "bits") for k in ("ts_t", "dc_t", "mc_t", "sq_t")]
+        elif pr["kind"] == "idstream":   # coordinator crossed out (boom), a blip per ID for the first rows, a ding on SORTED
+            p["sfx"] += [snd("boom", pr["x_t"] + 0.1, 0.3, "x"), snd("ding", pr["sorted_t"] + 0.05, 0.2, "sorted")]
+            p["sfx"] += [snd("blip", pr["rows_t"] + i * 0.24, 0.1, "id") for i in range(8)]
+        elif pr["kind"] == "clockback":  # clock ticks (keys), the rewind and the DUPLICATE stamp each on a riser -> boom
+            p["sfx"] += [snd("keys", pr["tick_t"] + i * pr.get("step", 0.28), 0.12, "tick") for i in range(6)]
+            p["sfx"] += [snd("riser", pr["rewind_t"], 0.2, "rewind-rise"), snd("boom", pr["rewind_t"] + 0.02, 0.3, "rewind"), snd("boom", pr["dup_t"] + 0.02, 0.38, "dup")]
+        elif pr["kind"] == "jam":        # promo chips pop in (every 3rd), the OTP lands with a ding, STUCK and USER DROP-OFF each on a riser -> boom
+            c, i = pr["flood_t"], 0
+            while c < pr["otp_t"] - 0.2:
+                if i % 3 == 0:
+                    p["sfx"].append(snd("pop", c + 0.2, 0.1, "promo"))
+                c += max(0.06, 0.32 - i * 0.03); i += 1
+            p["sfx"] += [snd("ding", pr["otp_t"] + 0.3, 0.2, "otp"), snd("riser", pr["stuck_t"], 0.22, "stuck-rise"), snd("boom", pr["stuck_t"] + 0.02, 0.3, "stuck"), snd("boom", pr["drop_t"] + 0.02, 0.4, "drop")]
+        elif pr["kind"] == "priority":   # a blip per lane, a ding per HIGH chip that arrives, a blip per worker bot
+            p["sfx"] += [snd("blip", pr["t0"] + 0.15, 0.14, "lane"), snd("blip", pr["t0"] + 0.3, 0.12, "lane")]
+            p["sfx"] += [snd("ding", pr["hi_t"] + i * 0.5 + 0.85, 0.12, "high-done") for i in range(4) if pr["hi_t"] + i * 0.5 + 0.85 < pr["t1"] - 0.3]
+            p["sfx"] += [snd("blip", pt + 0.15, 0.16, "worker") for pt in (pr.get("pool_ts") or [pr["pool_t"] + i * 0.12 for i in range(3)])]
+        elif pr["kind"] == "retry":      # a pop per failed attempt, a ding when it finally lands
+            p["sfx"] += [snd("pop", h + 0.05, 0.16, "fail") for h in pr["hops"][:3]] + [snd("ding", pr["hops"][3] + 0.05, 0.26, "landed")]
+        elif pr["kind"] == "dupe":       # the alert dings twice (that IS the bug), the timeout on a pop, SENT TWICE on a riser -> boom
+            p["sfx"] += [snd("ding", pr["card1_t"] + 0.12, 0.26, "alert-1"), snd("pop", pr["timeout_t"] + 0.1, 0.16, "timeout"), snd("ding", pr["card2_t"] + 0.12, 0.26, "alert-2"),
+                         snd("riser", pr["dup_t"], 0.22, "dup-rise"), snd("boom", pr["dup_t"] + 0.02, 0.38, "dup")]
     p["sfx"].sort(key=lambda s: s["t"])
     return f"v4: {len(plan_t)} transitions, earshot kit, {len(p['sfx'])} sfx"
 

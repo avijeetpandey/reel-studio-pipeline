@@ -11,7 +11,7 @@
  *     P.behind           [{t0, t1, text, style: serif|chrome|outline, kick, y, size}]   big word between room and person
  *     P.tier             {y, keys: [[t0, t1]]}       two-tier captions built from WORDS phrase marks ("/")
  *     P.cards            [{kind: search|checklist|nodes|slider|counter|load|dm, t0, t1, y, ...}]
- *     P.trans            [{t, type: zoomBlur|streak}] extra transitions (whip/blurIn/shrink stay in fx.js)
+ *     P.trans            [{t, type: zoomBlur|shake3d|streak}] extra transitions (whip/blurIn/shrink stay in fx.js)
  */
 function makePremium(tl, P, o) {
   const IM = { immediateRender: false };
@@ -273,6 +273,12 @@ function makePremium(tl, P, o) {
       tl.set("#world", { filter: "url(#rgb) blur(10px)" }, J - 0.04);
       tl.fromTo("#world", { scale: 1.22, filter: "blur(14px)" }, { scale: 1, filter: "blur(0px)", duration: 0.28, ease: "power3.out", ...IM }, J);
       tl.set("#world", { filter: "none" }, J + 0.3);
+    } else if (tr.type === "shake3d") {     // 3D-shake radial cut (realtor reel, 24 Nov study): push + roll + a jolt, lands from the overshoot and rolls back (≤ 1-2 per reel)
+      const sg = Math.round(J * 10) % 2 ? 1 : -1;      // roll direction alternates, deterministic
+      tl.fromTo("#world", { scale: 1, rotation: 0, filter: "blur(0px)" }, { scale: 1.3, rotation: -2.6 * sg, filter: "blur(18px)", duration: 0.15, ease: "power2.in", ...IM }, J - 0.15);
+      tl.set("#world", { filter: "url(#rgb) blur(12px)" }, J - 0.04);
+      tl.fromTo("#world", { scale: 1.3, rotation: 2.2 * sg, x: 18 * sg, filter: "blur(16px)" }, { scale: 1, rotation: 0, x: 0, filter: "blur(0px)", duration: 0.3, ease: "power3.out", ...IM }, J);
+      tl.set("#world", { filter: "none", rotation: 0, x: 0 }, J + 0.32);
     } else if (tr.type === "streak") {      // theme-coloured vertical light smear sweeps across while the frame defocuses (≤ 1 per reel)
       tl.fromTo("#streak", { opacity: 0, x: -420 }, { opacity: 0.95, x: 0, duration: 0.16, ease: "power2.in", ...IM }, J - 0.16);
       tl.fromTo("#streak", { opacity: 0.95, x: 0 }, { opacity: 0, x: 380, duration: 0.3, ease: "power2.out", ...IM }, J);

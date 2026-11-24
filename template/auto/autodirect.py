@@ -446,7 +446,9 @@ def main():
     if a.cmd == "world":
         txt = open(a.script, encoding="utf-8").read() if a.script and os.path.exists(a.script) else ""
         w = pick_world(txt, last, a.world)
-        print(json.dumps(dict(world=w, grade=WORLDS[w]["grade"], label=WORLDS[w]["label"], recent=last)))
+        relight_on = os.environ.get("RELIGHT") != "0" and (os.environ.get("LOOK") or "auto").lower() != "off"
+        # 24 Nov 2026: relight.py (matte-split look) builds the colour, so the cut only gets the skin-safe 'natural' tone; RELIGHT=0 restores the world's own grade
+        print(json.dumps(dict(world=w, grade="natural" if relight_on else WORLDS[w]["grade"], world_grade=WORLDS[w]["grade"], relight=relight_on, label=WORLDS[w]["label"], recent=last)))
         return
     R = os.path.abspath(a.reel)
     name = os.path.basename(R.rstrip("/"))
@@ -497,6 +499,9 @@ def main():
     beats = (mus or {}).get("beats", [])
     # ---- camera ------------------------------------------------------------------------
     A, B = W["alt_scales"]
+    if os.environ.get("ALT_B"): B = float(os.environ["ALT_B"])                       # calmer framing alternation for a close-up face (dialogue reel): ALT_B=1.05
+    if os.environ.get("PUNCH_AMT"): W = dict(W, punch=dict(W["punch"], amt=float(os.environ["PUNCH_AMT"])))   # PUNCH_AMT=1.04
+    if os.environ.get("HOOK_SNAP"): W = dict(W, hook_snap=float(os.environ["HOOK_SNAP"]))                    # HOOK_SNAP=1.08
     bounds = [0.0] + joins + [end]
     puncts = emphasis(words, end)
     # keep punches off transition joins and cap by density
@@ -644,7 +649,7 @@ def main():
         before = {t["t"]: t["type"] for t in trans}
         prem, has_dm = PREM.plan(sents, words, geo, end, joins, trans, script, recent_t, add_sfx, rnd,
                                  override=json.load(open(bj, encoding="utf-8")) if os.path.exists(bj) else None, headline=headline, forced=os.environ.get("THEME"),
-                                 broll=_broll(R, proj_assets), video=video, beats=beats, graphics=(open(os.environ["GRAPHICS"], encoding="utf-8").read() + (open(os.environ["GRAPHICS_JS"], encoding="utf-8").read() if os.environ.get("GRAPHICS_JS") else "")) if os.environ.get("GRAPHICS") else False)
+                                 broll=_broll(R, proj_assets), video=(os.path.join(proj_assets, "main_look.mp4") if os.path.exists(os.path.join(proj_assets, "main_look.mp4")) else video), beats=beats, graphics=(open(os.environ["GRAPHICS"], encoding="utf-8").read() + (open(os.environ["GRAPHICS_JS"], encoding="utf-8").read() if os.environ.get("GRAPHICS_JS") else "")) if os.environ.get("GRAPHICS") else False)
         swapped = {t["t"] for t in trans if before.get(t["t"]) != t["type"]}
         if swapped:                         # the premium transition replaces the camera one at that join (and its sound)
             fx_ops = [f for f in fx_ops if not (f[0] in ("whip", "shrink", "blurIn", "leak") and f[1][0] in swapped)]
@@ -686,6 +691,12 @@ def main():
                "- words behind the head: " + (", ".join(f"{b['text']} ({b['style']}) {b['t0']}-{b['t1']}" for b in prem["behind"]) or "—"),
                "- cards: " + (", ".join(f"{c['kind']} {c['t0']}-{c['t1']}" for c in prem["cards"]) or "—"),
                "- premium transitions: " + (", ".join(f"{t['type']} @{t['t']}" for t in prem["trans"]) or "—")]
+    lk = os.path.join(work, "look.json")
+    if os.path.exists(lk):
+        L = json.load(open(lk, encoding="utf-8")); f = L.get("features") or {}; c = L.get("calibration") or {}
+        md += ["", f"Look (relight.py, {'auto' if L.get('auto') else 'forced'}): **{L['look']}** — world {L.get('world')}; shot as: face L* {f.get('face_L')}, room L* {f.get('room_L')}, room cast a*/b* {f.get('room_a')}/{f.get('room_b')}, room sat {f.get('room_sat')}",
+               "- why: " + "; ".join(L.get("reasons", [])),
+               f"- exposure calibrated to face L* {c.get('targets', ['?'])[0]} / room L* {c.get('targets', ['?', '?'])[1]} (steps {c.get('face_room_L_trace')}); room exp {c.get('room_exp')}, subject expo {c.get('subj_expo')}. LOOK=<name> forces one, LOOK=off / RELIGHT=0 turns it off."]
     md += ["", "Checks:"]
     g = checks["grade"]
     md.append(f"- grade: luma {g['luma']}, face {g['face_luma']}, U {g['u']}, V {g['v']}" if g else "- grade: not measured")
