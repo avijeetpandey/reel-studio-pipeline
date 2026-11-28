@@ -11,9 +11,11 @@ Read this BEFORE choosing the treatment. It adds to `treatments.md` / `sound.md`
 6. **Versioning:** a re-edit never overwrites the first cut. Local files `renders/<reel>_v2_final.mp4`, `_v2.srt`, covers `<reel>_v2_thumbnail(.b).jpg`, `posting_kit_v2.md`, composition in `video_v2/`; Drive: `<drive remote>:<drive folder>/<reel>/v2/` (a NEW subfolder inside the reel's folder, after the creator approves video AND thumbnails).
 7. Build gotchas learned: caption word class `.w` and hidden-object class `.o` clash with component classes (use `.wh`, `.or`, `.kw`); animate `x/y/scale`, never `left/top` (lint error); art placed in a scaled wrapper must be checked against the 60 px edge margin AFTER scaling; one `#stage` clip makes `qa_reel.py` report a false "static for 35 s".
 
-## 1. The sameness cure: every reel gets its own "world"
+> **28 Nov 2026 (ecosystem study) — lock the frame, vary the inside.** The winners' grids are recognisable at thumbnail size: one cover template, one series tag on every frame, one caption style. Rotating the whole look per reel hurt recognition and follows. Now: the auto-director picks the world from the script only (no "never the last two"; `ROTATE_WORLDS=1` restores it), `pipeline.py series <reel>` numbers the reel, the tag sits on every frame (`compose.py` `#g-series`) and is the cover kicker (`make_cover.py`). What still varies per reel: the real-thing shots, props, gadget, sound. Fewer effects, more real footage: the teardown measured our motion density above the winners'.
+
+## 1. The sameness cure: every reel gets its own "world" (superseded 28 Nov 2026 for the frame; still applies to gadgets and sound)
 A reel's look = **World** (palette + type + surface) + **Signature gadget** (one component nobody sees twice in a row) + **Sound palette** (2–3 signature sounds) + **one human/physical element**.
-- Read `reels/style_log.md` first. **Never repeat the previous two reels' World or Signature gadget.** Log all four in the style log row.
+- Read `reels/style_log.md` first. **Never repeat the previous two reels' Signature gadget** (the World now stays put, see the 28 Nov note above). Log all four in the style log row.
 - Worlds (the three in `treatments.md` still count; these five are new and live in the same brand constants — face frame 0, safe box, one accent):
 | World | Look (hex) | Type | Signature gadgets | SFX palette | Seen in |
 |---|---|---|---|---|---|

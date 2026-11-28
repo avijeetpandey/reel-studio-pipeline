@@ -118,6 +118,11 @@ def main():
     ap.add_argument("--out-suffix", default="", help='e.g. "_v2": write cover_a_v2.* so earlier covers are kept')
     a = ap.parse_args()
     reel = os.path.abspath(a.reel); cov = os.path.join(reel, "covers"); os.makedirs(cov, exist_ok=True)
+    if not a.kicker:   # 28 Nov 2026: one cover template — the series tag (pipeline.py series) is the kicker on every cover
+        try:
+            a.kicker = (json.load(open(os.path.join(reel, "pipeline.json"))).get("series") or {}).get("tag", "")
+        except (OSError, ValueError):
+            pass
     cut = a.video or os.path.join(reel, "assets", "main.mp4")
     video = a.src or cut
     h = int(probe(video, "height") or 0)

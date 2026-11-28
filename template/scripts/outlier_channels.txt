@@ -1,0 +1,32 @@
+# YouTube handles for `outlier_scan.py` (one per line, without @). Grouped by lane; edit freely.
+# India, Hindi/Hinglish tech + career
+engineeringdigest
+ApnaCollegeOfficial
+CodeWithHarry
+takeUforward
+chaiaurcode
+akshaymarch7
+piyushgargdev
+gkcs
+KeertiPurswani
+NishantChahar11
+IshanSharma7390
+KunalKushwaha
+# Global, system design / backend / CS explainers
+ByteByteGo
+Fireship
+CodingWithLewis
+NeetCode
+NeetCodeIO
+LowLevelTV
+arjay_the_dev
+# Personality / career / life
+ThePrimeagen
+ThePrimeTimeagen
+JeffSu
+TiffinTech
+swerikcodes
+sajjaadkhader
+aaronjack
+KevinNaughtonJr
+TechWithTim

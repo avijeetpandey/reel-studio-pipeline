@@ -1,6 +1,6 @@
 ---
 name: reel-script
-description: Turn a topic into a ready-to-shoot {brand} reel — a suggested format (explainer, experiment, 3-AI comparison, myth-or-fact, hot take, POV skit, family/vox-pop, news, story) with its shooting plan, 3 hook options, a 25–35 s script in timed beats (line to say, on-screen text, graphic/b-roll, delivery note), loop line, yes/no CTA, b-roll list, cover/title ideas, a professional LinkedIn post (+ 4:5 image) on the same topic, plus a visual shoot sheet (framing guide, lighting plan, do/avoid, pre-shoot checklist) published as an artifact the creator can open on their phone while filming. Use whenever the creator gives a topic or idea for a reel/short and wants a script, hook, shoot plan or "what should I say".
+description: Turn a topic into a ready-to-shoot {brand} reel — a suggested format (explainer, experiment, 3-AI comparison, myth-or-fact, hot take, POV skit, family/vox-pop, news, story) with its shooting plan, 3 hook options, a 25–35 s script (up to 60 s for a story) in timed beats (line to say, on-screen text, graphic/b-roll, delivery note), loop line, yes/no CTA, b-roll list, cover/title ideas, a professional LinkedIn post (+ 4:5 image) on the same topic, plus a visual shoot sheet (framing guide, lighting plan, do/avoid, pre-shoot checklist) published as an artifact the creator can open on their phone while filming. Use whenever the creator gives a topic or idea for a reel/short and wants a script, hook, shoot plan or "what should I say".
 ---
 
 # Reel script + shoot sheet

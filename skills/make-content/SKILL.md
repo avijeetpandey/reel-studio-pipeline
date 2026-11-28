@@ -30,20 +30,25 @@ This skill only orchestrates. **Since 14 Nov 2026 the pipeline does not write sc
 | `stats: <reel>` / `stats: all` | **Stats mode** below: read Instagram Insights + YouTube Studio for that reel (or every reel `P due` lists) + a channel snapshot of both |
 | `report:` / `report: 2026-11` | **Report mode** below: `channel_report.py` → monthly report + `performance.json` |
 | `trends:` | **Trends mode** below: 3 topic suggestions from this week's AI / career trends |
+| `scan:` | **Scan mode** below: weekly outlier scan of the lane's YouTube Shorts → idea bank |
+| `review:` / `review: 14` | **Review mode** below: weekly review of the last 7 (or N) days |
 
-**On demand only.** `stats:`, `report:` and `trends:` run ONLY when the creator types them. Never create a scheduled task, cron, loop or background job for them, and never start one on your own: they cost tokens and need the creator's signed-in browser. `P due` only *lists* what is due; it runs nothing.
+**On demand only.** `stats:`, `report:`, `trends:`, `scan:` and `review:` run ONLY when the creator types them. Never create a scheduled task, cron, loop or background job for them, and never start one on your own: they cost tokens and need the creator's signed-in browser. `P due` only *lists* what is due; it runs nothing.
 
 ## Setup per script
 - **The script is the input.** Save the creator's pasted text verbatim as `reels/<reel_name>/script.md` (spoken lines only matter; keep any notes they wrote). Never edit, shorten or "improve" it. `script_lint.py` may be run for advice (never blocking) and its advice goes into the checkpoint as a one-line note at most.
 - `reel_name` = snake_case of the hook / title they give. `P init <reel_name> --script script.md [--topic "<one line>"]` (this marks the script stage done: "provided by the creator"; there is no research or script-writing stage any more). Work in `$STUDIO/reels/<reel_name>/` (move the session there with change_directory); the carousel lives in `reels/<reel_name>/carousel/`.
 - Check `reels/` + `style_log.md` for a repeat; if the script repeats a reel already made, say so at the checkpoint (no change to their words).
+- **Idea gate (28 Nov 2026, `template/IDEA_SCORECARD.md`):** score the script on the five criteria and record it: `P idea <reel> engine=… send=… frame0=… hook=… twist=… --engines <list>`. Pass = 7/10 with an engine. Below 7: the FIRST item of checkpoint 1 (or, in edit-only mode, a one-message question before the cut) is the score, the missing criteria and **3 hook rewrites as suggestions** — never edit their script. They rewrite, or says "film anyway" → re-run with `--override`. Also list the real-thing shot the reel needs (frame0) so they film it.
+- **Series:** `P series <reel>` (default: `series` in the config; `--name` for another show). The tag goes on every frame (auto) and is the cover kicker (auto).
+- Update the manifest at every stage: `P set <reel> <stage> running` → do it → `P set <reel> <stage> done` (or `failed --note "<error>"`). Record deliverables with `P file <reel> <key> <path>`. Skip any stage already `done` (idempotent resume).
 - Update the manifest at every stage: `P set <reel> <stage> running` → do it → `P set <reel> <stage> done` (or `failed --note "<error>"`). Record deliverables with `P file <reel> <key> <path>`. Skip any stage already `done` (idempotent resume).
 
 ## Half 1 — from the creator's script, no footage needed (no questions)
 1. **carousel + linkedin in parallel** (skip both on `reel only`):
    - **carousel** → helper agent (`model: "sonnet"`): "Follow $PLUGIN/skills/generate-carousel/SKILL.md steps 1–7 for <reel> (format chosen from `generate-carousel/formats.md` to fit the script) in <reel>/carousel/, using <reel>/script.md (the creator's own words — do not rewrite their claims). Pipeline mode: do NOT show a checkpoint and do NOT upload; stop after caption.md and report the QA result and the contact-sheet path." Then `P file <reel> carousel_dir <reel>/carousel`.
    - **linkedin** → helper agent (`model: "sonnet"`): "Follow $PLUGIN/skills/reel-script/SKILL.md section 6 for <reel>/script.md; write linkedin_post.md and render linkedin_image.png; report paths." Then `P file` for `linkedin_post` and `linkedin_image`.
-2. **checkpoint1** — one message: carousel contact sheet + cover, LinkedIn post text + image, any failed stage, and the ONE-line world/grade the auto-director would pick for this script (`autodirect.py world --script`). The creator replies "ok"/notes. On approval: `P approve <reel> checkpoint1`. (No shoot card is made: he films from his own script.)
+2. **checkpoint1** — one message: the idea score (and, if below 7, the 3 hook suggestions + the real-thing shot to film), carousel contact sheet + cover, LinkedIn post text + image, any failed stage, and the ONE-line world/grade the auto-director would pick for this script (`autodirect.py world --script`). The creator replies "ok"/notes. On approval: `P approve <reel> checkpoint1`. (No shoot card is made: he films from his own script.)
 3. **upload1**: `P upload <reel> half1`. `footage` stays `waiting`.
 4. Tell the creator: "Film <reel> (4K, HDR off), AirDrop the original from Photos, then say `footage ready`."
 Several scripts: up to 4 helpers in parallel (carousel/LinkedIn per script), one combined checkpoint 1.
@@ -91,6 +96,16 @@ Several reels with footage: run Half 2 one reel at a time (helpers parallel insi
 2. Filter: broad AI curiosity / career > dev-only (CHANNEL_RULES.md); skip anything already made (`reels/` folders, `style_log.md`) or older than 14 days; check each claim against a primary source.
 3. Write `research/trends/<YYYY-MM-DD>.md` (suggestions for the creator's OWN scripts — the pipeline never writes the script): **3 topic suggestions**, each with the trend + source links + date, the viewer's-problem framing, 3 hooks in proven shapes (WINNING_PATTERNS §1, §11, §16, §22, §27), the best format (reel-script table), series fit (Fact or Hype? / How does X work? / Day N), and the paired carousel format; plus a short "skipped and why" list.
 4. Reply with the 3 suggestions; the creator starts one with `make: <topic>`. Never start `make:` from trends by yourself, never schedule this.
+
+## Scan mode (`scan:` — only when asked)
+1. `python3 -I $STUDIO/template/scripts/outlier_scan.py` (handles in `outlier_channels.txt`; one yt-dlp call at a time under `nice`, no video download, ~5–10 min) → `research/outliers/<date>.md`.
+2. Read the top rows; drop paid promotions (sponsor / course / app promos). For each usable row write the engine (IDEA_SCORECARD) and a Hinglish angle for the creator's pillars into the same file under "Idea bank". Optionally download ≤ 5 to study (study mode, sequential, delete videos after).
+3. Reply with 5 ideas (engine + angle + the real thing to film). the creator writes the script; never start `make:` yourself.
+
+## Review mode (`review:` — weekly, only when asked)
+1. Make sure the week's 48 h stats are in (`P due` → `stats:` first if anything is due).
+2. `P review [--days N]` → `reports/review_<date>.md` (per-reel views, stayed %, sends / saves / follows per 1K, idea score, engines, verdict; median views by engine).
+3. Reply: the winner and why (engine + hook), the loser and why, the remake for Saturday (best idea, new hook), and whether overrides (`--override`) paid off. Feed the winning engine into the next `scan:`.
 
 ## Music + SFX libraries (never an interruption)
 - **Allowed sources (the creator, 14 Nov 2026):** YouTube Audio Library ("Attribution not required") and any other free-licence, no-attribution source (Mixkit is in; Pixabay-style sites qualify if their licence says no attribution and commercial use is fine — record the licence line). Never Instagram's in-app music (not licensed outside the app), never ripped tracks.

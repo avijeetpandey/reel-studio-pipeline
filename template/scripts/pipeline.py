@@ -16,6 +16,10 @@ Spec: $STUDIO/template/PIPELINE.md · Skill: $PLUGIN/skills/make-content/SKILL.m
   pipeline.py stats <reel> ig|yt --window 48h|7d [--json FILE] [key=value ...]   record numbers read from Insights / Studio
   pipeline.py channel ig|yt [--json FILE] [key=value ...]      record a channel-level snapshot (followers/subs, 7/28-day totals, …)
   pipeline.py due                                              which posted reels have 48 h / 7 d stats due (nothing runs on its own)
+  pipeline.py idea <reel> engine=2 send=1 frame0=2 hook=1 twist=1 [--engines stakes,conflict] [--override]
+                                                               idea gate (template/IDEA_SCORECARD.md): score the idea BEFORE filming; pass >= 7 of 10
+  pipeline.py series <reel> [--name "BACKEND STORIES"]         give the reel the next series number (the tag on every frame + cover)
+  pipeline.py review [--days 7]                                weekly review: every reel's 48 h scorecard ranked, engines that won → reports/review_<date>.md
 """
 import argparse, datetime, fcntl, glob, json, os, shutil, subprocess, sys, time
 
@@ -34,6 +38,13 @@ STATS_LOG = os.path.join(REELS, "stats_log.md")
 CHANNEL_LOG = os.path.join(REELS, "channel_log.json")
 # channel targets (CHANNEL_RULES.md): checked on the 48 h window
 TARGETS = {"yt": {"stayed_pct": 70, "avg_viewed_pct": 80}, "ig": {"shares_saves": 5}}
+# per-1,000-view rates (ecosystem study, 28 Nov 2026): sends carry non-follower reach, follows are the point
+RATE_TARGETS = {"shares": 4, "saves": 10, "follows": 4, "subs_gained": 4}
+# idea gate (template/IDEA_SCORECARD.md): each criterion 0-2
+IDEA_KEYS = ("engine", "send", "frame0", "hook", "twist")
+ENGINES = ("stakes", "conflict", "mirror", "wrong_thing", "insider", "receipts", "challenge")
+IDEA_PASS = 7
+SERIES_DEFAULT = (_CFG.get("series") or "EPISODE")   # the series tag on every frame + cover
 
 
 def now():
@@ -309,7 +320,54 @@ def verdict(platform, s):
         ss = (s.get("shares") or 0) + (s.get("saves") or 0) if any(isinstance(s.get(k), (int, float)) for k in ("shares", "saves")) else None
         bad = [f"shares+saves {ss} < 5"] if ss is not None and ss < TARGETS["ig"]["shares_saves"] else []
         miss = [] if ss is not None else ["shares/saves"]
+    views = s.get("views")
+    if isinstance(views, (int, float)) and views > 0:   # per-1K rates (sends / saves / follows)
+        for k, t in RATE_TARGETS.items():
+            if isinstance(s.get(k), (int, float)) and 1000 * s[k] / views < t:
+                bad.append(f"{k} {1000 * s[k] / views:.1f}/1K < {t}")
     return ("below target: " + "; ".join(bad)) if bad else ("target not checkable: " + ", ".join(miss)) if miss else "on target"
+
+
+def per_k(s, k):
+    v = s.get("views")
+    return round(1000 * s[k] / v, 1) if isinstance(s.get(k), (int, float)) and isinstance(v, (int, float)) and v > 0 else None
+
+
+def idea_score(scores):
+    """-> (total, passed). Every key in IDEA_KEYS must be 0, 1 or 2."""
+    for k in IDEA_KEYS:
+        if scores.get(k) not in (0, 1, 2):
+            sys.exit(f"idea: {k} must be 0, 1 or 2 (got {scores.get(k)!r}); keys: {' '.join(IDEA_KEYS)}")
+    total = sum(scores[k] for k in IDEA_KEYS)
+    return total, total >= IDEA_PASS and scores["engine"] > 0
+
+
+def cmd_idea(a):
+    m = load(a.reel)
+    s = kv(a.pairs)
+    total, ok = idea_score(s)
+    eng = [e.strip() for e in (a.engines or "").split(",") if e.strip()]
+    if any(e not in ENGINES for e in eng):
+        sys.exit(f"unknown engine; use: {', '.join(ENGINES)}")
+    m["idea"] = dict({k: s[k] for k in IDEA_KEYS}, total=total, passed=ok, engines=eng, override=bool(a.override and not ok), at=now())
+    save(a.reel, m)
+    msg = "PASS" if ok else ("FAIL — the creator chose to film anyway (override recorded)" if a.override else
+                             "FAIL — show the creator the score + 3 hook rewrites at checkpoint 1; they rewrite or say 'film anyway' (--override)")
+    print(f"{a.reel} idea {total}/10 engines={','.join(eng) or '-'}: {msg}")
+
+
+def cmd_series(a):
+    m = load(a.reel)
+    if m.get("series"):
+        print(m["series"]["tag"]); return
+    name = (a.name or SERIES_DEFAULT).upper()
+    n = 0
+    for mp in glob.glob(os.path.join(REELS, "*", "pipeline.json")):
+        x = (json.load(open(mp)).get("series") or {})
+        if x.get("name") == name:
+            n = max(n, x.get("no", 0))
+    m["series"] = dict(name=name, no=n + 1, tag=f"{name} · {n + 1:03d}")
+    save(a.reel, m); print(m["series"]["tag"])
 
 
 def cmd_stats(a):
@@ -364,6 +422,48 @@ def cmd_due(a):
         print(f"{r[0]:40} {r[1]:3} {r[2]:4} posted {r[4]} h ago  {r[3]}")
 
 
+def cmd_review(a):
+    """Sunday review: rank the last N days' reels by their 48 h numbers, show which idea engines won. Reads manifests only."""
+    t0 = datetime.datetime.now().astimezone()
+    rows = []
+    for mp in sorted(glob.glob(os.path.join(REELS, "*", "pipeline.json"))):
+        m = json.load(open(mp))
+        for pf, post in (m.get("posts") or {}).items():
+            try:
+                age_d = (t0 - datetime.datetime.fromisoformat(post["posted_at"])).days
+            except (KeyError, ValueError):
+                continue
+            s = ((m.get("stats") or {}).get(pf) or {}).get("48h")
+            if age_d <= a.days and s:
+                idea = m.get("idea") or {}
+                rows.append(dict(reel=m["reel_name"], pf=pf, views=s.get("views"), stayed=s.get("stayed_pct"),
+                                 shares_k=per_k(s, "shares"), saves_k=per_k(s, "saves"),
+                                 follows_k=per_k(s, "follows") if pf == "ig" else per_k(s, "subs_gained"),
+                                 idea=idea.get("total"), engines=",".join(idea.get("engines") or []) or "-", verdict=verdict(pf, s)))
+    out = [f"# Weekly review — {t0.date()} (last {a.days} days, 48 h numbers)", ""]
+    if not rows:
+        out.append("No posted reel with 48 h stats in this window — run `stats: all` first.")
+    for pf in ("ig", "yt"):
+        r = sorted([x for x in rows if x["pf"] == pf], key=lambda x: -(x["views"] or 0))
+        if not r:
+            continue
+        out += [f"## {pf.upper()}", "", "| reel | views | stayed % | sends/1K | saves/1K | follows/1K | idea /10 | engines | verdict |", "|---|---|---|---|---|---|---|---|---|"]
+        out += [f"| {x['reel']} | {x['views']} | {x['stayed'] if x['stayed'] is not None else ''} | {x['shares_k'] or ''} | {x['saves_k'] or ''} | {x['follows_k'] or ''} | {x['idea'] or ''} | {x['engines']} | {x['verdict']} |" for x in r]
+        eng = {}
+        for x in r:
+            for e in x["engines"].split(","):
+                if e != "-":
+                    eng.setdefault(e, []).append(x["views"] or 0)
+        if eng:
+            out += ["", "Median views by engine: " + " · ".join(f"{e} {sorted(v)[len(v) // 2]} (n={len(v)})" for e, v in sorted(eng.items(), key=lambda kv_: -sorted(kv_[1])[len(kv_[1]) // 2]))]
+        out.append("")
+    out += ["## Next week", "- Remake the best idea with a new hook (Saturday slot).", "- Drop the weakest pillar slot if it lost two weeks running.", "- Feed the winning engine into the idea bank (`scan:`)."]
+    d = os.path.join(ROOT, "reports"); os.makedirs(d, exist_ok=True)
+    f = os.path.join(d, f"review_{t0.date()}.md")
+    open(f, "w", encoding="utf-8").write("\n".join(out) + "\n")
+    print(f)
+
+
 ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 sub = ap.add_subparsers(dest="cmd", required=True)
 p = sub.add_parser("init"); p.add_argument("reel"); p.add_argument("--topic"); p.add_argument("--script"); p.add_argument("--playbook"); p.add_argument("--carousel"); p.set_defaults(fn=cmd_init)
@@ -380,6 +480,9 @@ p = sub.add_parser("posted"); p.add_argument("reel"); p.add_argument("--ig"); p.
 p = sub.add_parser("stats"); p.add_argument("reel"); p.add_argument("platform", choices=["ig", "yt"]); p.add_argument("--window", choices=["48h", "7d"], required=True); p.add_argument("--json"); p.add_argument("pairs", nargs="*"); p.set_defaults(fn=cmd_stats)
 p = sub.add_parser("channel"); p.add_argument("platform", choices=["ig", "yt"]); p.add_argument("--json"); p.add_argument("pairs", nargs="*"); p.set_defaults(fn=cmd_channel)
 p = sub.add_parser("due"); p.set_defaults(fn=cmd_due)
+p = sub.add_parser("idea"); p.add_argument("reel"); p.add_argument("pairs", nargs="*"); p.add_argument("--engines"); p.add_argument("--override", action="store_true"); p.set_defaults(fn=cmd_idea)
+p = sub.add_parser("series"); p.add_argument("reel"); p.add_argument("--name"); p.set_defaults(fn=cmd_series)
+p = sub.add_parser("review"); p.add_argument("--days", type=int, default=7); p.set_defaults(fn=cmd_review)
 a = ap.parse_args()
 if a.cmd == "locked":
     a.command = a.command[1:] if a.command[:1] == ["--"] else a.command

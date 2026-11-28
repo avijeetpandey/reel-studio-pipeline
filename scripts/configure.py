@@ -13,7 +13,7 @@ import argparse, json, os, shutil
 DEFAULTS = {
     "creator_name": "", "brand": "", "handle": "", "yt_handle": "", "role": "", "promise": "one useful idea every day",
     "accent": "#3ee0ff", "avatar": "", "confidential": "", "niche": "", "audience": "", "languages": "English",
-    "prefer": "broad curiosity and career topics", "avoid": "", "series": "", "length": "25–35 s of speech, hard cap 40 s",
+    "prefer": "broad curiosity and career topics", "avoid": "", "series": "", "length": "25–35 s of speech by default, up to 60 s when the story needs it",
     "cta": "one debatable yes/no question; never 'comment KEYWORD for a DM'", "timezone": "Asia/Kolkata",
     "slots": "Instagram 7–9 PM, YouTube 12–2 PM; one reel per day; never two on one platform within 12 h; never 11 PM–9 AM",
     "music_rule": "free-licence, no-attribution music only (YouTube Audio Library 'Attribution not required' or Mixkit; never Instagram's in-app music); the pipeline picks and downloads tracks without asking",

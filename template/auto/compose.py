@@ -17,6 +17,7 @@ Plan keys (all optional except end, words):
   cta {variant: follow|save|comment|subscribe, t0, y, promise, answer, handle} — a dict, or a list (comment card for the question, then a follow card: each card ends when the next starts), progress {color}, grain (opacity), accent, bg
 """
 import json, os, re, shutil, subprocess, sys
+from html import escape as html_escape
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 T = os.path.dirname(HERE)
@@ -217,7 +218,9 @@ def main():
         "{{WORDS}}": json.dumps(flat, ensure_ascii=False), "{{CAP}}": json.dumps(cap), "{{FX}}": json.dumps(plan.get("fx", [])),
         "{{CTA_CALL}}": cta_calls,
         "{{CTA_STYLE}}": cta_style,
-        "{{PROGRESS}}": f'<div id="g-progress"><div id="pg-bar"></div></div>' if plan.get("progress", True) else "",
+        "{{PROGRESS}}": (f'<div id="g-progress"><div id="pg-bar"></div></div>' if plan.get("progress", True) else "")
+                        # 28 Nov 2026: one series tag on every frame (same place, same type) so the grid reads as one show
+                        + (f'<div id="g-series">{html_escape(plan["series"])}</div>' if plan.get("series") else ""),
         "{{PROGRESS_JS}}": f'tl.fromTo("#pg-bar", {{ scaleX: 0 }}, {{ scaleX: 1, duration: {round(END - 0.1, 2)}, ease: "none", ...IM }}, 0);' if plan.get("progress", True) else "",
         "{{PREMIUM_CSS}}": pr_css, "{{PREMIUM_JS}}": pr_js, "{{PREMIUM_CALL}}": pr_call, "{{PREMIUM_BEHIND}}": pr_behind, "{{PREMIUM_FRONT}}": pr_front,
         "{{LEAK}}": '<div id="leak"></div>' if any(f.get("fn") == "leak" for f in plan.get("fx", [])) else '<div id="leak"></div>',
@@ -258,6 +261,7 @@ TEMPLATE = r"""<!doctype html>
       #grain { position: absolute; left: -60px; top: -60px; width: 1200px; height: 2100px; background: url(assets/img/grain.jpg) 0 0 / 1200px 2100px; mix-blend-mode: overlay; opacity: {{GRAIN}}; pointer-events: none; }
       #g-progress { position: absolute; left: 0; top: 0; width: 1080px; height: 8px; pointer-events: none; }
       #pg-bar { width: 100%; height: 8px; background: var(--accent); transform-origin: 0 50%; }
+      #g-series { position: absolute; left: 0; right: 0; top: 214px; text-align: center; font: 700 30px/1 "JetBrains Mono", Menlo, monospace; letter-spacing: .18em; color: #fff; -webkit-text-stroke: 6px rgba(14,16,24,.85); paint-order: stroke fill; pointer-events: none; }
 {{CTA_STYLE}}{{CTA_CSS}}
 {{GRAPHICS_CSS}}
 {{PREMIUM_CSS}}

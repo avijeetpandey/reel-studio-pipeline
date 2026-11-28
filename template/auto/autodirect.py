@@ -26,7 +26,7 @@ Decisions (rules come from the round-8 study of 63 reels, research/refs_<date>/R
              two-tier captions, script-driven frosted cards (search / checklist / nodes / slider / counter / load / DM-bubble CTA), zoomBlur + streak
              transitions with riser -> impact. Hand overrides: <reel>/work/beats.json (THEME=<id> forces a theme).
 """
-import argparse, json, math, os, random, re, subprocess, sys
+import argparse, glob, json, math, os, random, re, shutil, subprocess, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "premium"))
 import premium as PREM
 
@@ -70,6 +70,10 @@ def pick_world(text, last, forced=None):
     score = {k: sum(t.count(c) for c in sel[k + "_cues"]) for k in ("warm_cinema", "hype_hero")}
     score["clean_pop"] = sum(t.count(c) for c in sel["explainer_cues"]) + 1
     order = sorted(score, key=lambda k: -score[k])
+    # 28 Nov 2026: lock the frame, vary the inside. A grid that changes look every reel is not recognisable, so the world
+    # follows the script only; ROTATE_WORLDS=1 brings back "never the last two worlds".
+    if os.environ.get("ROTATE_WORLDS") != "1":
+        return order[0]
     for w in order:
         if w not in last[-2:] or w == order[-1]:
             return w
@@ -423,10 +427,23 @@ def grade_check(video, joins, end):
     return dict(luma=ly, face_luma=fy, u=u, v=v, notes=notes)
 
 
+def realthing_check(R):
+    """28 Nov 2026 (ecosystem study): winners show a REAL thing (screen, bill, app, second person, street, the dog), not only a face + generated type.
+    A real-thing shot = any still/clip in reels/<reel>/broll/ (stills feed the photo card; clips are cut in by hand). Returns notes (empty = ok)."""
+    fs = glob.glob(os.path.join(R, "broll", "*")) if R else []
+    if fs:
+        return []
+    return ["no real-thing shot (reels/<reel>/broll/ is empty): frame 0 is only face + generated type. Add one phone clip/still of the stake "
+            "(the app showing the bug, the bill, a screen, a second person) - IDEA_SCORECARD.md frame0"]
+
+
 def retention_checks(sents, words, end):
     n = []
-    if end > 33:
-        n.append(f"length {end:.0f} s > 33 s: YouTube average view is ~18 s (28 Oct-18 Nov data); tighten, or land the payoff before 15 s")
+    # 28 Nov 2026: the lane's median is ~60 s and outliers run 30-79 s; length is fine while the story holds. Flag only past 60 s.
+    if end > 60:
+        n.append(f"length {end:.0f} s > 60 s: past the lane's median; cut a beat unless every line moves the story")
+    elif end > 35 and sents and sents[0]["t1"] > 3.0:
+        n.append(f"length {end:.0f} s with a slow hook: a 35-60 s reel needs the stake inside the first 3 s to earn the length")
     if sents and sents[0]["t1"] > 4.0:
         n.append(f"the hook sentence runs {sents[0]['t1']:.1f} s; the claim has to land in the first 3 s")
     if words and words[0][1] > 0.15:
@@ -662,12 +679,17 @@ def main():
         chips = [c for c in chips if not any(a < c["t1"] and c["t0"] < b for a, b in busy)]
         # captions keep the approved pop style in the reel's accent; they step aside while a word is behind the head (the word IS the caption then)
         caption = dict(W["caption"], style="pop" if W["caption"]["style"] == "hero" else W["caption"]["style"], accent=prem["theme_vars"]["accent"], skip=[[b["t0"], b["t1"]] for b in prem["behind"]]) if not prem.get("tier") else dict(W["caption"], style="tier")
-    checks = dict(grade=grade_check(video, joins, end), retention=retention_checks(sents, words, end))
+    checks = dict(grade=grade_check(video, joins, end), retention=retention_checks(sents, words, end) + realthing_check(R))
+    try:   # series tag on every frame (pipeline.py series <reel>); SERIES_TAG overrides, SERIES_TAG=off removes it
+        series = os.environ.get("SERIES_TAG") or (json.load(open(os.path.join(R, "pipeline.json"))).get("series") or {}).get("tag")
+    except (OSError, ValueError):
+        series = os.environ.get("SERIES_TAG")
+    series = None if (series or "").lower() == "off" else series
     v4_note = None
     plan = dict(reel=name, end=end, world=wid, layout=geo, grade=W["grade"], accent=(prem["theme_vars"]["accent"] if prem else W["accent"]), seed=seed,
                 words=islands if isinstance(islands[0][0], list) else [islands], premium=prem,
                 caption=caption, fx=[dict(fn=f[0], a=f[1]) for f in sorted(fx_ops, key=lambda x: x[2])], sfx=sorted(sfx, key=lambda s: s["t"]),
-                music=dict(file="assets/audio/bgm.mp3", vol=0.38, fade=0.28, meta=mus) if mus else None, cta=cta, progress=True, grain=0.1, headline=headline, chips=chips, checks=checks,
+                music=dict(file="assets/audio/bgm.mp3", vol=0.38, fade=0.28, meta=mus) if mus else None, cta=cta, progress=True, grain=0.1, headline=headline, chips=chips, checks=checks, series=series,
                 transitions=trans, punches=[dict(t=round(p[0], 2), kind=p[2], score=p[1]) for p in puncts], joins=joins, sentences=[dict(t0=s["t0"], t1=s["t1"], text=s["text"], q=s["q"]) for s in sents])
     if prem and os.environ.get("KINETIC_V", "4") == "4":   # Round 17 default: transitions at every idea change + earshot kit placed by peak
         import v4_finish
