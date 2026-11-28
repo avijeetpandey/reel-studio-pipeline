@@ -285,3 +285,13 @@ Script is the creator's (never written by the pipeline) → `autodirect.py` deci
 ## 41. What the numbers cannot promise
 - The study reels' likes come with comments of 1–3× the likes (comment-keyword giveaways): they do not prove the look drives views. the creator's 1.4–1.6K reels match the audit's steady state; breakouts came from debate topics + a share CTA.
   Expect a retention lift from the new look; test it with Instagram Trial Reels (old look vs new look, same script).
+
+## 42. The idea beats the edit (outlier study, 28 Nov 2026)
+- About 2,600 Shorts from 43 tech creators (India + global), each ranked against its channel median; 25 outliers transcribed and read frame by frame; 80 Instagram lifestyle reels.
+- Pure "X explained" is the weakest family even for ByteByteGo / Gaurav Sen. Outliers carry an **engine**: stakes · conflict · mirror · wrong thing · insider · receipts · challenge (`IDEA_SCORECARD.md`, gated by `pipeline.py idea`).
+- Frame 0 of the outliers is a real thing (0.1 + 0.2 on screen, a TV of logs, a street, two people, a face + a charged word), never a generated scene. `autodirect.py` now flags a reel with no real-thing shot in `broll/`.
+- Our motion density is already above the winners': do not add effects; add real footage.
+- Lock the frame: series tag on every frame + cover kicker (`pipeline.py series`), world from the script only (no rotation).
+- Length: the lane's median is ~60 s; 35–60 s is fine when the story holds (`retention_checks` flags > 60 s, or > 35 s with a slow hook).
+- Lifestyle (dog, rides, day in the life) works only inside a shared feeling (a dog judging a WFH meeting: 935K likes); a plain diary got tens to hundreds of likes.
+- Loop: `scan:` (weekly outliers → idea bank) → idea gate → shoot two setups → 48 h scorecard with sends / saves / follows per 1K → `review:` on Sunday.

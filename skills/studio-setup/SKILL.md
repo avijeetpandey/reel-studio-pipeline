@@ -28,7 +28,7 @@ Goal: after this, `make: <topic>` works for this person exactly like it does for
 11. Series names you want to run (e.g. "Fact or Hype?", "AI Decoded") — `series`
 
 **Channel rules (defaults in brackets — these came from the author's analytics, keep or change)**
-12. Reel length [25–35 s speech, hard cap 40 s] — `length`
+12. Reel length [25–35 s speech by default, up to 60 s for a story] — `length`
 13. CTA style [one debatable yes/no question; no "comment KEYWORD for DM"] — `cta`
 14. Timezone [Asia/Kolkata] and posting slots [Instagram 7–9 PM, YouTube 12–2 PM, one per day, never two within 12 h, never 11 PM–9 AM] — `timezone`, `slots`
 15. Music rule [YouTube Audio Library "Attribution not required" only; the pipeline downloads tracks without asking] — `music_rule`

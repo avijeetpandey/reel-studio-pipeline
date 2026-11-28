@@ -34,7 +34,7 @@ def window(st):
 
 def length_band(s):
     s = num(s)
-    return None if s is None else "< 25 s" if s < 25 else "25–35 s" if s <= 35 else "36–45 s" if s <= 45 else "> 45 s"
+    return None if s is None else "< 25 s" if s < 25 else "25–35 s" if s <= 35 else "36–60 s" if s <= 60 else "> 60 s"
 
 
 def load_reels(reels_dir, month):
